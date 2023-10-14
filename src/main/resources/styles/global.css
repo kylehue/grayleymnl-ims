@@ -1,0 +1,56 @@
+@font-face {
+    font-family: Roboto;
+    src: url("../fonts/Roboto-Regular.ttf");
+}
+
+@font-face {
+    font-family: Roboto-Lt;
+    src: url("../fonts/Roboto-Medium.ttf");
+}
+
+@font-face {
+    font-family: Roboto-Bold;
+    src: url("../fonts/Roboto-Bold.ttf");
+}
+
+.root {
+    /* Setup */
+    -fx-font-family: Roboto, "Segoe UI";
+    -fx-font-size: 14px;
+
+    /* Variables */
+    -accent: #ff7272;
+    -text-color: black;
+    -button-text-color: white;
+}
+
+/* Use this class to an element if you want it to have a background */
+.background {
+    -fx-background-image: url("../images/bg.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+}
+
+.mfx-button, .mfx-text-field, .mfx-password-field {
+    -fx-pref-height: 50px;
+    -fx-min-height: 50px;
+    -fx-max-height: 50px;
+    -mfx-main: -accent;
+}
+
+.mfx-text-field, .mfx-password-field {
+    -fx-cursor: text;
+}
+
+.mfx-button,
+.mfx-button:armed,
+.mfx-button:focused {
+    -fx-cursor: hand;
+    -fx-text-fill: -button-text-color;
+    -fx-background-color: -accent;
+
+    -fx-font-family: Roboto, "Segoe UI";
+    -fx-font-size: 0.9em;
+    -fx-font-weight: bold;
+}
