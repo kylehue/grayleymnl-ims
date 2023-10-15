@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ims.MainController">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ims.controller.LoginController">
     <columnConstraints>
         <ColumnConstraints />
         <ColumnConstraints />
@@ -49,8 +49,8 @@
                   <Label styleClass="h4" text="Let's dive in!" />
                   <MFXTextField floatingText="Username" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1" />
                   <MFXPasswordField floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.rowIndex="2" />
-                  <MFXButton maxWidth="1.7976931348623157E308" text="LOGIN" GridPane.rowIndex="3" />
-                  <MFXButton maxWidth="1.7976931348623157E308" styleClass="link-button" text="Forgot your password?" GridPane.rowIndex="4" />
+                  <MFXButton fx:id="loginButton" maxWidth="1.7976931348623157E308" text="LOGIN" GridPane.rowIndex="3" />
+                  <MFXButton styleClass="link-button" text="Forgot your password?" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
                </children>
             </GridPane>
          </children>
@@ -71,7 +71,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <ImageView fx:id="vectorImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="vectorImage" fitHeight="188.0" fitWidth="266.0" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="@../../images/girl-with-dog.png" />
                             </image>

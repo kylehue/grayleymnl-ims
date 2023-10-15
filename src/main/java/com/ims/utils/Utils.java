@@ -1,4 +1,4 @@
-package com.ims;
+package com.ims.utils;
 
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
