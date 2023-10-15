@@ -60,3 +60,11 @@
     -fx-font-size: 1.3em;
     -fx-margin: 0 0 5 0;
 }
+
+.text-accent {
+    -fx-text-fill: -accent;
+}
+
+.text-bold {
+    -fx-font-weight: bold;
+}

@@ -67,3 +67,27 @@
 .link-button .mfx-ripple-generator {
     -mfx-ripple-color: #D9E9FF;
 }
+
+.tab-button, .tab-button:armed, .tab-button:focused {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 0;
+    -fx-text-fill: -text-color-fade;
+    -fx-font-weight: bold;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+.tab-button:hover {
+    -fx-background-color: rgb(116, 170, 255, 0.1);
+}
+
+.tab-button .mfx-ripple-generator {
+    -mfx-ripple-color: -accent;
+}
+
+.tab-button-active {
+    -fx-text-fill: -accent!important;
+    -fx-border-width: 0 0 1.5 0!important;
+    -fx-border-color: -accent!important;
+}

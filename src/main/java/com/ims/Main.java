@@ -12,10 +12,10 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, URISyntaxException {
         SceneManager.setStage(stage);
-        SceneManager.setSize(940, 540);
         SceneManager.registerScene("login", "login-view.fxml");
         SceneManager.registerScene("base", "base-view.fxml");
         SceneManager.setScene("login");
+        SceneManager.setSize(940, 640);
 
         stage.setTitle("GrayleyMNL Inventory Manager");
         stage.show();

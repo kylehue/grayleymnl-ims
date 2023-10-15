@@ -13,7 +13,7 @@ public class SceneManager {
 
     private static HashMap<String, Scene> registeredScenes = new HashMap();
 
-    private static double[] size = {940, 480};
+    private static double[] size = {940, 640};
 
     /**
      * Set the stage where scenes will be added.
@@ -72,5 +72,7 @@ public class SceneManager {
     public static void setSize(double width, double height) {
         SceneManager.size[0] = width;
         SceneManager.size[1] = height;
+        SceneManager.stage.setWidth(width);
+        SceneManager.stage.setHeight(height);
     }
 }
