@@ -1,3 +1,7 @@
+@import "./variables.css";
+@import "./mfx/textfield.css";
+@import "./mfx/button.css";
+
 @font-face {
     font-family: Roboto;
     src: url("../fonts/Roboto-Regular.ttf");
@@ -17,11 +21,11 @@
     /* Setup */
     -fx-font-family: Roboto, "Segoe UI";
     -fx-font-size: 14px;
+}
 
-    /* Variables */
-    -accent: #ff7272;
-    -text-color: black;
-    -button-text-color: white;
+* {
+    -fx-text-fill: -text-color;
+    -fx-font-smoothing-type: gray;
 }
 
 /* Use this class to an element if you want it to have a background */
@@ -32,25 +36,27 @@
     -fx-background-position: center center;
 }
 
-.mfx-button, .mfx-text-field, .mfx-password-field {
-    -fx-pref-height: 50px;
-    -fx-min-height: 50px;
-    -fx-max-height: 50px;
-    -mfx-main: -accent;
+.h1 {
+    -fx-font-size: 2.5em;
+    -fx-margin: 0 0 5 0;
 }
 
-.mfx-text-field, .mfx-password-field {
-    -fx-cursor: text;
+.h2 {
+    -fx-font-size: 2.2em;
+    -fx-margin: 0 0 5 0;
 }
 
-.mfx-button,
-.mfx-button:armed,
-.mfx-button:focused {
-    -fx-cursor: hand;
-    -fx-text-fill: -button-text-color;
-    -fx-background-color: -accent;
+.h3 {
+    -fx-font-size: 1.9em;
+    -fx-margin: 0 0 5 0;
+}
 
-    -fx-font-family: Roboto, "Segoe UI";
-    -fx-font-size: 0.9em;
-    -fx-font-weight: bold;
+.h4 {
+    -fx-font-size: 1.6em;
+    -fx-margin: 0 0 5 0;
+}
+
+.h5 {
+    -fx-font-size: 1.3em;
+    -fx-margin: 0 0 5 0;
 }

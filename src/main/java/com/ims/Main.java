@@ -23,10 +23,6 @@ public class Main extends Application {
         stage.show();
         stage.setMinWidth(480);
         stage.setMinHeight(320);
-
-        MFXThemeManager.addOn(scene, Themes.DEFAULT);
-
-        scene.getStylesheets().add(getClass().getResource("/styles/global.css").toExternalForm());
     }
 
     public static void main(String[] args) {

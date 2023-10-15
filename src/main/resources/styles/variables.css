@@ -1,0 +1,14 @@
+* {
+    /* colors */
+    -accent: #3e7bed;
+    -text-color: #464648;
+    -button-text-color: #f3f4f6;
+    -button-hovered-color: #4b86f4;
+    -text-field-background-color: #e9ebef;
+    -text-field-disabled-text-color: rgba(125, 120, 120, 0.25);
+    -text-field-prompt-color: rgba(125, 120, 120, 0.5);
+    -text-field-label-color: rgba(125, 120, 120, 0.75);
+
+    /* sizes */
+    -field-height: 50px;
+}

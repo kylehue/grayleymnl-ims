@@ -1,0 +1,69 @@
+@import "../variables.css";
+
+.mfx-button:armed,
+.mfx-button:hover,
+.mfx-button:focused,
+.mfx-button {
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0px;
+    -fx-pref-height: -field-height;
+}
+
+.mfx-button .mfx-ripple-generator {
+    -mfx-ripple-opacity: 0.5;
+    -mfx-ripple-color: white;
+}
+
+.mfx-button,
+.mfx-button:armed,
+.mfx-button:focused {
+    -fx-font-family: Roboto-Bold;
+    -fx-background-color: -accent;
+    -fx-text-fill: -button-text-color;
+    -fx-cursor: hand;
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+}
+
+/*.mfx-button:armed,
+.mfx-button:focused {
+    -fx-border-color: #badbff;
+    -fx-border-width: 2px;
+    -fx-border-radius: 3px;
+}*/
+
+.mfx-button:hover {
+    -fx-background-color: -button-hovered-color;
+}
+
+.outline-button {
+    -fx-background-color: transparent;
+    -fx-border-color: -accent;
+    -fx-border-radius: 3;
+    -fx-text-fill: -accent;
+    -fx-pref-height: -field-height;
+}
+
+.outline-button:hover,
+.outline-button:focused {
+    -fx-background-color: -accent;
+    -fx-text-fill: white;
+}
+
+.link-button {
+    -fx-background-color: transparent!important;
+    -fx-border-radius: 3;
+    -fx-text-fill: -accent;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+.link-button:armed,
+.link-button:focused {
+    -fx-border-color: -accent;
+    -fx-text-fill: -accent;
+}
+
+.link-button .mfx-ripple-generator {
+    -mfx-ripple-color: #D9E9FF;
+}
