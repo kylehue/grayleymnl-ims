@@ -9,6 +9,8 @@
     -text-field-disabled-text-color: rgba(125, 120, 120, 0.25);
     -text-field-prompt-color: rgba(125, 120, 120, 0.5);
     -text-field-label-color: rgba(125, 120, 120, 0.75);
+    -card-background-color: white;
+    -card-border-color: white;
 
     /* sizes */
     -field-height: 50px;

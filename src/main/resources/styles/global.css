@@ -1,6 +1,7 @@
 @import "./variables.css";
 @import "./mfx/textfield.css";
 @import "./mfx/button.css";
+@import "./mfx/scrollpane.css";
 
 @font-face {
     font-family: Roboto;
@@ -67,4 +68,13 @@
 
 .text-bold {
     -fx-font-weight: bold;
+}
+
+.card {
+    -fx-background-color: -card-background-color;
+    -fx-background-radius: 3px;
+    -fx-border-color: -card-border-color;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 4, 0, 3, 4);
 }
