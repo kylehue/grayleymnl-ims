@@ -1,17 +1,25 @@
 package com.ims.controller;
 
+import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.fxml.FXML;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static com.ims.utils.Utils.createSmartFlowPane;
-import static com.ims.utils.Utils.createTabGroup;
+import com.ims.utils.Utils;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class BaseController {
+    @FXML
+    private GridPane rootContainer;
+    
     @FXML
     private MFXButton tabDashboardButton;
     
@@ -20,6 +28,9 @@ public class BaseController {
     
     @FXML
     private MFXButton tabCategoriesButton;
+    
+    @FXML
+    private MFXButton settingsButton;
     
     @FXML
     private GridPane tabDashboardPane;
@@ -34,8 +45,13 @@ public class BaseController {
     private FlowPane analyticsFlowPane;
     
     @FXML
-    public void initialize() {
-        createTabGroup(
+    public void initialize()
+        throws URISyntaxException, ParserConfigurationException, IOException, SAXException {
+        Utils.addIconToButton(tabDashboardButton, "/icons/home.svg");
+        Utils.addIconToButton(tabProductsButton, "/icons/paw.svg");
+        Utils.addIconToButton(tabCategoriesButton, "/icons/shape.svg");
+        
+        Utils.createTabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabDashboardButton, tabDashboardPane),
@@ -44,6 +60,11 @@ public class BaseController {
             )
         );
         
-        createSmartFlowPane(analyticsFlowPane, 240, 3, 2);
+        Utils.createResponsiveFlowPane(analyticsFlowPane, 350, 2.05);
+    }
+    
+    @FXML
+    public void goBack() {
+        SceneManager.setScene("login");
     }
 }
