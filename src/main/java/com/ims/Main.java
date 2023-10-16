@@ -16,18 +16,18 @@ public class Main extends Application {
         SceneManager.registerScene("base", "base-view.fxml");
         SceneManager.setScene("login");
         SceneManager.setSize(940, 640);
-
+        
         stage.setTitle("GrayleyMNL Inventory Manager");
         stage.show();
         stage.setMinWidth(480);
         stage.setMinHeight(320);
         stage.getIcons().add(
-                new Image(Main.class.getResource(
-                        "/images/icon.png"
-                ).toURI().toString())
+            new Image(Main.class.getResource(
+                "/images/icon.png"
+            ).toURI().toString())
         );
     }
-
+    
     public static void main(String[] args) {
         launch();
     }

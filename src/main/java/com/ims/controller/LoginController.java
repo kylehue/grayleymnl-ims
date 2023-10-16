@@ -11,17 +11,17 @@ import javafx.scene.input.MouseEvent;
 public class LoginController {
     @FXML
     private Label welcomeText;
-
+    
     @FXML
     private ImageView vectorImage;
-
+    
     @FXML
     private MFXButton loginButton;
-
+    
     @FXML
     public void initialize() {
         Utils.fitImageViewToParent(vectorImage);
-
+        
         loginButton.setOnMouseClicked((MouseEvent event) -> {
             SceneManager.setScene("base");
         });

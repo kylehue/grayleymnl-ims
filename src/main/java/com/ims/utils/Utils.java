@@ -27,7 +27,7 @@ public class Utils {
         node.fitWidthProperty().bind(((Region) parent).widthProperty());
         node.fitHeightProperty().bind(((Region) parent).heightProperty());
     }
-
+    
     /**
      * Make a particular tab active, making the rest inactive.
      *
@@ -36,32 +36,30 @@ public class Utils {
      * @param activeClass The class to use in an active button.
      */
     private static void makeTabActive(
-            Pair<MFXButton, Pane> tab,
-            List<Pair<MFXButton, Pane>> tabs,
-            String activeClass
+        Pair<MFXButton, Pane> tab,
+        List<Pair<MFXButton, Pane>> tabs,
+        String activeClass
     ) {
-        MFXButton tabButton = (MFXButton) tab.getKey();
-        Pane tabPane = (Pane) tab.getValue();
-
+        MFXButton tabButton = tab.getKey();
+        Pane tabPane = tab.getValue();
+        
         ObservableList<String> styleClass = tabButton.getStyleClass();
-
-        // Make this tab button active
         if (!styleClass.contains(activeClass)) {
             styleClass.add(activeClass);
         }
-
+        
         tabPane.setVisible(true);
-
-        // Make the other tabs inactive
+        
+        // Make other tabs inactive
         for (Pair<MFXButton, Pane> otherTab : tabs) {
             if (otherTab == tab) continue;
-            MFXButton otherTabButton = (MFXButton) otherTab.getKey();
-            Pane otherTabPane = (Pane) otherTab.getValue();
+            MFXButton otherTabButton = otherTab.getKey();
+            Pane otherTabPane = otherTab.getValue();
             otherTabButton.getStyleClass().remove(activeClass);
             otherTabPane.setVisible(false);
         }
     }
-
+    
     /**
      * Create a tab group from a list of pairs of buttons and panes.
      * The first pair in the list will be the main tab.
@@ -70,39 +68,36 @@ public class Utils {
      * @param tabs        A list containing pairs of buttons and panes.
      */
     public static void createTabGroup(
-            String activeClass,
-            List<Pair<MFXButton, Pane>> tabs
+        String activeClass,
+        List<Pair<MFXButton, Pane>> tabs
     ) {
         boolean hasActiveTab = false;
-
+        
         for (Pair<MFXButton, Pane> tab : tabs) {
-            MFXButton tabButton = (MFXButton) tab.getKey();
-            Pane tabPane = (Pane) tab.getValue();
-
+            MFXButton tabButton = tab.getKey();
+            Pane tabPane = tab.getValue();
+            
             // All tab panes should start invisible
             tabPane.setVisible(false);
-
-            // Then here, if a tab's button is active, we make its tab pane visible
+            
             boolean isActiveTabButton = tabButton.getStyleClass().contains(activeClass);
             if (isActiveTabButton) {
-                System.out.println(1);
                 makeTabActive(tab, tabs, activeClass);
             }
-
-            // Switch active tab on tab button click
+            
             tabButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 makeTabActive(tab, tabs, activeClass);
             });
-
+            
             if (!hasActiveTab) hasActiveTab = isActiveTabButton;
         }
-
-        // Make the first tab active if no tabs are active
+        
         if (!hasActiveTab) {
-            makeTabActive(tabs.get(0), tabs, activeClass);
+            Pair firstTab = tabs.get(0);
+            makeTabActive(firstTab, tabs, activeClass);
         }
     }
-
+    
     /**
      * Create a smart FlowPane that is aware of the size of its children.
      *
@@ -112,15 +107,15 @@ public class Utils {
      * @apiNote The children of the `FlowPane` must be an instance of the `Pane` class.
      */
     public static void createSmartFlowPane(
-            FlowPane pane,
-            double childMinWidth,
-            int maxChildrenInRow,
-            double childrenAspectRatio
+        FlowPane pane,
+        double childMinWidth,
+        int maxChildrenInRow,
+        double childrenAspectRatio
     ) {
         if (maxChildrenInRow <= 0) {
             throw new Error("The max number of children must be higher than 0.");
         }
-
+        
         ObservableList<Node> children = pane.getChildren();
         pane.widthProperty().addListener((obs, oldValue, newValue) -> {
             double paneWidth = newValue.doubleValue();
@@ -140,38 +135,50 @@ public class Utils {
               Then we can simply floor that and subtract it to the max children.
              */
             int computedMaxChildrenInRow = (int) (
-                    maxChildrenInRow - Math.floor(childMinWidth / childWidth)
+                maxChildrenInRow - Math.floor(childMinWidth / childWidth)
             );
-
-            // Compute the needed width for a child
+            
             double computedChildWidth = paneWidth / computedMaxChildrenInRow;
-
+            
             int excessChildrenCount = children.size() % computedMaxChildrenInRow;
             int emptyChildrenCount = computedMaxChildrenInRow - excessChildrenCount;
-
+            
             for (int i = 0; i < children.size(); i++) {
                 Pane child = (Pane) children.get(i);
-
+                
                 // Get the margins/paddings size for offset
                 Insets margin = FlowPane.getMargin(child);
                 Insets padding = child.getPadding();
                 Insets insets = child.getInsets();
                 double marginsOffset = stream(new double[]{
-                        margin.getRight(),
-                        margin.getLeft(),
-                        padding.getRight(),
-                        padding.getLeft(),
-                        insets.getRight(),
-                        insets.getLeft()
+                    margin.getRight(),
+                    margin.getLeft(),
+                    padding.getRight(),
+                    padding.getLeft(),
+                    insets.getRight(),
+                    insets.getLeft()
                 }).sum();
-
-                double finalWidth = computedChildWidth - marginsOffset;
-
+                
+                
+                double widthMultiplier = 1.0;
+                double arbitraryOffset = 5;
+                
                 // The last children should fill the remaining space if there's any
-                if (excessChildrenCount != 0 && i > children.size() - 1 - excessChildrenCount) {
-                    finalWidth = computedChildWidth * ((double) emptyChildrenCount / (double) excessChildrenCount + 1) - marginsOffset;
+                int startIndexOfExcessChildren = children.size() - 1 - excessChildrenCount;
+                boolean hasExcessChildren = excessChildrenCount != 0;
+                boolean currentChildIsAnExcess = i > startIndexOfExcessChildren;
+                if (hasExcessChildren && currentChildIsAnExcess) {
+                    widthMultiplier +=
+                        (double) emptyChildrenCount / (double) excessChildrenCount;
+                    
+                    // we also need to adjust the margin sum offset of the children
+                    // honestly I have no clue how math worked here
+                    arbitraryOffset += marginsOffset * (widthMultiplier - 1) / 2;
                 }
-
+                
+                double finalWidth =
+                    computedChildWidth * widthMultiplier - marginsOffset - arbitraryOffset;
+                
                 child.setPrefWidth(finalWidth);
                 child.setMaxWidth(finalWidth);
                 child.setPrefHeight(finalWidth / childrenAspectRatio);
