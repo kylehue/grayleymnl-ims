@@ -218,7 +218,7 @@ public class Utils {
         Pane icon = new Pane();
         icon.setStyle("-fx-shape: \"" + path + "\";");
         
-        double size = 18;
+        double size = 16;
         icon.setPrefWidth(size);
         icon.setMaxWidth(size);
         icon.setPrefHeight(size);

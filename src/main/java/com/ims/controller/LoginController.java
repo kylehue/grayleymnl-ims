@@ -1,9 +1,11 @@
 package com.ims.controller;
 
+import com.ims.canvas.network.Network;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -24,13 +26,21 @@ public class LoginController {
     private MFXButton loginButton;
     
     @FXML
+    private Canvas networkCanvas;
+    
+    @FXML
     public void initialize()
         throws URISyntaxException, ParserConfigurationException, IOException, SAXException {
         Utils.fitImageViewToParent(vectorImage);
-        Utils.addIconToButton(loginButton, "/icons/login.svg");
+//        Utils.addIconToButton(loginButton, "/icons/login.svg");
         
+        // TODO: Make a separate function in the class for this
         loginButton.setOnMouseClicked((MouseEvent event) -> {
             SceneManager.setScene("base");
         });
+        
+        Network networkAnimation = new Network(networkCanvas);
+        
+        
     }
 }

@@ -4,9 +4,11 @@
 .mfx-button:hover,
 .mfx-button:focused,
 .mfx-button {
+    -fx-border-radius: 3px;
     -fx-background-radius: 3px;
     -fx-background-insets: 0px;
     -fx-pref-height: -field-height;
+    -fx-padding: 0 20px 0 20px;
 }
 
 .mfx-button .mfx-ripple-generator {
@@ -40,36 +42,40 @@
     -fx-background-color: -button-hovered-color;
 }
 
-.outline-button {
+.outline-button,
+.outline-button:hover,
+.outline-button:focused{
+    -fx-font-family: "Roboto Medium";
     -fx-background-color: transparent;
-    -fx-border-color: -accent;
-    -fx-border-radius: 3;
-    -fx-text-fill: -accent;
-    -fx-pref-height: -field-height;
+    -fx-text-fill: -accent!important;
+    -fx-border-color: -accent!important;
 }
 
 .outline-button:hover,
 .outline-button:focused {
-    -fx-background-color: -accent;
-    -fx-text-fill: white;
+    -fx-background-color: -accent-glass;
 }
 
-.link-button {
+.link-button,
+.link-button:armed,
+.link-button:focused {
+    -fx-font-family: "Roboto Medium";
     -fx-background-color: transparent!important;
-    -fx-border-radius: 3;
     -fx-text-fill: -accent;
-    -fx-underline: true;
     -fx-cursor: hand;
+    -fx-padding: 5!important;
+    -fx-pref-height: 30!important;
+    -fx-border-width: 0;
 }
 
 .link-button:armed,
 .link-button:focused {
-    -fx-border-color: -accent;
+    -fx-underline: true;
     -fx-text-fill: -accent;
 }
 
-.link-button .mfx-ripple-generator {
-    -mfx-ripple-color: #D9E9FF;
+.link-button .mfx-ripple-generator, .outline-button .mfx-ripple-generator {
+    -mfx-ripple-color: -accent!important;
 }
 
 .tab-button, .tab-button:armed, .tab-button:focused {

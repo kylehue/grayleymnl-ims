@@ -1,11 +1,12 @@
 * {
     /* colors */
     -accent: #3e7bed;
+    -accent-glass: rgba(62, 123, 237, 0.1);
     -text-color: #4d4d51;
     -text-color-fade: #6e6e71;
     -button-text-color: #f3f4f6;
     -button-hovered-color: #4b86f4;
-    -text-field-background-color: #e9ebef;
+    -text-field-background-color: #f5f6f8;
     -text-field-disabled-text-color: rgba(125, 120, 120, 0.25);
     -text-field-prompt-color: rgba(125, 120, 120, 0.5);
     -text-field-label-color: rgba(125, 120, 120, 0.75);
