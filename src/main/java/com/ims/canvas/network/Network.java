@@ -55,8 +55,14 @@ public class Network extends FixedTimestepAnimationTimer {
         final double CANVAS_WIDTH = this.canvas.getWidth();
         final double CANVAS_HEIGHT = this.canvas.getHeight();
         
-        node.position.randomizeX(0, CANVAS_WIDTH);
-        node.position.randomizeY(0, CANVAS_HEIGHT);
+        node.position.randomizeX(
+            -Config.CONNECTION_LENGTH,
+            CANVAS_WIDTH + Config.CONNECTION_LENGTH
+        );
+        node.position.randomizeY(
+            -Config.CONNECTION_LENGTH,
+            CANVAS_HEIGHT + Config.CONNECTION_LENGTH
+        );
         
         this.nodes.add(node);
     }
@@ -65,25 +71,31 @@ public class Network extends FixedTimestepAnimationTimer {
         final double CANVAS_WIDTH = this.canvas.getWidth();
         final double CANVAS_HEIGHT = this.canvas.getHeight();
         
-        node.position.randomizeX(0, CANVAS_WIDTH);
-        node.position.randomizeY(0, CANVAS_HEIGHT);
+        node.position.randomizeX(
+            -Config.CONNECTION_LENGTH,
+            CANVAS_WIDTH + Config.CONNECTION_LENGTH
+        );
+        node.position.randomizeY(
+            -Config.CONNECTION_LENGTH,
+            CANVAS_HEIGHT + Config.CONNECTION_LENGTH
+        );
         
-        for (int i = 0; i < this.nodes.size(); i++) {
-            Node otherNode = this.nodes.get(i);
-            if (node == otherNode) continue;
-            double distance = Utils.getDistance(
-                node.position.getX(),
-                node.position.getY(),
-                otherNode.position.getX(),
-                otherNode.position.getY()
-            );
-            
-            if (distance <= Config.CONNECTION_LENGTH / 3) {
-                node.position.randomizeX(0, CANVAS_WIDTH);
-                node.position.randomizeY(0, CANVAS_HEIGHT);
-                i = 0;
-            }
-        }
+//        for (int i = 0; i < this.nodes.size(); i++) {
+//            Node otherNode = this.nodes.get(i);
+//            if (node == otherNode) continue;
+//            double distance = Utils.getDistance(
+//                node.position.getX(),
+//                node.position.getY(),
+//                otherNode.position.getX(),
+//                otherNode.position.getY()
+//            );
+//
+//            if (distance <= Config.CONNECTION_LENGTH / 2) {
+//                node.position.randomizeX(0, CANVAS_WIDTH);
+//                node.position.randomizeY(0, CANVAS_HEIGHT);
+//                i = 0;
+//            }
+//        }
         
         node.reset();
     }
@@ -124,10 +136,10 @@ public class Network extends FixedTimestepAnimationTimer {
         double nodeRadius = node.getRadius();
         
         final boolean IS_OUT_OF_BOUNDS =
-            nodeX >= CANVAS_WIDTH + nodeRadius ||
-                nodeX <= -nodeRadius ||
-                nodeY >= CANVAS_HEIGHT + nodeRadius ||
-                nodeY <= -nodeRadius;
+            nodeX >= CANVAS_WIDTH + nodeRadius + Config.CONNECTION_LENGTH ||
+                nodeX <= -nodeRadius - Config.CONNECTION_LENGTH ||
+                nodeY >= CANVAS_HEIGHT + nodeRadius + Config.CONNECTION_LENGTH ||
+                nodeY <= -nodeRadius - Config.CONNECTION_LENGTH;
         
         if (IS_OUT_OF_BOUNDS) {
             this.restartNode(node);

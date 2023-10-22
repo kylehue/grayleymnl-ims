@@ -35,8 +35,8 @@ public class Node {
     private double opacity = Utils.generateRandomNumber(0, maxOpacity);
     private double speed = 10;
     private String color = getRandomColor();
-    private double zoomOutAccelerator = 1;
-    private double zoomInAccelerator = 1;
+    private double zoomOutAccelerator = 0.1;
+    private double zoomInAccelerator = 0.1;
     private double heartBeatIncrementor = 1;
     
     private HashMap<String, Tuple<Node, Double>> connectedNodes = new HashMap<>();
@@ -52,12 +52,12 @@ public class Node {
         for (Tuple<Node, Double> connection : this.connectedNodes.values()) {
             ctx.save();
             ctx.beginPath();
-            ctx.setStroke(Color.BLACK);
+            ctx.setStroke(Color.web(this.color));
             Node connectedNode = connection.x;
             double distance = connection.y;
             
             ctx.setGlobalAlpha(
-                Math.abs(distance / Config.CONNECTION_LENGTH - 1.0) * this.opacity * connectedNode.opacity
+                Math.abs(distance / Config.CONNECTION_LENGTH - 1.0) * this.opacity
             );
             
             ctx.moveTo(this.position.getX(), this.position.getY());
@@ -115,17 +115,17 @@ public class Node {
         if (distance < Config.HOVER_DISTANCE) {
             if (this.radius <= this.originalRadius + Config.RADIUS_GAIN_ON_HOVER) {
                 this.radius += zoomInAccelerator;
-                zoomInAccelerator *= 1.05;
+                zoomInAccelerator *= 1.2;
             }
             heartBeatIncrementor++;
             this.radius += Math.sin(heartBeatIncrementor / 15) / 10;
-            zoomOutAccelerator = 1;
+            zoomOutAccelerator = 0.1;
         } else {
             if (this.radius >= this.originalRadius) {
                 this.radius -= zoomOutAccelerator;
-                zoomOutAccelerator *= 1.05;
+                zoomOutAccelerator *= 1.2;
             }
-            zoomInAccelerator = 1;
+            zoomInAccelerator = 0.1;
             heartBeatIncrementor = 0;
         }
     }
