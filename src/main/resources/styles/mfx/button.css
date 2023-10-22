@@ -110,3 +110,30 @@
 .tab-button-active * {
     -fx-background-color: -accent!important;
 }
+
+.tag-button,
+.tag-button:armed,
+.tag-button:focused,
+.tag-button:hover {
+    -fx-font-family: "Roboto Medium"!important;
+    -fx-text-fill: -text-color;
+    -fx-background-color: -tag-button-background-color;
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+}
+
+.tag-button:hover {
+    -fx-background-color: -tag-button-hover-background-color;
+}
+
+.tag-button-active,
+.tag-button-active:armed,
+.tag-button-active:focused {
+    -fx-background-color: -accent;
+    -fx-text-fill: -button-text-color;
+}
+
+.tag-button-active:hover {
+    -fx-background-color: -button-hovered-color;
+    -fx-text-fill: -button-text-color;
+}

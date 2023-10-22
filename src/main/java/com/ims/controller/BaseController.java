@@ -45,6 +45,12 @@ public class BaseController {
     private FlowPane analyticsFlowPane;
     
     @FXML
+    private FlowPane productsFlowPane;
+    
+    @FXML
+    private FlowPane productsCategoriesFlowPane;
+    
+    @FXML
     public void initialize()
         throws URISyntaxException, ParserConfigurationException, IOException, SAXException {
         Utils.addIconToButton(tabDashboardButton, "/icons/home.svg");
@@ -60,7 +66,24 @@ public class BaseController {
             )
         );
         
-        Utils.createResponsiveFlowPane(analyticsFlowPane, 350, 2.05);
+        Utils.createResponsiveFlowPane(
+            analyticsFlowPane,
+            350,
+            2.05,
+            true
+        );
+        Utils.createResponsiveFlowPane(
+            productsFlowPane,
+            350,
+            2.05,
+            false
+        );
+        Utils.createResponsiveFlowPane(
+            productsCategoriesFlowPane,
+            350,
+            2.05,
+            false
+        );
     }
     
     @FXML

@@ -120,7 +120,8 @@ public class Utils {
     public static void createResponsiveFlowPane(
         FlowPane flowPane,
         double minWidth,
-        double aspectRatio
+        double aspectRatio,
+        boolean fillEmptySpace
     ) {
         ObservableList<Node> children = flowPane.getChildren();
         int childCount = children.size();
@@ -151,7 +152,11 @@ public class Utils {
                         
                         double finalWidth;
                         int lastRowPanes = childCount % numChildrenInRow;
-                        if (lastRowPanes != 0 && i > childCount - 1 - lastRowPanes) {
+                        if (
+                            lastRowPanes != 0 &&
+                                i > childCount - 1 - lastRowPanes &&
+                                fillEmptySpace
+                        ) {
                             double lastRowWidth = currentWidth / lastRowPanes;
                             
                             // TODO: fix computations to properly align the excess child width

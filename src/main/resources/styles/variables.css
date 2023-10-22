@@ -6,6 +6,8 @@
     -text-color-fade: #6e6e71;
     -button-text-color: #f3f4f6;
     -button-hovered-color: #4b86f4;
+    -tag-button-background-color: #ebedf1;
+    -tag-button-hover-background-color: #e1e3e8;
     -text-field-background-color: #f5f6f8;
     -text-field-disabled-text-color: rgba(125, 120, 120, 0.25);
     -text-field-prompt-color: rgba(125, 120, 120, 0.5);
