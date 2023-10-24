@@ -1,8 +1,11 @@
 package com.ims.controller;
 
+import com.ims.components.TagButton;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
@@ -10,6 +13,7 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import com.ims.utils.Utils;
 import org.xml.sax.SAXException;
@@ -50,9 +54,11 @@ public class BaseController {
     @FXML
     private FlowPane productsCategoriesFlowPane;
     
+    private HashMap<String, String> categories = new HashMap<>();
+    
     @FXML
     public void initialize()
-        throws URISyntaxException, ParserConfigurationException, IOException, SAXException {
+        throws URISyntaxException, ParserConfigurationException, IOException, SAXException, InterruptedException {
         Utils.addIconToButton(tabDashboardButton, "/icons/home.svg");
         Utils.addIconToButton(tabProductsButton, "/icons/paw.svg");
         Utils.addIconToButton(tabCategoriesButton, "/icons/shape.svg");
@@ -84,6 +90,20 @@ public class BaseController {
             2.05,
             false
         );
+        
+        this.createCategory("All", true);
+        this.createCategory("Dog", false);
+        this.createCategory("Cat", false);
+        this.createCategory("Bird", false);
+    }
+    
+    private MFXButton createCategory(String categoryName, boolean isActive) {
+        TagButton categoryButton = new TagButton();
+        categoryButton.setText(categoryName);
+        categoryButton.setActive(isActive);
+        productsCategoriesFlowPane.getChildren().add(categoryButton);
+        
+        return categoryButton;
     }
     
     @FXML
