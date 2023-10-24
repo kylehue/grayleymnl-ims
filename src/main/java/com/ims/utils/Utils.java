@@ -5,9 +5,6 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
@@ -110,10 +107,74 @@ public class Utils {
     }
     
     /**
+     * Resize a FlowPane's children based on its width
+     * @param flowPane The FlowPane that contains the children to be resized.
+     * @param minWidth Minimum width of a child in a row.
+     * @param aspectRatio The aspect ratio of children. Set to 1 to disable.
+     * @apiNote The children of the `FlowPane` must be an instance of the `Pane`
+     */
+    private static void resizeFlowPaneChildren(
+        FlowPane flowPane,
+        double minWidth,
+        double aspectRatio,
+        boolean fillEmptySpace
+    ) {
+        ObservableList<Node> children = flowPane.getChildren();
+        int childCount = children.size();
+        double flowPaneWidth = flowPane.getWidth();
+        
+        // Get number of children that can fit without reaching minWidth
+        int numChildrenInRow = (int) (flowPaneWidth / minWidth);
+        if (numChildrenInRow > childCount) {
+            numChildrenInRow = childCount;
+        }
+        
+        double computedWidth = flowPaneWidth / numChildrenInRow;
+        
+        for (int i = 0; i < childCount; i++) {
+            Node node = children.get(i);
+            
+            if (node instanceof Pane) {
+                double arbitraryOffset = 10;
+                
+                Insets margin = FlowPane.getMargin(node);
+                double marginsOffset = margin != null ?
+                    arbitraryOffset +
+                        margin.getRight() +
+                        margin.getLeft()
+                    : 0;
+                
+                double finalWidth;
+                int lastRowPanes = childCount % numChildrenInRow;
+                if (
+                    lastRowPanes != 0 &&
+                        i > childCount - 1 - lastRowPanes &&
+                        fillEmptySpace
+                ) {
+                    double lastRowWidth = flowPaneWidth / lastRowPanes;
+                    
+                    // TODO: fix computations to properly align the excess child width
+                    finalWidth = lastRowWidth - marginsOffset * (numChildrenInRow - lastRowPanes);
+                } else {
+                    finalWidth = computedWidth - marginsOffset;
+                }
+                
+                Pane pane = (Pane) node;
+                pane.setPrefWidth(finalWidth);
+                pane.setPrefHeight(finalWidth / aspectRatio);
+                pane.setMinWidth(20);
+                pane.setMinHeight(20 / aspectRatio);
+                pane.setMaxWidth(Double.MAX_VALUE);
+                pane.setMaxHeight(Double.MAX_VALUE);
+            }
+        }
+    }
+    
+    /**
      * Create a responsive FlowPane that is aware of the width of its children.
      *
-     * @param flowPane    The `FlowPane` element.
-     * @param minWidth    Minimum width of a child in a row.
+     * @param flowPane The `FlowPane` element.
+     * @param minWidth Minimum width of a child in a row.
      * @param aspectRatio The aspect ratio of children. Set to 1 to disable.
      * @apiNote The children of the `FlowPane` must be an instance of the `Pane` class.
      */
@@ -123,57 +184,14 @@ public class Utils {
         double aspectRatio,
         boolean fillEmptySpace
     ) {
-        ObservableList<Node> children = flowPane.getChildren();
-        int childCount = children.size();
-        
-        flowPane.widthProperty().addListener(($1, $2, _currentWidth) -> {
+        flowPane.widthProperty().addListener(($1, $2, $3) -> {
             Platform.runLater(() -> {
-                // Get number of children that can fit without reaching minWidth
-                double currentWidth = _currentWidth.doubleValue();
-                int numChildrenInRow = (int) (currentWidth / minWidth);
-                if (numChildrenInRow > childCount) {
-                    numChildrenInRow = childCount;
-                }
-                
-                double computedWidth = currentWidth / numChildrenInRow;
-                
-                for (int i = 0; i < childCount; i++) {
-                    Node node = children.get(i);
-                    
-                    if (node instanceof Pane) {
-                        double arbitraryOffset = 10;
-                        
-                        Insets margin = FlowPane.getMargin(node);
-                        double marginsOffset = margin != null ?
-                            arbitraryOffset +
-                                margin.getRight() +
-                                margin.getLeft()
-                            : 0;
-                        
-                        double finalWidth;
-                        int lastRowPanes = childCount % numChildrenInRow;
-                        if (
-                            lastRowPanes != 0 &&
-                                i > childCount - 1 - lastRowPanes &&
-                                fillEmptySpace
-                        ) {
-                            double lastRowWidth = currentWidth / lastRowPanes;
-                            
-                            // TODO: fix computations to properly align the excess child width
-                            finalWidth = lastRowWidth - marginsOffset * (numChildrenInRow - lastRowPanes);
-                        } else {
-                            finalWidth = computedWidth - marginsOffset;
-                        }
-                        
-                        Pane pane = (Pane) node;
-                        pane.setPrefWidth(finalWidth);
-                        pane.setPrefHeight(finalWidth / aspectRatio);
-                        pane.setMinWidth(20);
-                        pane.setMinHeight(20 / aspectRatio);
-                        pane.setMaxWidth(Double.MAX_VALUE);
-                        pane.setMaxHeight(Double.MAX_VALUE);
-                    }
-                }
+                resizeFlowPaneChildren(
+                    flowPane,
+                    minWidth,
+                    aspectRatio,
+                    fillEmptySpace
+                );
             });
         });
     }
