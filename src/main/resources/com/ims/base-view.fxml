@@ -161,13 +161,9 @@
          </rowConstraints>
          <children>
             <FlowPane fx:id="productsCategoriesFlowPane" hgap="5.0" vgap="5.0" />
-            <MFXScrollPane fitToWidth="true" GridPane.rowIndex="1">
+            <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
                <content>
-                  <FlowPane fx:id="productsFlowPane" prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <MFXButton />
-                     </children>
-                  </FlowPane>
+                  <FlowPane fx:id="productsFlowPane" hgap="10.0" vgap="10.0" />
                </content>
                <GridPane.margin>
                   <Insets top="10.0" />

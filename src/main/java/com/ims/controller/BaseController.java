@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.components.Product;
 import com.ims.components.TagButton;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -84,17 +85,14 @@ public class BaseController {
             2.05,
             false
         );
-        Utils.createResponsiveFlowPane(
-            productsCategoriesFlowPane,
-            350,
-            2.05,
-            false
-        );
         
         this.createCategory("All", true);
         this.createCategory("Dog", false);
         this.createCategory("Cat", false);
         this.createCategory("Bird", false);
+        
+        Product prod = new Product();
+        productsFlowPane.getChildren().add(prod);
     }
     
     private MFXButton createCategory(String categoryName, boolean isActive) {

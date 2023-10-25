@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static java.util.Arrays.fill;
 import static java.util.Arrays.stream;
 
 public class Utils {
@@ -120,21 +121,18 @@ public class Utils {
         boolean fillEmptySpace
     ) {
         ObservableList<Node> children = flowPane.getChildren();
-        int childCount = children.size();
+        int maxChildrenInRow = children.size();
         double flowPaneWidth = flowPane.getWidth();
         
         // Get number of children that can fit without reaching minWidth
         int numChildrenInRow = (int) (flowPaneWidth / minWidth);
-        if (numChildrenInRow > childCount) {
-            numChildrenInRow = childCount;
-        }
         
         double computedWidth = flowPaneWidth / numChildrenInRow;
         
-        for (int i = 0; i < childCount; i++) {
+        for (int i = 0; i < children.size(); i++) {
             Node node = children.get(i);
             
-            if (node instanceof Pane) {
+            if (node instanceof Pane pane) {
                 double arbitraryOffset = 10;
                 
                 Insets margin = FlowPane.getMargin(node);
@@ -145,10 +143,10 @@ public class Utils {
                     : 0;
                 
                 double finalWidth;
-                int lastRowPanes = childCount % numChildrenInRow;
+                int lastRowPanes = maxChildrenInRow % numChildrenInRow;
                 if (
                     lastRowPanes != 0 &&
-                        i > childCount - 1 - lastRowPanes &&
+                        i > maxChildrenInRow - 1 - lastRowPanes &&
                         fillEmptySpace
                 ) {
                     double lastRowWidth = flowPaneWidth / lastRowPanes;
@@ -159,7 +157,6 @@ public class Utils {
                     finalWidth = computedWidth - marginsOffset;
                 }
                 
-                Pane pane = (Pane) node;
                 pane.setPrefWidth(finalWidth);
                 pane.setPrefHeight(finalWidth / aspectRatio);
                 pane.setMinWidth(20);
@@ -184,6 +181,8 @@ public class Utils {
         double aspectRatio,
         boolean fillEmptySpace
     ) {
+        flowPane.setMinWidth(0);
+        flowPane.setMaxWidth(Double.MAX_VALUE);
         flowPane.widthProperty().addListener(($1, $2, $3) -> {
             Platform.runLater(() -> {
                 resizeFlowPaneChildren(
