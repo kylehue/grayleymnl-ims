@@ -2,6 +2,7 @@
 @import "./mfx/textfield.css";
 @import "./mfx/button.css";
 @import "./mfx/scrollpane.css";
+@import "./mfx/combobox.css";
 
 @font-face {
     font-family: Roboto-Regular;
@@ -82,4 +83,38 @@
     -fx-border-width: 1px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 4, 0, 0, 2);
     -fx-padding: 5px 10px 5px 10px;
+}
+
+.product-container {
+
+}
+
+.product-container .product-text-container {
+    -fx-padding: 0 0 0 10;
+}
+
+.product-container .product-text-container .product-name-label {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 1.2em;
+    -fx-padding: 0 0 2.5px 0;
+}
+
+.product-container .product-text-container .product-category-label {
+    -fx-text-fill: -text-color-fade;
+    -fx-padding: 0 0 10px 0;
+}
+
+.product-container .product-text-container .product-description-label {
+    -fx-text-fill: -text-color-fade;
+    -fx-padding: 0 0 10px 0;
+}
+
+.product-container .product-text-container .product-price-label {
+    -fx-text-fill: -text-color-fade;
+    -fx-padding: 0 0 5px 0;
+}
+
+.product-container .product-image {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
 }
