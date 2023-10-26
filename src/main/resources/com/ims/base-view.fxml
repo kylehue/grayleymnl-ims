@@ -2,6 +2,7 @@
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
@@ -10,6 +11,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 
 <GridPane fx:id="rootContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ims.controller.BaseController">
   <columnConstraints>
@@ -42,155 +44,171 @@
             <MFXButton fx:id="settingsButton" onAction="#goBack" text="hi" GridPane.columnIndex="1" />
          </children>
       </GridPane>
-      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
+      <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-border-color: rgba(125, 125, 125, 0.1); -fx-border-width: 0 0 1 0;" GridPane.rowIndex="1">
          <children>
             <MFXButton fx:id="tabDashboardButton" styleClass="tab-button" text="Dashboard" />
             <MFXButton fx:id="tabProductsButton" styleClass="tab-button" text="Products" />
             <MFXButton fx:id="tabCategoriesButton" styleClass="tab-button" text="Categories" />
          </children>
       </HBox>
-      <GridPane fx:id="tabDashboardPane" visible="false" GridPane.rowIndex="2">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
+      <StackPane GridPane.rowIndex="2">
          <children>
-            <Label text="Analytics">
-               <styleClass>
-                  <String fx:value="h5" />
-                  <String fx:value="text-medium" />
-               </styleClass></Label>
-            <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" vvalue="0.74" GridPane.rowIndex="1">
-               <content>
-                  <FlowPane fx:id="analyticsFlowPane" hgap="10.0" vgap="10.0">
-                     <children>
-                        <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <FlowPane.margin>
-                              <Insets />
-                           </FlowPane.margin>
+            <GridPane fx:id="tabDashboardPane" visible="false">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Analytics">
+                     <styleClass>
+                        <String fx:value="h5" />
+                        <String fx:value="text-medium" />
+                     </styleClass>
+                  </Label>
+                  <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" vvalue="0.74" GridPane.rowIndex="1">
+                     <content>
+                        <FlowPane fx:id="analyticsFlowPane" hgap="10.0" vgap="10.0">
                            <children>
-                              <Label styleClass="text-medium" text="Total Products" />
+                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <FlowPane.margin>
+                                    <Insets />
+                                 </FlowPane.margin>
+                                 <children>
+                                    <Label styleClass="text-medium" text="Total Products" />
+                                 </children>
+                              </GridPane>
+                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label styleClass="text-medium" text="Low Stocks Products" />
+                                 </children>
+                                 <FlowPane.margin>
+                                    <Insets />
+                                 </FlowPane.margin>
+                              </GridPane>
+                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label styleClass="text-medium" text="Out of Stocks Products" />
+                                 </children>
+                                 <FlowPane.margin>
+                                    <Insets />
+                                 </FlowPane.margin>
+                              </GridPane>
+                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label styleClass="text-medium" text="Inventory" />
+                                 </children>
+                                 <FlowPane.margin>
+                                    <Insets />
+                                 </FlowPane.margin>
+                              </GridPane>
+                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label styleClass="text-medium" text="Alerts" />
+                                 </children>
+                                 <FlowPane.margin>
+                                    <Insets />
+                                 </FlowPane.margin>
+                              </GridPane>
                            </children>
-                        </GridPane>
-                        <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Label styleClass="text-medium" text="Low Stocks Products" />
-                           </children>
-                           <FlowPane.margin>
-                              <Insets />
-                           </FlowPane.margin>
-                        </GridPane>
-                        <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Label styleClass="text-medium" text="Out of Stocks Products" />
-                           </children>
-                           <FlowPane.margin>
-                              <Insets />
-                           </FlowPane.margin>
-                        </GridPane>
-                        <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Label styleClass="text-medium" text="Inventory" />
-                           </children>
-                           <FlowPane.margin>
-                              <Insets />
-                           </FlowPane.margin>
-                        </GridPane>
-                        <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Label styleClass="text-medium" text="Alerts" />
-                           </children>
-                           <FlowPane.margin>
-                              <Insets />
-                           </FlowPane.margin>
-                        </GridPane>
-                     </children>
+                        </FlowPane>
+                     </content>
+                  </MFXScrollPane>
+               </children>
+            </GridPane>
+            <GridPane fx:id="tabProductsPane" visible="false">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints vgrow="SOMETIMES" />
+                  <RowConstraints vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" vgrow="ALWAYS" />
+               </rowConstraints>
+               <children>
+                  <FlowPane fx:id="productsCategoriesFlowPane" hgap="5.0" vgap="5.0" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets top="10.0" />
+                     </GridPane.margin>
                   </FlowPane>
-               </content>
-            </MFXScrollPane>
+                  <MFXTextField fx:id="searchProductTextField" floatingText="Search" maxWidth="300.0" minWidth="100.0" GridPane.halignment="LEFT" />
+                  <GridPane GridPane.rowIndex="2">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                           <content>
+                              <FlowPane fx:id="productsFlowPane" hgap="10.0" rowValignment="TOP" vgap="10.0" />
+                           </content>
+                        </MFXScrollPane>
+                     </children>
+                     <GridPane.margin>
+                        <Insets top="10.0" />
+                     </GridPane.margin>
+                  </GridPane>
+               </children>
+            </GridPane>
+            <GridPane fx:id="tabCategoriesPane">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <MFXScrollPane fitToHeight="true" fitToWidth="true">
+                     <content>
+                        <FlowPane fx:id="categoriesFlowPane" />
+                     </content>
+                  </MFXScrollPane>
+               </children>
+            </GridPane>
          </children>
          <GridPane.margin>
             <Insets top="10.0" />
          </GridPane.margin>
-      </GridPane>
-      <GridPane fx:id="tabProductsPane" GridPane.rowIndex="2">
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" vgrow="ALWAYS" />
-         </rowConstraints>
-         <children>
-            <FlowPane fx:id="productsCategoriesFlowPane" hgap="5.0" vgap="5.0" />
-            <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
-               <content>
-                  <FlowPane fx:id="productsFlowPane" hgap="10.0" vgap="10.0" />
-               </content>
-               <GridPane.margin>
-                  <Insets top="10.0" />
-               </GridPane.margin>
-            </MFXScrollPane>
-         </children>
-         <GridPane.margin>
-            <Insets top="10.0" />
-         </GridPane.margin>
-      </GridPane>
-      <GridPane fx:id="tabCategoriesPane" visible="false" GridPane.rowIndex="2">
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-         <children>
-            <Label text="categories" GridPane.rowIndex="2" />
-         </children>
-         <GridPane.margin>
-            <Insets top="10.0" />
-         </GridPane.margin>
-      </GridPane>
+      </StackPane>
    </children>
    <padding>
       <Insets bottom="30.0" left="30.0" right="30.0" />

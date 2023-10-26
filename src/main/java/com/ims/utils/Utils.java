@@ -1,15 +1,16 @@
 package com.ims.utils;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
+import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.util.Pair;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static java.util.Arrays.fill;
 import static java.util.Arrays.stream;
+import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
 public class Utils {
     /**
@@ -121,7 +123,7 @@ public class Utils {
         boolean fillEmptySpace
     ) {
         ObservableList<Node> children = flowPane.getChildren();
-        int maxChildrenInRow = children.size();
+        int childrenCount = children.size();
         double flowPaneWidth = flowPane.getWidth();
         
         // Get number of children that can fit without reaching minWidth
@@ -137,24 +139,23 @@ public class Utils {
                 
                 Insets margin = FlowPane.getMargin(node);
                 double marginsOffset = margin != null ?
-                    arbitraryOffset +
                         margin.getRight() +
                         margin.getLeft()
                     : 0;
                 
                 double finalWidth;
-                int lastRowPanes = maxChildrenInRow % numChildrenInRow;
+                int lastRowPanes = childrenCount % numChildrenInRow;
                 if (
                     lastRowPanes != 0 &&
-                        i > maxChildrenInRow - 1 - lastRowPanes &&
+                        i > childrenCount - 1 - lastRowPanes &&
                         fillEmptySpace
                 ) {
                     double lastRowWidth = flowPaneWidth / lastRowPanes;
                     
                     // TODO: fix computations to properly align the excess child width
-                    finalWidth = lastRowWidth - marginsOffset * (numChildrenInRow - lastRowPanes);
+                    finalWidth = lastRowWidth - arbitraryOffset - marginsOffset * (numChildrenInRow - lastRowPanes);
                 } else {
-                    finalWidth = computedWidth - marginsOffset;
+                    finalWidth = computedWidth - marginsOffset - arbitraryOffset;
                 }
                 
                 pane.setPrefWidth(finalWidth);
@@ -226,28 +227,92 @@ public class Utils {
     }
     
     /**
-     * Adds an icon to a button.
+     * Adds an icon to a node.
      *
-     * @param button  The button where the icon will be placed.
+     * @param button  The node where the icon will be placed.
      * @param iconURL The URL of the icon.
      * @throws URISyntaxException
      */
-    public static void addIconToButton(
+    public static <T extends MFXButton>void addIconToButton(
         MFXButton button, String iconURL
-    ) throws URISyntaxException, ParserConfigurationException, IOException, SAXException {
-        String resolvedPath = Utils.class.getResource(iconURL).toURI().toString();
-        String path = extractSVGPath(resolvedPath);
-        Pane icon = new Pane();
-        icon.setStyle("-fx-shape: \"" + path + "\";");
+    ) {
+        try {
+            String resolvedPath = Utils.class.getResource(iconURL).toURI().toString();
+            String path = extractSVGPath(resolvedPath);
+            Pane icon = new Pane();
+            icon.setStyle("-fx-shape: \"" + path + "\";");
+            
+            double size = 16;
+            icon.setPrefWidth(size);
+            icon.setMaxWidth(size);
+            icon.setPrefHeight(size);
+            icon.setMaxHeight(size);
+            icon.setFocusTraversable(false);
+            
+            button.setGraphicTextGap(8);
+            button.setGraphic(icon);
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+    }
+    
+    /**
+     * Adds an icon to a node.
+     *
+     * @param textField  The node where the icon will be placed.
+     * @param iconURL The URL of the icon.
+     * @throws URISyntaxException
+     */
+    public static <T extends MFXButton>void addIconToTextField(
+        MFXTextField textField, String iconURL
+    ) {
+        try {
+            String resolvedPath = Utils.class.getResource(iconURL).toURI().toString();
+            String path = extractSVGPath(resolvedPath);
+            Pane icon = new Pane();
+            icon.setStyle("-fx-shape: \"" + path + "\";");
+            
+            double size = 16;
+            icon.setPrefWidth(size);
+            icon.setMaxWidth(size);
+            icon.setPrefHeight(size);
+            icon.setMaxHeight(size);
+            icon.setFocusTraversable(false);
+            
+            textField.setGraphicTextGap(8);
+            textField.setLeadingIcon(icon);
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+    }
+    
+    public static GridPane createGridPane(int rowCount, int columnCount) {
+        GridPane gridPane = new GridPane();
         
-        double size = 16;
-        icon.setPrefWidth(size);
-        icon.setMaxWidth(size);
-        icon.setPrefHeight(size);
-        icon.setMaxHeight(size);
-        icon.setFocusTraversable(false);
+        for (int i = 0; i < rowCount; i++) {
+            RowConstraints rowConstraints = new RowConstraints();
+            rowConstraints.setVgrow(Priority.SOMETIMES);
+            rowConstraints.setValignment(VPos.TOP);
+            rowConstraints.setFillHeight(true);
+            rowConstraints.setMinHeight(10);
+            rowConstraints.setPrefHeight(USE_COMPUTED_SIZE);
+            rowConstraints.setMaxHeight(USE_COMPUTED_SIZE);
+            rowConstraints.setPrefHeight(-1);
+            gridPane.getRowConstraints().add(rowConstraints);
+        }
         
-        button.setGraphicTextGap(8);
-        button.setGraphic(icon);
+        for (int i = 0; i < columnCount; i++) {
+            ColumnConstraints columnConstraints = new ColumnConstraints();
+            columnConstraints.setHgrow(Priority.SOMETIMES);
+            columnConstraints.setHalignment(HPos.LEFT);
+            columnConstraints.setFillWidth(true);
+            columnConstraints.setMinWidth(10);
+            columnConstraints.setPrefWidth(USE_COMPUTED_SIZE);
+            columnConstraints.setMaxWidth(USE_COMPUTED_SIZE);
+            columnConstraints.setPrefWidth(-1);
+            gridPane.getColumnConstraints().add(columnConstraints);
+        }
+        
+        return gridPane;
     }
 }

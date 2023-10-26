@@ -56,6 +56,10 @@
     -fx-background-color: -accent-glass;
 }
 
+.outline-button * {
+    -fx-background-color: -accent!important;
+}
+
 .link-button,
 .link-button:armed,
 .link-button:focused {
@@ -120,6 +124,7 @@
     -fx-background-color: -tag-button-background-color;
     -fx-background-radius: 50px;
     -fx-border-radius: 50px;
+    -fx-pref-height: 30px;
 }
 
 .tag-button:hover {
