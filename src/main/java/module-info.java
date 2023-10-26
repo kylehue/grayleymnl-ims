@@ -3,6 +3,7 @@ module com.imsgrayleymnl {
     requires javafx.fxml;
     requires javafx.web;
     requires MaterialFX;
+    requires VirtualizedFX;
 
     opens com.ims to javafx.fxml;
     exports com.ims;
