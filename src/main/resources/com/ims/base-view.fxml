@@ -26,7 +26,7 @@
       <GridPane>
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -41,7 +41,7 @@
                   <Insets />
                </GridPane.margin>
             </Label>
-            <MFXButton fx:id="settingsButton" onAction="#goBack" text="hi" GridPane.columnIndex="1" />
+            <MFXButton fx:id="settingsButton" onAction="#goBack" text="settings" GridPane.columnIndex="1" />
          </children>
       </GridPane>
       <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-border-color: rgba(125, 125, 125, 0.1); -fx-border-width: 0 0 1 0;" GridPane.rowIndex="1">
@@ -163,12 +163,28 @@
                   <RowConstraints minHeight="10.0" vgrow="ALWAYS" />
                </rowConstraints>
                <children>
+                  <GridPane hgap="10.0" vgap="10.0" GridPane.halignment="LEFT">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                        <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints fillHeight="false" minHeight="10.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <MFXTextField fx:id="searchProductTextField" floatingText="Search" maxWidth="300.0" minWidth="100.0" />
+                        <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1">
+                           <children>
+                              <MFXButton text="Add Product" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </GridPane>
                   <FlowPane fx:id="productsCategoriesFlowPane" hgap="5.0" vgap="5.0" GridPane.rowIndex="1">
                      <GridPane.margin>
                         <Insets top="10.0" />
                      </GridPane.margin>
                   </FlowPane>
-                  <MFXTextField fx:id="searchProductTextField" floatingText="Search" maxWidth="300.0" minWidth="100.0" GridPane.halignment="LEFT" />
                   <GridPane GridPane.rowIndex="2">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -194,14 +210,36 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <MFXScrollPane fitToHeight="true" fitToWidth="true">
+                  <MFXScrollPane fitToHeight="true" fitToWidth="true" GridPane.rowIndex="1">
                      <content>
-                        <FlowPane fx:id="categoriesFlowPane" />
+                        <FlowPane fx:id="categoriesFlowPane" hgap="10.0" vgap="10.0" />
                      </content>
+                     <GridPane.margin>
+                        <Insets top="10.0" />
+                     </GridPane.margin>
                   </MFXScrollPane>
+                  <GridPane hgap="10.0" vgap="10.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                        <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.columnIndex="1">
+                           <children>
+                              <MFXButton styleClass="outline-button" text="Save All" />
+                              <MFXButton text="Add Category" />
+                           </children>
+                        </HBox>
+                        <MFXTextField floatingText="Search" maxWidth="300.0" minWidth="100.0" />
+                     </children>
+                  </GridPane>
                </children>
             </GridPane>
          </children>

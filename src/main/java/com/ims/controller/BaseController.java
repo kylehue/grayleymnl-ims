@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.components.Category;
 import com.ims.components.Product;
 import com.ims.components.TagButton;
 import com.ims.utils.SceneManager;
@@ -72,6 +73,9 @@ public class BaseController {
         Utils.addIconToButton(tabDashboardButton, "/icons/home.svg");
         Utils.addIconToButton(tabProductsButton, "/icons/paw.svg");
         Utils.addIconToButton(tabCategoriesButton, "/icons/shape.svg");
+        Utils.addIconToButton(settingsButton, "/icons/cog.svg");
+        settingsButton.getStyleClass().add("icon-button");
+        settingsButton.setText("");
         
         Utils.createTabGroup(
             "tab-button-active",
@@ -94,28 +98,41 @@ public class BaseController {
             2.05,
             false
         );
+        Utils.createResponsiveFlowPane(
+            categoriesFlowPane,
+            300,
+            1,
+            false
+        );
         
-        this.addCategory("All", true);
-        this.addCategory("Dog", false);
-        this.addCategory("Cat", false);
-        this.addCategory("Bird", false);
-        this.addCategory("Howls", false);
-        this.addCategory("Cat Food", false);
-        this.addCategory("Dog Food", false);
-        this.addCategory("Bird Food", false);
+        this.addCategoryTag("All", true);
+        this.addCategoryTag("Dog", false);
+        this.addCategoryTag("Cat", false);
+        this.addCategoryTag("Bird", false);
+        this.addCategoryTag("Howls", false);
+        this.addCategoryTag("Cat Food", false);
+        this.addCategoryTag("Dog Food", false);
+        this.addCategoryTag("Bird Food", false);
+        this.addCategory("hello");
+        this.addCategory("uhuh");
+        this.addCategory("test");
+        this.addCategory("hello");
+        this.addCategory("uhuh");
+        this.addCategory("test");
         
         for (int i = 0; i < 12; i++) {
             this.addProduct(
                 "Some Cat",
                 "Cat",
-                "Meow meow meow meow meow meow meow, meow meow. Meow meow meow meow! meow meow meow, meow, meow. Meow meow meow meow.",
                 "https://i0.wp.com/suddenlycat.com/wp-content/uploads/2020/09/b31.jpg?resize=680%2C839&ssl=1",
-                2.99f
+                i * 4,
+                i * 7,
+                i * 2.99f
             );
         }
     }
     
-    private TagButton addCategory(String categoryName, boolean isActive) {
+    private TagButton addCategoryTag(String categoryName, boolean isActive) {
         TagButton categoryButton = new TagButton();
         categoryButton.setText(categoryName);
         categoryButton.setActive(isActive);
@@ -124,17 +141,25 @@ public class BaseController {
         return categoryButton;
     }
     
+    private Category addCategory(String name) {
+        Category category = new Category();
+        category.setName(name);
+        categoriesFlowPane.getChildren().add(category);
+        return category;
+    }
+    
     private Product addProduct(
         String name,
         String category,
-        String description,
         String imageUrl,
+        int currentStock,
+        int neededStock,
         float price
     ) {
         Product product = new Product();
         product.setName(name);
         product.setCategory(category);
-        product.setDescription(description);
+        product.setStocks(currentStock, neededStock);
         product.setPrice(price);
         product.setImage(imageUrl);
         productsFlowPane.getChildren().add(product);
