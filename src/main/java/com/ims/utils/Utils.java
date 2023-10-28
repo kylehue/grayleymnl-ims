@@ -159,11 +159,14 @@ public class Utils {
                 }
                 
                 pane.setPrefWidth(finalWidth);
-                pane.setPrefHeight(finalWidth / aspectRatio);
                 pane.setMinWidth(20);
-                pane.setMinHeight(20 / aspectRatio);
                 pane.setMaxWidth(Double.MAX_VALUE);
-                pane.setMaxHeight(Double.MAX_VALUE);
+                
+                if (aspectRatio != 1) {
+                    pane.setPrefHeight(finalWidth / aspectRatio);
+                    pane.setMinHeight(20 / aspectRatio);
+                    pane.setMaxHeight(Double.MAX_VALUE);
+                }
             }
         }
     }
@@ -248,6 +251,7 @@ public class Utils {
             icon.setPrefHeight(size);
             icon.setMaxHeight(size);
             icon.setFocusTraversable(false);
+            icon.getStyleClass().add("icon");
             
             button.setGraphicTextGap(8);
             button.setGraphic(icon);
@@ -261,7 +265,6 @@ public class Utils {
      *
      * @param textField  The node where the icon will be placed.
      * @param iconURL The URL of the icon.
-     * @throws URISyntaxException
      */
     public static <T extends MFXButton>void addIconToTextField(
         MFXTextField textField, String iconURL
@@ -286,33 +289,37 @@ public class Utils {
         }
     }
     
-    public static GridPane createGridPane(int rowCount, int columnCount) {
-        GridPane gridPane = new GridPane();
-        
-        for (int i = 0; i < rowCount; i++) {
+    public static void setupGridPane(
+        GridPane gridPane,
+        int rowCount,
+        int columnCount
+    ) {
+        for (int i = 0; i < Math.max(rowCount, 1); i++) {
             RowConstraints rowConstraints = new RowConstraints();
             rowConstraints.setVgrow(Priority.SOMETIMES);
             rowConstraints.setValignment(VPos.TOP);
             rowConstraints.setFillHeight(true);
-            rowConstraints.setMinHeight(10);
+            rowConstraints.setMinHeight(USE_COMPUTED_SIZE);
             rowConstraints.setPrefHeight(USE_COMPUTED_SIZE);
             rowConstraints.setMaxHeight(USE_COMPUTED_SIZE);
-            rowConstraints.setPrefHeight(-1);
             gridPane.getRowConstraints().add(rowConstraints);
         }
         
-        for (int i = 0; i < columnCount; i++) {
+        for (int i = 0; i < Math.max(columnCount, 1); i++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
             columnConstraints.setHgrow(Priority.SOMETIMES);
             columnConstraints.setHalignment(HPos.LEFT);
             columnConstraints.setFillWidth(true);
-            columnConstraints.setMinWidth(10);
+            columnConstraints.setMinWidth(USE_COMPUTED_SIZE);
             columnConstraints.setPrefWidth(USE_COMPUTED_SIZE);
             columnConstraints.setMaxWidth(USE_COMPUTED_SIZE);
-            columnConstraints.setPrefWidth(-1);
             gridPane.getColumnConstraints().add(columnConstraints);
         }
-        
+    }
+    
+    public static GridPane createGridPane(int rowCount, int columnCount) {
+        GridPane gridPane = new GridPane();
+        Utils.setupGridPane(gridPane, rowCount, columnCount);
         return gridPane;
     }
 }
