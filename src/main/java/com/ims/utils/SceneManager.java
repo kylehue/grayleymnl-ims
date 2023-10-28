@@ -2,13 +2,12 @@ package com.ims.utils;
 
 import com.ims.Main;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class SceneManager {
     private static Stage stage;
@@ -16,6 +15,10 @@ public class SceneManager {
     private static HashMap<String, Scene> registeredScenes = new HashMap();
     
     private static double[] size = {940, 640};
+    
+    private static HashSet<SceneChangeEvent> sceneChangeListeners = new HashSet<>();
+    
+    private static String currentScene = "";
     
     /**
      * Set the stage where scenes will be added.
@@ -62,6 +65,12 @@ public class SceneManager {
         }
         
         SceneManager.stage.setScene(targetScene);
+        
+        for (SceneChangeEvent listener : sceneChangeListeners) {
+            listener.call(id, SceneManager.currentScene);
+        }
+        
+        SceneManager.currentScene = id;
     }
     
     /**
@@ -71,7 +80,7 @@ public class SceneManager {
      * @return The scene that matches the id.
      */
     public static Scene getScene(String id) {
-        return registeredScenes.get(id);
+        return SceneManager.registeredScenes.get(id);
     }
     
     /**
@@ -85,5 +94,13 @@ public class SceneManager {
         SceneManager.size[1] = height;
         SceneManager.stage.setWidth(width);
         SceneManager.stage.setHeight(height);
+    }
+    
+    /**
+     * Execute a function whenever the scene changes.
+     * @param cb The function to execute.
+     */
+    public static void onChangeScene(SceneChangeEvent cb) {
+        SceneManager.sceneChangeListeners.add(cb);
     }
 }
