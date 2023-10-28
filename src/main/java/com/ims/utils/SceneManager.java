@@ -1,9 +1,14 @@
 package com.ims.utils;
 
 import com.ims.Main;
+import javafx.animation.FadeTransition;
+import javafx.animation.PathTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -64,6 +69,25 @@ public class SceneManager {
             throw new Error("The scene named '" + id + "' doesn't exist.");
         }
         
+        Scene curScene = getScene(currentScene);
+        
+        if (curScene != null) {
+            final double transitionDuration = 200;
+            FadeTransition fadeOut = new FadeTransition(
+                Duration.millis(transitionDuration), curScene.getRoot()
+            );
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.play();
+            
+            FadeTransition fadeIn = new FadeTransition(
+                Duration.millis(transitionDuration), targetScene.getRoot()
+            );
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+        }
+        
         SceneManager.stage.setScene(targetScene);
         
         for (SceneChangeEvent listener : sceneChangeListeners) {
@@ -98,6 +122,7 @@ public class SceneManager {
     
     /**
      * Execute a function whenever the scene changes.
+     *
      * @param cb The function to execute.
      */
     public static void onChangeScene(SceneChangeEvent cb) {
