@@ -26,6 +26,10 @@ public class SceneManager {
         SceneManager.stage = stage;
     }
     
+    public static Stage getStage() {
+        return stage;
+    }
+    
     /**
      * Register scenes.
      *
