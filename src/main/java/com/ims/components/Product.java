@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class Product extends GridPane {
@@ -23,12 +24,7 @@ public class Product extends GridPane {
         this.styleClass.add("product-container");
         
         // Setup main row and columns
-        RowConstraints row = new RowConstraints();
-        this.getRowConstraints().add(0, row);
-        ColumnConstraints imageColumn = new ColumnConstraints();
-        this.getColumnConstraints().add(0, imageColumn);
-        ColumnConstraints detailsColumn = new ColumnConstraints();
-        this.getColumnConstraints().add(1, detailsColumn);
+        Utils.setupGridPane(this, 1, 2);
         
         // Setup grid pane for the details
         GridPane detailsGridPane = Utils.createGridPane(2, 1);
@@ -52,10 +48,12 @@ public class Product extends GridPane {
         FlowPane controlFlowPane = new FlowPane();
         controlFlowPane.setAlignment(Pos.BOTTOM_RIGHT);
         controlGridPane.add(controlFlowPane, 0, 0);
+        
+        // Setup buttons
         MFXButton editButton = new MFXButton();
-        editButton.setText("Edit");
+        editButton.setText("");
         Utils.addIconToButton(editButton, "/icons/pencil.svg");
-        editButton.getStyleClass().add("outline-button");
+        editButton.getStyleClass().add("icon-button");
         controlFlowPane.getChildren().add(editButton);
     }
     
@@ -111,9 +109,9 @@ public class Product extends GridPane {
         this.textGridPane.add(label, 0, 1);
     }
     
-    public void setDescription(String description) {
+    public void setStocks(int current, int max) {
         Label label = new Label();
-        label.setText(description);
+        label.setText("In stock: " + current + "/" + max);
         label.setAlignment(Pos.TOP_LEFT);
         label.setWrapText(true);
         this.heightProperty().addListener(($1, $2, $3) -> {

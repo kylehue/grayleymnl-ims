@@ -2,116 +2,176 @@
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXComboBox?>
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@../../styles/global.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="com.ims.controller.ProductController">
-  <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="60.0" vgrow="NEVER" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-  </rowConstraints>
-   <children>
-      <GridPane>
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
+<GridPane fx:id="rootContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ims.controller.ProductController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="60.0" minHeight="-Infinity" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints vgrow="NEVER" />
+    </rowConstraints>
+    <children>
+        <GridPane hgap="10.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" />
+                <ColumnConstraints hgrow="SOMETIMES" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label text="Edit Product" GridPane.columnIndex="1">
+                    <styleClass>
+                        <String fx:value="h5" />
+                        <String fx:value="text-bold" />
+                    </styleClass>
+                    <GridPane.margin>
+                        <Insets />
+                    </GridPane.margin>
+                </Label>
+                <MFXButton fx:id="backButton" onAction="#goBack" text="🡸" />
+            </children>
+        </GridPane>
+        <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-border-color: rgba(125, 125, 125, 0.1); -fx-border-width: 0 0 1 0;" GridPane.rowIndex="1">
+            <children>
+                <MFXButton fx:id="tabGeneralButton" styleClass="tab-button" text="General" />
+                <MFXButton fx:id="tabStocksButton" styleClass="tab-button" text="Stocks" />
+            <MFXButton fx:id="tabOthersButton" styleClass="tab-button" text="Others" />
+            </children>
+        </HBox>
+        <StackPane GridPane.rowIndex="2">
+            <GridPane.margin>
+                <Insets top="10.0" />
+            </GridPane.margin>
          <children>
-            <Label text="Edit Product">
-               <styleClass>
-                  <String fx:value="h5" />
-                  <String fx:value="text-bold" />
-               </styleClass>
-            </Label>
-         </children>
-      </GridPane>
-      <GridPane GridPane.rowIndex="1">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <GridPane GridPane.rowIndex="1">
+            <GridPane fx:id="tabGeneralPane" visible="false">
               <columnConstraints>
-                <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <HBox spacing="10.0" GridPane.halignment="RIGHT">
-                     <children>
-                        <MFXButton styleClass="outline-button" text="Cancel" />
-                        <MFXButton text="Save" />
-                     </children>
-                  </HBox>
-               </children>
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </GridPane>
-            <GridPane>
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </GridPane>
-                  <GridPane hgap="10.0" vgap="10.0" GridPane.columnIndex="1">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints maxHeight="-Infinity" minHeight="20.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="-Infinity" minHeight="20.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="-Infinity" minHeight="20.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="-Infinity" minHeight="20.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <MFXTextField floatingText="Price" maxWidth="300.0" minWidth="100.0" GridPane.rowIndex="1" />
-                        <MFXTextField floatingText="Name" maxWidth="300.0" minWidth="100.0" />
-                        <MFXTextField floatingText="Description" maxWidth="300.0" GridPane.rowIndex="2" />
-                        <MFXComboBox allowEdit="true" floatingText="Category" maxWidth="300.0" GridPane.rowIndex="3" />
-                     </children>
-                  </GridPane>
+                  <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vvalue="1.0">
+                     <content>
+                        <VBox spacing="10.0">
+                           <children>
+                              <MFXTextField fx:id="productNameTextField" floatingText="Product Name" maxWidth="300.0" minWidth="100.0" />
+                              <MFXTextField fx:id="productPriceTextField" floatingText="Price" maxWidth="300.0" minWidth="100.0" />
+                              <MFXComboBox fx:id="productCategoryComboBox" floatingText="Category" maxWidth="300.0" minWidth="100.0" />
+                              <GridPane vgap="5.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label style="-fx-text-fill: -text-color-fade;" text="Product Image" />
+                                    <StackPane GridPane.rowIndex="1">
+                                       <children>
+                                          <ImageView fx:id="productImageView" fitHeight="250.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../images/image-placeholder.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </StackPane>
+                                    <MFXButton fx:id="uploadImageButton" styleClass="outline-button" text="Upload Image" GridPane.rowIndex="2" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets top="10.0" />
+                                 </padding>
+                              </GridPane>
+                           </children>
+                        </VBox>
+                     </content>
+                  </MFXScrollPane>
                </children>
-               <GridPane.margin>
-                  <Insets bottom="10.0" />
-               </GridPane.margin>
+            </GridPane>
+            <GridPane fx:id="tabStocksPane">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER">
+                     <content>
+                        <VBox fx:id="stocksPaneFieldsContainer" spacing="10.0" />
+                     </content>
+                  </MFXScrollPane>
+               </children>
+            </GridPane>
+            <GridPane fx:id="tabOthersPane">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER">
+                     <content>
+                        <VBox spacing="10.0">
+                           <children>
+                              <MFXButton text="Delete Product">
+                                 <styleClass>
+                                    <String fx:value="button-danger" />
+                                    <String fx:value="outline-button" />
+                                 </styleClass>
+                              </MFXButton>
+                           </children>
+                        </VBox>
+                     </content>
+                  </MFXScrollPane>
+               </children>
             </GridPane>
          </children>
+        </StackPane>
+      <GridPane GridPane.rowIndex="3">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints vgrow="NEVER" />
+        </rowConstraints>
+         <children>
+            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+               <children>
+                  <MFXButton styleClass="outline-button" text="Cancel" />
+                  <MFXButton text="Apply Changes" />
+               </children>
+            </HBox>
+         </children>
+         <GridPane.margin>
+            <Insets top="10.0" />
+         </GridPane.margin>
       </GridPane>
-   </children>
-   <padding>
-      <Insets bottom="30.0" left="30.0" right="30.0" />
-   </padding>
+    </children>
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" />
+    </padding>
 </GridPane>
