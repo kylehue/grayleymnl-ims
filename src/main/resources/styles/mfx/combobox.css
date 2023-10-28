@@ -7,6 +7,8 @@
 
     -mfx-gap: 0;
     -fx-padding: 3 5 3 5;
+    -fx-pref-height: -field-height;
+    -fx-min-height: -field-height;
 }
 
 .mfx-combo-box .caret .mfx-ripple-generator {

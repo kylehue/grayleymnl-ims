@@ -27,14 +27,17 @@
     -fx-font-weight: bold;
 }
 
-/*.mfx-button:armed,
-.mfx-button:focused {
-    -fx-border-color: #badbff;
-    -fx-border-width: 2px;
-    -fx-border-radius: 3px;
-}*/
+.mfx-button.button-danger,
+.mfx-button.button-danger:armed,
+.mfx-button.button-danger:focused {
+    -fx-background-color: -danger;
+}
 
-.mfx-button * {
+.mfx-button.button-danger:hover {
+    -fx-background-color: -danger-hover;
+}
+
+.mfx-button .icon {
     -fx-background-color: -button-text-color;
 }
 
@@ -44,11 +47,11 @@
 
 .outline-button,
 .outline-button:hover,
-.outline-button:focused{
+.outline-button:focused {
     -fx-font-family: "Roboto Medium";
     -fx-background-color: transparent;
-    -fx-text-fill: -accent!important;
-    -fx-border-color: -accent!important;
+    -fx-text-fill: -accent !important;
+    -fx-border-color: -accent !important;
 }
 
 .outline-button:hover,
@@ -56,19 +59,40 @@
     -fx-background-color: -accent-glass;
 }
 
-.outline-button * {
-    -fx-background-color: -accent!important;
+.outline-button .icon {
+    -fx-background-color: -accent !important;
+}
+
+.outline-button .mfx-ripple-generator {
+    -mfx-ripple-color: -accent !important;
+}
+
+.outline-button.button-danger,
+.outline-button.button-danger:hover,
+.outline-button.button-danger:focused {
+    -fx-background-color: transparent;
+    -fx-text-fill: -danger !important;
+    -fx-border-color: -danger !important;
+}
+
+.outline-button.button-danger:hover,
+.outline-button.button-danger:focused {
+    -fx-background-color: -danger-glass;
+}
+
+.outline-button.button-danger .mfx-ripple-generator {
+    -mfx-ripple-color: -danger !important;
 }
 
 .link-button,
 .link-button:armed,
 .link-button:focused {
     -fx-font-family: "Roboto Medium";
-    -fx-background-color: transparent!important;
+    -fx-background-color: transparent !important;
     -fx-text-fill: -accent;
     -fx-cursor: hand;
-    -fx-padding: 5!important;
-    -fx-pref-height: 30!important;
+    -fx-padding: 5 !important;
+    -fx-pref-height: 30 !important;
     -fx-border-width: 0;
 }
 
@@ -78,8 +102,8 @@
     -fx-text-fill: -accent;
 }
 
-.link-button .mfx-ripple-generator, .outline-button .mfx-ripple-generator {
-    -mfx-ripple-color: -accent!important;
+.link-button .mfx-ripple-generator {
+    -mfx-ripple-color: -accent !important;
 }
 
 .tab-button, .tab-button:armed, .tab-button:focused {
@@ -87,7 +111,7 @@
     -fx-border-width: 0;
     -fx-border-radius: 0;
     -fx-text-fill: -text-color;
-    -fx-font-family: "Roboto Medium"!important;
+    -fx-font-family: "Roboto Medium" !important;
     -fx-underline: false;
     -fx-cursor: hand;
 }
@@ -101,25 +125,24 @@
 }
 
 .tab-button-active {
-    -fx-text-fill: -accent!important;
-    -fx-border-width: 0 0 1.5 0!important;
-    -fx-border-color: -accent!important;
+    -fx-text-fill: -accent !important;
+    -fx-border-width: 0 0 1.5 0 !important;
+    -fx-border-color: -accent !important;
 }
 
-/* TODO: this is ugly, find another way to change color of button's icon when active*/
-.tab-button * {
-    -fx-background-color: -text-color!important;
+.tab-button .icon {
+    -fx-background-color: -text-color !important;
 }
 
-.tab-button-active * {
-    -fx-background-color: -accent!important;
+.tab-button-active .icon {
+    -fx-background-color: -accent !important;
 }
 
 .tag-button,
 .tag-button:armed,
 .tag-button:focused,
 .tag-button:hover {
-    -fx-font-family: "Roboto Medium"!important;
+    -fx-font-family: "Roboto Medium" !important;
     -fx-text-fill: -text-color;
     -fx-background-color: -tag-button-background-color;
     -fx-background-radius: 50px;
@@ -142,3 +165,41 @@
     -fx-background-color: -button-hovered-color;
     -fx-text-fill: -button-text-color;
 }
+
+.icon-button,
+.icon-button:armed,
+.icon-button:focused,
+.icon-button:hover {
+    -fx-background-color: transparent;
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+    -fx-padding: 0;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 40px;
+}
+
+.icon-button .mfx-ripple-generator {
+    -mfx-ripple-color: -accent !important;
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+}
+
+.icon-button .icon {
+    -fx-background-color: -text-color-fade;
+}
+
+.icon-button:hover .icon {
+    -fx-background-color: -accent;
+}
+
+.icon-button-danger:hover .icon{
+    -fx-background-color: -danger;
+}
+
+.icon-button-danger .mfx-ripple-generator {
+    -mfx-ripple-color: -danger !important;
+}
+
+.mfx-ripple-generator {
+     -mfx-auto-clip: true;
+ }
