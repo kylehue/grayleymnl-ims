@@ -30,6 +30,10 @@
     -fx-font-smoothing-type: gray;
 }
 
+.button:armed {
+    -fx-cursor: pointer;
+}
+
 /* Use this class to an element if you want it to have a background */
 .background {
     -fx-background-image: url("../images/bg.jpg");
