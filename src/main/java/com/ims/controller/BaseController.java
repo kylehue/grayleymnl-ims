@@ -8,6 +8,7 @@ import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
@@ -142,6 +143,10 @@ public class BaseController {
         
         logoutButton.setOnMouseClicked((e) -> {
             this.goBack();
+        });
+        
+        accountSettingsButton.setOnMouseClicked((e) -> {
+            SceneManager.setScene("account-settings");
         });
     }
     
