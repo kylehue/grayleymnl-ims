@@ -117,7 +117,7 @@
 }
 
 .tab-button:hover {
-    -fx-background-color: rgb(116, 170, 255, 0.1);
+    -fx-background-color: -accent-glass;
 }
 
 .tab-button .mfx-ripple-generator {

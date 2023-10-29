@@ -130,3 +130,39 @@
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
 }
+
+.context-menu {
+    -fx-background-color: -card-background-color;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.context-menu-item-button,
+.context-menu-item-button:armed,
+.context-menu-item-button:focused {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: -text-color-fade;
+    -fx-font-family: "Roboto Medium" !important;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+.context-menu-item-button .icon {
+    -fx-background-color: -text-color-fade;
+}
+
+.context-menu-item-button:hover {
+    -fx-background-color: -accent-glass;
+    -fx-text-fill: -text-color;
+}
+
+.context-menu-item-button:hover .icon {
+    -fx-background-color: -text-color;
+}
+
+.context-menu-item-button .mfx-ripple-generator {
+    -mfx-ripple-color: -accent;
+}

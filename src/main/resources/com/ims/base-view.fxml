@@ -41,7 +41,7 @@
                   <Insets />
                </GridPane.margin>
             </Label>
-            <MFXButton fx:id="settingsButton" onAction="#goBack" text="settings" GridPane.columnIndex="1" />
+            <MFXButton fx:id="settingsButton" text="settings" GridPane.columnIndex="1" />
          </children>
       </GridPane>
       <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-border-color: rgba(125, 125, 125, 0.1); -fx-border-width: 0 0 1 0;" GridPane.rowIndex="1">

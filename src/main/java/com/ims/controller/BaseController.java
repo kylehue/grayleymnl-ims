@@ -1,6 +1,7 @@
 package com.ims.controller;
 
 import com.ims.components.Category;
+import com.ims.components.ContextMenu;
 import com.ims.components.Product;
 import com.ims.components.TagButton;
 import com.ims.utils.SceneManager;
@@ -130,6 +131,18 @@ public class BaseController {
                 i * 2.99f
             );
         }
+        
+        ContextMenu ctx = new ContextMenu();
+        ctx.bindToNode(settingsButton);
+        ctx.setHeaderText("someemail12@gmail.com");
+        MFXButton accountSettingsButton = ctx.addButtonItem("My Account");
+        MFXButton managerUsersButton = ctx.addButtonItem("Manage Users");
+        MFXButton logoutButton = ctx.addButtonItem("Logout");
+        Utils.addIconToButton(logoutButton, "/icons/logout.svg");
+        
+        logoutButton.setOnMouseClicked((e) -> {
+            this.goBack();
+        });
     }
     
     private TagButton addCategoryTag(String categoryName, boolean isActive) {
