@@ -32,6 +32,9 @@ public class LoginController {
     public MFXButton registerButton;
     
     @FXML
+    public MFXButton forgotPasswordButton;
+    
+    @FXML
     public void initialize() {
         this.initializeNetworkAnimation();
         Utils.fitImageViewToParent(vectorImage);
@@ -42,6 +45,10 @@ public class LoginController {
         
         registerButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             SceneManager.setScene("register");
+        });
+        
+        forgotPasswordButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
+            SceneManager.setScene("forgot-password");
         });
     }
     
