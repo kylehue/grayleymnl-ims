@@ -22,9 +22,17 @@
     -fx-font-family: Roboto-Bold;
     -fx-background-color: -accent;
     -fx-text-fill: -button-text-color;
-    -fx-cursor: hand;
     -fx-font-size: 1em;
     -fx-font-weight: bold;
+}
+
+.mfx-button .icon {
+    -fx-background-color: -button-text-color;
+}
+
+.mfx-button:hover {
+    -fx-cursor: hand;
+    -fx-background-color: -button-hovered-color;
 }
 
 .mfx-button.button-danger,
@@ -35,14 +43,6 @@
 
 .mfx-button.button-danger:hover {
     -fx-background-color: -danger-hover;
-}
-
-.mfx-button .icon {
-    -fx-background-color: -button-text-color;
-}
-
-.mfx-button:hover {
-    -fx-background-color: -button-hovered-color;
 }
 
 .outline-button,
@@ -90,7 +90,6 @@
     -fx-font-family: "Roboto Medium";
     -fx-background-color: transparent !important;
     -fx-text-fill: -accent;
-    -fx-cursor: hand;
     -fx-padding: 5 !important;
     -fx-pref-height: 30 !important;
     -fx-border-width: 0;
@@ -113,7 +112,6 @@
     -fx-text-fill: -text-color;
     -fx-font-family: "Roboto Medium" !important;
     -fx-underline: false;
-    -fx-cursor: hand;
 }
 
 .tab-button:hover {

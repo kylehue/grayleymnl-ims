@@ -54,12 +54,20 @@ public class LoginController {
     
     private void initializeNetworkAnimation() {
         Network networkAnimation = new Network(networkCanvas);
-        SceneManager.onChangeScene((newScene, oldScene) -> {
-            if (newScene != "login") {
-                networkAnimation.stop();
-            } else {
-                networkAnimation.start();
-            }
-        });
+        /*
+         * Temporarily disable stopping the animation.
+         *
+         * Why?
+         *
+         * For some reason, stopping the animation when the scene gets hidden
+         * causes a lag when the user goes back to that scene.
+         */
+        // SceneManager.onChangeScene((newScene, oldScene) -> {
+        //     if (newScene != "login") {
+        //         networkAnimation.stop();
+        //     } else {
+        //         networkAnimation.start();
+        //     }
+        // });
     }
 }

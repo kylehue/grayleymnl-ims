@@ -3,6 +3,7 @@
 @import "./mfx/button.css";
 @import "./mfx/scrollpane.css";
 @import "./mfx/combobox.css";
+@import "./mfx/tableview.css";
 
 @font-face {
     font-family: Roboto-Regular;
@@ -28,10 +29,6 @@
 * {
     -fx-text-fill: -text-color;
     -fx-font-smoothing-type: gray;
-}
-
-.button:armed {
-    -fx-cursor: pointer;
 }
 
 /* Use this class to an element if you want it to have a background */
@@ -147,7 +144,6 @@
     -fx-text-fill: -text-color-fade;
     -fx-font-family: "Roboto Medium" !important;
     -fx-underline: false;
-    -fx-cursor: hand;
 }
 
 .context-menu-item-button .icon {
@@ -155,6 +151,7 @@
 }
 
 .context-menu-item-button:hover {
+    -fx-cursor: hand;
     -fx-background-color: -accent-glass;
     -fx-text-fill: -text-color;
 }
@@ -165,4 +162,8 @@
 
 .context-menu-item-button .mfx-ripple-generator {
     -mfx-ripple-color: -accent;
+}
+
+.button:armed {
+    -fx-cursor: pointer !important;
 }
