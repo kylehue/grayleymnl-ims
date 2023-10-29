@@ -24,7 +24,7 @@ public class RegisterController {
     
     @FXML
     public void initialize() {
-        this.initializeNetworkAnimation();
+        // this.initializeNetworkAnimation();
         Utils.fitImageViewToParent(vectorImage);
         
         loginButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
