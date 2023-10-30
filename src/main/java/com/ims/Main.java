@@ -1,5 +1,6 @@
 package com.ims;
 
+import com.ims.utils.DatabaseManager;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -11,6 +12,8 @@ import java.net.URISyntaxException;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, URISyntaxException {
+        DatabaseManager.connect();
+        
         SceneManager.setStage(stage);
         SceneManager.registerScene("login", "login-view.fxml");
         SceneManager.registerScene("register", "register-view.fxml");
@@ -20,7 +23,7 @@ public class Main extends Application {
         SceneManager.registerScene("account-settings", "account-settings-view.fxml");
         SceneManager.registerScene("user-manager", "user-manager-view.fxml");
         SceneManager.registerScene("user", "user-view.fxml");
-        SceneManager.setScene("user");
+        SceneManager.setScene("login");
         SceneManager.setSize(940, 640);
         
         stage.setTitle("GrayleyMNL Inventory Manager");
