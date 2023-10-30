@@ -3,7 +3,6 @@
 @import "./mfx/button.css";
 @import "./mfx/scrollpane.css";
 @import "./mfx/combobox.css";
-@import "./mfx/tableview.css";
 
 @font-face {
     font-family: Roboto-Regular;
@@ -126,6 +125,30 @@
 .product-container .product-image {
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
+}
+
+.user-container {
+
+}
+
+.user-container .user-email-label {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 1.2em;
+    -fx-padding: 0 0 2.5px 0;
+}
+
+.user-container .user-role-label {
+    -fx-text-fill: -text-color-fade;
+    -fx-padding: 0 0 10px 0;
+}
+
+.user-container .user-joined-date-label {
+    -fx-text-fill: -text-color-fade;
+}
+
+.user-container .user-last-activity-date-label {
+    -fx-text-fill: -text-color-fade;
+    -fx-padding: 0 0 5px 0;
 }
 
 .context-menu {

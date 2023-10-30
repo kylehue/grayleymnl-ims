@@ -148,6 +148,10 @@ public class BaseController {
         accountSettingsButton.setOnMouseClicked((e) -> {
             SceneManager.setScene("account-settings");
         });
+        
+        managerUsersButton.setOnMouseClicked((e) -> {
+            SceneManager.setScene("user-manager");
+        });
     }
     
     private TagButton addCategoryTag(String categoryName, boolean isActive) {
