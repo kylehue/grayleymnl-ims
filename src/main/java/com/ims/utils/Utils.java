@@ -21,6 +21,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.util.Arrays.fill;
@@ -325,5 +327,18 @@ public class Utils {
         GridPane gridPane = new GridPane();
         Utils.setupGridPane(gridPane, rowCount, columnCount);
         return gridPane;
+    }
+    
+    public static String formatDate(LocalDate date) {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        
+        if (date.equals(today)) {
+            return "Today";
+        } else if (date.equals(yesterday)) {
+            return "Yesterday";
+        } else {
+            return date.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"));
+        }
     }
 }
