@@ -1,6 +1,6 @@
 package com.ims.components;
 
-import com.ims.utils.Utils;
+import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -17,17 +17,17 @@ import javafx.scene.shape.Rectangle;
 public class Product extends GridPane {
     private final ObservableList<String> styleClass = this.getStyleClass();
     
-    private final GridPane textGridPane = Utils.createGridPane(4, 1);
+    private final GridPane textGridPane = LayoutUtils.createGridPane(4, 1);
     
     public Product() {
         this.styleClass.add("card");
         this.styleClass.add("product-container");
         
         // Setup main row and columns
-        Utils.setupGridPane(this, 1, 2);
+        LayoutUtils.setupGridPane(this, 1, 2);
         
         // Setup grid pane for the details
-        GridPane detailsGridPane = Utils.createGridPane(2, 1);
+        GridPane detailsGridPane = LayoutUtils.createGridPane(2, 1);
         this.add(detailsGridPane, 1, 0);
         
         // Setup grid pane for text
@@ -40,7 +40,7 @@ public class Product extends GridPane {
         textGridPane.getStyleClass().add("product-text-container");
         
         // Setup grid pane for controls
-        GridPane controlGridPane = Utils.createGridPane(1, 1);
+        GridPane controlGridPane = LayoutUtils.createGridPane(1, 1);
         detailsGridPane.add(controlGridPane, 0, 1);
         RowConstraints controlRow = controlGridPane.getRowConstraints().get(0);
         controlRow.setFillHeight(false);
@@ -52,7 +52,7 @@ public class Product extends GridPane {
         // Setup buttons
         MFXButton editButton = new MFXButton();
         editButton.setText("");
-        Utils.addIconToButton(editButton, "/icons/pencil.svg");
+        LayoutUtils.addIconToButton(editButton, "/icons/pencil.svg");
         editButton.getStyleClass().add("icon-button");
         controlFlowPane.getChildren().add(editButton);
     }

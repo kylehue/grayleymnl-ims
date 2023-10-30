@@ -1,11 +1,10 @@
 package com.ims.controller;
 
+import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
-import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
@@ -47,11 +46,11 @@ public class AccountSettingsController {
     
     @FXML
     public void initialize() {
-        Utils.addIconToButton(backButton, "/icons/arrow-left.svg");
+        LayoutUtils.addIconToButton(backButton, "/icons/arrow-left.svg");
         backButton.getStyleClass().add("icon-button");
         backButton.setText("");
         
-        Utils.createTabGroup(
+        LayoutUtils.createTabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabGeneralButton, tabGeneralPane),

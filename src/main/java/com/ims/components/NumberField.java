@@ -1,6 +1,6 @@
 package com.ims.components;
 
-import com.ims.utils.Utils;
+import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.geometry.Pos;
@@ -24,12 +24,12 @@ public class NumberField extends HBox {
         MFXButton decrementButton = new MFXButton();
         decrementButton.getStyleClass().addAll("icon-button");
         decrementButton.setText("");
-        Utils.addIconToButton(decrementButton, "/icons/minus-circle-outline.svg");
+        LayoutUtils.addIconToButton(decrementButton, "/icons/minus-circle-outline.svg");
         
         MFXButton incrementButton = new MFXButton();
         incrementButton.getStyleClass().addAll("icon-button");
         incrementButton.setText("");
-        Utils.addIconToButton(incrementButton, "/icons/plus-circle-outline.svg");
+        LayoutUtils.addIconToButton(incrementButton, "/icons/plus-circle-outline.svg");
         
         textField.setFloatingText("Number");
         this.getChildren().addAll(decrementButton, textField, incrementButton);
@@ -49,7 +49,7 @@ public class NumberField extends HBox {
                 this.value = !newValue.isEmpty() ? Double.parseDouble(newValue) : 0;
             }
         });
-
+        
         textField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
             String text = textField.getText();
             int caretPosition = textField.delegateGetCaretPosition();

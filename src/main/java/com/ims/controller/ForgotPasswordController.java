@@ -2,7 +2,7 @@ package com.ims.controller;
 
 import com.ims.canvas.network.Network;
 import com.ims.utils.SceneManager;
-import com.ims.utils.Utils;
+import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -25,7 +25,7 @@ public class ForgotPasswordController {
     @FXML
     public void initialize() {
         // this.initializeNetworkAnimation();
-        Utils.fitImageViewToParent(vectorImage);
+        LayoutUtils.fitImageViewToParent(vectorImage);
         
         loginButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             SceneManager.setScene("login");

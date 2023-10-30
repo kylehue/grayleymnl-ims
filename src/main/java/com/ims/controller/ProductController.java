@@ -2,19 +2,16 @@ package com.ims.controller;
 
 import com.ims.components.NumberField;
 import com.ims.utils.SceneManager;
-import com.ims.utils.Utils;
+import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 
@@ -67,11 +64,11 @@ public class ProductController {
     
     @FXML
     public void initialize() {
-        Utils.addIconToButton(backButton, "/icons/arrow-left.svg");
+        LayoutUtils.addIconToButton(backButton, "/icons/arrow-left.svg");
         backButton.getStyleClass().add("icon-button");
         backButton.setText("");
         
-        Utils.createTabGroup(
+        LayoutUtils.createTabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabGeneralButton, tabGeneralPane),

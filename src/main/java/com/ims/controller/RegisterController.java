@@ -1,10 +1,7 @@
 package com.ims.controller;
 
 import com.ims.canvas.network.Network;
-import com.ims.utils.DatabaseManager;
-import com.ims.utils.SceneManager;
-import com.ims.utils.Utils;
-import com.ims.utils.TextFieldValidator;
+import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -43,7 +40,7 @@ public class RegisterController {
     @FXML
     public void initialize() {
         // this.initializeNetworkAnimation();
-        Utils.fitImageViewToParent(vectorImage);
+        LayoutUtils.fitImageViewToParent(vectorImage);
         
         loginButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             SceneManager.setScene("login");

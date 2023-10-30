@@ -1,17 +1,13 @@
 package com.ims.components;
 
+import com.ims.utils.LayoutUtils;
 import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 
 import java.time.LocalDate;
 
@@ -24,10 +20,10 @@ public class User extends GridPane {
         
         // email, role, joined_date, last_activity_date, controls
         // Setup main row and columns
-        Utils.setupGridPane(this, 5, 1);
+        LayoutUtils.setupGridPane(this, 5, 1);
         
         // Setup grid pane for controls
-        GridPane controlGridPane = Utils.createGridPane(1, 1);
+        GridPane controlGridPane = LayoutUtils.createGridPane(1, 1);
         this.add(controlGridPane, 0, 4);
         RowConstraints controlRow = controlGridPane.getRowConstraints().get(0);
         controlRow.setFillHeight(false);
@@ -39,7 +35,7 @@ public class User extends GridPane {
         // Setup buttons
         MFXButton editButton = new MFXButton();
         editButton.setText("");
-        Utils.addIconToButton(editButton, "/icons/pencil.svg");
+        LayoutUtils.addIconToButton(editButton, "/icons/pencil.svg");
         editButton.getStyleClass().add("icon-button");
         controlFlowPane.getChildren().add(editButton);
     }

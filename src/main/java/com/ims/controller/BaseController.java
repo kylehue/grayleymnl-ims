@@ -8,14 +8,13 @@ import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
 import java.util.Arrays;
 
-import com.ims.utils.Utils;
+import com.ims.utils.LayoutUtils;
 
 public class BaseController {
     // The container of everything in here
@@ -72,14 +71,14 @@ public class BaseController {
     
     @FXML
     public void initialize() {
-        Utils.addIconToButton(tabDashboardButton, "/icons/home.svg");
-        Utils.addIconToButton(tabProductsButton, "/icons/paw.svg");
-        Utils.addIconToButton(tabCategoriesButton, "/icons/shape.svg");
-        Utils.addIconToButton(settingsButton, "/icons/cog.svg");
+        LayoutUtils.addIconToButton(tabDashboardButton, "/icons/home.svg");
+        LayoutUtils.addIconToButton(tabProductsButton, "/icons/paw.svg");
+        LayoutUtils.addIconToButton(tabCategoriesButton, "/icons/shape.svg");
+        LayoutUtils.addIconToButton(settingsButton, "/icons/cog.svg");
         settingsButton.getStyleClass().add("icon-button");
         settingsButton.setText("");
         
-        Utils.createTabGroup(
+        LayoutUtils.createTabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabDashboardButton, tabDashboardPane),
@@ -88,19 +87,19 @@ public class BaseController {
             )
         );
         
-        Utils.createResponsiveFlowPane(
+        LayoutUtils.createResponsiveFlowPane(
             analyticsFlowPane,
             350,
             2.05,
             true
         );
-        Utils.createResponsiveFlowPane(
+        LayoutUtils.createResponsiveFlowPane(
             productsFlowPane,
             350,
             2.05,
             false
         );
-        Utils.createResponsiveFlowPane(
+        LayoutUtils.createResponsiveFlowPane(
             categoriesFlowPane,
             300,
             1,
@@ -138,7 +137,7 @@ public class BaseController {
         MFXButton accountSettingsButton = ctx.addButtonItem("My Account");
         MFXButton managerUsersButton = ctx.addButtonItem("Manage Users");
         MFXButton logoutButton = ctx.addButtonItem("Logout");
-        Utils.addIconToButton(logoutButton, "/icons/logout.svg");
+        LayoutUtils.addIconToButton(logoutButton, "/icons/logout.svg");
         
         logoutButton.setOnMouseClicked((e) -> {
             this.goBack();

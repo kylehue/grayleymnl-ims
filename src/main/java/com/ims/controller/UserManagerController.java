@@ -3,7 +3,7 @@ package com.ims.controller;
 import com.ims.components.Role;
 import com.ims.components.User;
 import com.ims.utils.SceneManager;
-import com.ims.utils.Utils;
+import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
@@ -46,11 +46,11 @@ public class UserManagerController {
     
     @FXML
     public void initialize() {
-        Utils.addIconToButton(backButton, "/icons/arrow-left.svg");
+        LayoutUtils.addIconToButton(backButton, "/icons/arrow-left.svg");
         backButton.getStyleClass().add("icon-button");
         backButton.setText("");
         
-        Utils.createTabGroup(
+        LayoutUtils.createTabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabUsersButton, tabUsersPane),
@@ -58,13 +58,13 @@ public class UserManagerController {
             )
         );
         
-        Utils.createResponsiveFlowPane(
+        LayoutUtils.createResponsiveFlowPane(
             usersFlowPane,
             300,
             1,
             false
         );
-        Utils.createResponsiveFlowPane(
+        LayoutUtils.createResponsiveFlowPane(
             rolesFlowPane,
             300,
             1,
