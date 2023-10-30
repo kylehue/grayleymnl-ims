@@ -72,6 +72,14 @@
     -fx-text-fill: -danger !important;
 }
 
+.text-warning {
+    -fx-text-fill: -warning !important;
+}
+
+.text-info {
+    -fx-text-fill: -info !important;
+}
+
 .text-accent {
     -fx-text-fill: -accent !important;
 }

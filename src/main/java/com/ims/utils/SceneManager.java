@@ -68,7 +68,7 @@ public class SceneManager {
         }
         
         Scene currentScene = getScene(currentSceneID);
-
+        
         if (currentScene != null) {
             final double transitionDuration = 200;
             FadeTransition fadeOut = new FadeTransition(
@@ -102,6 +102,14 @@ public class SceneManager {
      */
     public static Scene getScene(String id) {
         return SceneManager.registeredScenes.get(id);
+    }
+    
+    /**
+     * Retrieve the current scene.
+     * @return The current scene.
+     */
+    public static Scene getCurrentScene() {
+        return SceneManager.registeredScenes.get(currentSceneID);
     }
     
     /**

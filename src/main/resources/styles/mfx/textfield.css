@@ -7,7 +7,7 @@
     -fx-border-radius: 5 5 0 0;
     -fx-border-width: 0 0 1 0;
     -fx-border-color: #c1c0bf;
-    -fx-padding: 5 10 5 10;
+    -fx-padding: 5 0 5 0;
     -fx-cursor: text;
     -fx-pref-height: -field-height;
 }
@@ -23,7 +23,7 @@
 }
 
 .mfx-text-field .text-field .text {
-    -fx-font-smoothing-type: lcd;
+    -fx-font-smoothing-type: gray;
 }
 
 .mfx-text-field:focus-within {
@@ -37,7 +37,7 @@
 }
 
 .mfx-text-field:floating .floating-text {
-    -fx-background-color: -text-field-background-color;
+    -fx-background-color: transparent;
 }
 
 .mfx-text-field:focus-within .floating-text {
@@ -89,4 +89,28 @@
 
 .mfx-password-field .mfx-icon-wrapper .mfx-font-icon {
     -fx-opacity: 0.75;
+}
+
+.mfx-text-field-danger {
+    -fx-border-color: -danger !important;
+}
+
+.mfx-text-field-danger .floating-text {
+    -fx-text-fill: -danger !important;
+}
+
+.mfx-text-field-warning {
+    -fx-border-color: -warning !important;
+}
+
+.mfx-text-field-warning .floating-text {
+    -fx-text-fill: -warning !important;
+}
+
+.mfx-text-field-info {
+    -fx-border-color: -info !important;
+}
+
+.mfx-text-field-info .floating-text {
+    -fx-text-fill: -info !important;
 }
