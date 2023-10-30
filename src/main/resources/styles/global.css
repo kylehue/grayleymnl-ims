@@ -3,6 +3,7 @@
 @import "./mfx/button.css";
 @import "./mfx/scrollpane.css";
 @import "./mfx/combobox.css";
+@import "./mfx/toggle.css";
 
 @font-face {
     font-family: Roboto-Regular;

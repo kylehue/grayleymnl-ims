@@ -111,7 +111,6 @@ public class BaseController {
         this.addCategoryTag("Dog", false);
         this.addCategoryTag("Cat", false);
         this.addCategoryTag("Bird", false);
-        this.addCategoryTag("Howls", false);
         this.addCategoryTag("Cat Food", false);
         this.addCategoryTag("Dog Food", false);
         this.addCategoryTag("Bird Food", false);

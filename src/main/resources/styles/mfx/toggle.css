@@ -1,0 +1,59 @@
+@import "../variables.css";
+
+.mfx-toggle-button {
+    -mfx-main: -accent;
+    -mfx-secondary: #424242;
+    -fx-padding: 10;
+    -fx-border-radius: 50;
+    -fx-background-radius: 50;
+}
+
+.mfx-toggle-button:hover {
+    -fx-cursor: hand;
+}
+
+.mfx-toggle-button:armed {
+    -fx-cursor: pointer;
+}
+
+.mfx-toggle-button .mfx-ripple-generator {
+    -mfx-animation-speed: 1.5;
+    -mfx-ripple-radius: 10;
+    -mfx-ripple-color: -accent;
+    -mfx-ripple-opacity: 0.4;
+    -mfx-auto-clip: true;
+}
+
+.mfx-toggle-button .circle {
+    -fx-stroke: transparent;
+    -fx-fill: -mfx-secondary;
+}
+
+.mfx-toggle-button .line {
+    -fx-stroke-line-cap: ROUND;
+    -fx-stroke: -mfx-secondary;
+    -fx-opacity: 0.3;
+}
+
+.mfx-toggle-button:selected .mfx-ripple-generator {
+    -mfx-ripple-color: -mfx-secondary;
+    -mfx-auto-clip: true;
+}
+
+.mfx-toggle-button:selected .circle {
+    -fx-fill: -accent;
+}
+
+.mfx-toggle-button:selected .line {
+    -fx-stroke: -accent;
+}
+
+.mfx-toggle-button:disabled .circle,
+.mfx-toggle-button:disabled:selected .circle {
+    -fx-fill: gray;
+}
+
+.mfx-toggle-button:disabled .line,
+.mfx-toggle-button:disabled:selected .line {
+    -fx-stroke: gray;
+}

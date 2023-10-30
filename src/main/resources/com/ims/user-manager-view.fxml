@@ -92,9 +92,10 @@
                         <Insets top="10.0" />
                      </GridPane.margin>
                   </MFXScrollPane>
-                  <GridPane>
+                  <GridPane hgap="10.0">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" />
+                        <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />
                      </columnConstraints>
                      <rowConstraints>
@@ -102,7 +103,8 @@
                      </rowConstraints>
                      <children>
                         <MFXTextField fx:id="searchRoleTextField" floatingText="Search Role" maxWidth="300.0" minWidth="100.0" />
-                        <MFXButton text="Add Role" GridPane.columnIndex="1" />
+                        <MFXButton text="Add Role" GridPane.columnIndex="2" />
+                        <MFXButton fx:id="saveAllButton" styleClass="outline-button" text="Save All" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
                </children>

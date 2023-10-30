@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.components.Role;
 import com.ims.components.User;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Utils;
@@ -33,6 +34,9 @@ public class UserManagerController {
     
     @FXML
     FlowPane rolesFlowPane;
+    
+    @FXML
+    MFXButton saveAllRolesButton;
     
     @FXML
     MFXTextField searchUserTextField;
@@ -75,6 +79,10 @@ public class UserManagerController {
                 "2023-10-30"
             );
         }
+        
+        for (int i = 0; i < 7; i++) {
+            this.addRole("Role " + (i + 1));
+        }
     }
     
     private User addUser(
@@ -90,6 +98,13 @@ public class UserManagerController {
         user.setLastActivityDate(lastActivityDate);
         usersFlowPane.getChildren().add(user);
         return user;
+    }
+    
+    private Role addRole(String name) {
+        Role role = new Role();
+        role.setName(name);
+        rolesFlowPane.getChildren().add(role);
+        return role;
     }
     
     @FXML
