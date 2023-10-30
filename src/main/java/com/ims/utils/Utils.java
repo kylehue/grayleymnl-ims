@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.util.Pair;
+import org.mindrot.jbcrypt.BCrypt;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -342,6 +343,14 @@ public class Utils {
         } else {
             return date.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"));
         }
+    }
+    
+    public static String hashPassword(String plainTextPassword){
+        return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
+    }
+    
+    public static boolean checkPassword(String plainTextPassword, String hashedPassword) {
+        return BCrypt.checkpw(plainTextPassword, hashedPassword);
     }
     
     private static final Pattern VALID_EMAIL_ADDRESS_REGEX =

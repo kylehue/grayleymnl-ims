@@ -62,6 +62,17 @@ public class RegisterController {
                 emailTextField.textProperty()
             )
         );
+        emailTextFieldValidator.addConstraint(
+            Severity.ERROR,
+            "This email address already exists.",
+            Bindings.createBooleanBinding(
+                () -> {
+                    String email = emailTextField.getText();
+                    return true;
+                },
+                emailTextField.textProperty()
+            )
+        );
         
         TextFieldValidator passwordTextFieldValidator = new TextFieldValidator(passwordTextField);
         passwordTextFieldValidator.addConstraint(
@@ -100,7 +111,7 @@ public class RegisterController {
         }
         
         String email = emailTextField.getText();
-        String password = passwordTextField.getText();
+        String password = Utils.hashPassword(passwordTextField.getText());
         
         try {
             Connection connection = DatabaseManager.getConnection();
