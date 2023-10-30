@@ -19,7 +19,8 @@ public class Main extends Application {
         SceneManager.registerScene("product", "product-view.fxml");
         SceneManager.registerScene("account-settings", "account-settings-view.fxml");
         SceneManager.registerScene("user-manager", "user-manager-view.fxml");
-        SceneManager.setScene("user-manager");
+        SceneManager.registerScene("user", "user-view.fxml");
+        SceneManager.setScene("user");
         SceneManager.setSize(940, 640);
         
         stage.setTitle("GrayleyMNL Inventory Manager");

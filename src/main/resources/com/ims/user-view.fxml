@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXComboBox?>
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<GridPane fx:id="rootContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ims.controller.UserController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="60.0" minHeight="-Infinity" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <children>
+        <GridPane hgap="10.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" />
+                <ColumnConstraints hgrow="SOMETIMES" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label text="Edit User" GridPane.columnIndex="1">
+                    <styleClass>
+                        <String fx:value="h5" />
+                        <String fx:value="text-bold" />
+                    </styleClass>
+                    <GridPane.margin>
+                        <Insets />
+                    </GridPane.margin>
+                </Label>
+                <MFXButton fx:id="backButton" onAction="#goBack" text="🡸" />
+            </children>
+        </GridPane>
+        <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-border-color: rgba(125, 125, 125, 0.1); -fx-border-width: 0 0 1 0;" GridPane.rowIndex="1">
+            <children>
+                <MFXButton fx:id="tabGeneralButton" styleClass="tab-button" text="General" />
+                <MFXButton fx:id="tabOthersButton" styleClass="tab-button" text="Others" />
+            </children>
+        </HBox>
+        <StackPane GridPane.rowIndex="2">
+            <GridPane.margin>
+                <Insets top="10.0" />
+            </GridPane.margin>
+            <children>
+                <GridPane fx:id="tabGeneralPane" visible="false">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vvalue="1.0">
+                            <content>
+                                <VBox spacing="10.0">
+                                    <children>
+                                        <MFXTextField fx:id="emailTextField" disable="true" floatingText="Email" maxWidth="300.0" minWidth="100.0" />
+                              <MFXComboBox fx:id="roleComboBox" floatingText="Role" maxWidth="300.0" minWidth="100.0" />
+                                    </children>
+                                </VBox>
+                            </content>
+                        </MFXScrollPane>
+                    </children>
+                </GridPane>
+                <GridPane fx:id="tabOthersPane">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER">
+                            <content>
+                                <VBox spacing="10.0">
+                                    <children>
+                                        <MFXButton fx:id="disableAccountButton" text="Disable Account">
+                                            <styleClass>
+                                                <String fx:value="button-danger" />
+                                                <String fx:value="outline-button" />
+                                            </styleClass>
+                                        </MFXButton>
+                                    </children>
+                                </VBox>
+                            </content>
+                        </MFXScrollPane>
+                    </children>
+                </GridPane>
+            </children>
+        </StackPane>
+    </children>
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" />
+    </padding>
+</GridPane>
