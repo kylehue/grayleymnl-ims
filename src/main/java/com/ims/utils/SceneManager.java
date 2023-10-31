@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class SceneManager {
+public abstract class SceneManager {
     private static Stage stage;
     
     private static HashMap<String, Scene> registeredScenes = new HashMap();
