@@ -1,19 +1,19 @@
 package com.ims.controller;
 
 import com.ims.canvas.network.Network;
+import com.ims.database.DBUsers;
+import com.ims.database.DBUsersColumn;
+import com.ims.model.RegisterModel;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import io.github.palexdev.materialfx.validation.Severity;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
-import java.sql.Connection;
-import java.sql.Statement;
+import java.util.Objects;
 
 public class RegisterController {
     @FXML
@@ -42,49 +42,62 @@ public class RegisterController {
         // this.initializeNetworkAnimation();
         LayoutUtils.fitImageViewToParent(vectorImage);
         
+        TextFieldValidator emailTextFieldValidator = new TextFieldValidator(emailTextField);
+        emailTextFieldValidator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "Invalid email address.",
+            () -> Utils.validateEmail(emailTextField.getText()),
+            emailTextField.textProperty()
+        );
+        emailTextFieldValidator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "This email address already exists.",
+            () -> {
+                String email = emailTextField.getText();
+                // TODO: why is this getting triggered twice?
+                // TODO: add delay before checking in database
+                return DBUsers.getUsersWithLabel(DBUsersColumn.EMAIL, email).isEmpty();
+            },
+            emailTextField.textProperty()
+        );
+
+        TextFieldValidator passwordTextFieldValidator = new TextFieldValidator(passwordTextField);
+        passwordTextFieldValidator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "Password must be at least 8 characters long.",
+            () -> passwordTextField.getText().length() >= 8,
+            passwordTextField.textProperty()
+        );
+        
+        TextFieldValidator confirmPasswordTextFieldValidator = new TextFieldValidator(confirmPasswordTextField);
+        confirmPasswordTextFieldValidator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "Passwords doesn't match.",
+            () -> Objects.equals(
+                passwordTextField.getText(),
+                confirmPasswordTextField.getText()
+            ),
+            passwordTextField.textProperty(),
+            confirmPasswordTextField.textProperty()
+        );
+        
+        Utils.bindModelToTextField(RegisterModel.emailProperty, emailTextField);
+        Utils.bindModelToTextField(RegisterModel.passwordProperty, passwordTextField);
+        Utils.bindModelToTextField(RegisterModel.confirmPasswordProperty, confirmPasswordTextField);
+        
         loginButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             SceneManager.setScene("login");
         });
         
         registerButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
-            this.register();
+            if (
+                emailTextField.isValid() &&
+                    passwordTextField.isValid() &&
+                    confirmPasswordTextField.isValid()
+            ) {
+                RegisterModel.register();
+            }
         });
-        
-        TextFieldValidator emailTextFieldValidator = new TextFieldValidator(emailTextField);
-        emailTextFieldValidator.addConstraint(
-            Severity.ERROR,
-            "Invalid email address.",
-            Bindings.createBooleanBinding(
-                () -> Utils.validateEmail(emailTextField.getText()),
-                emailTextField.textProperty()
-            )
-        );
-        emailTextFieldValidator.addConstraint(
-            Severity.ERROR,
-            "This email address already exists.",
-            Bindings.createBooleanBinding(
-                () -> {
-                    String email = emailTextField.getText();
-                    return true;
-                },
-                emailTextField.textProperty()
-            )
-        );
-        
-        TextFieldValidator passwordTextFieldValidator = new TextFieldValidator(passwordTextField);
-        passwordTextFieldValidator.addConstraint(
-            Severity.ERROR,
-            "Password must be at least 8 characters long.",
-            passwordTextField.textProperty().length().greaterThanOrEqualTo(8)
-        );
-        
-        TextFieldValidator confirmPasswordTextFieldValidator = new TextFieldValidator(confirmPasswordTextField);
-        confirmPasswordTextFieldValidator.addDependents(passwordTextField);
-        confirmPasswordTextFieldValidator.addConstraint(
-            Severity.ERROR,
-            "Passwords doesn't match.",
-            confirmPasswordTextField.textProperty().isEqualTo(passwordTextField.textProperty())
-        );
     }
     
     private void initializeNetworkAnimation() {
@@ -96,27 +109,5 @@ public class RegisterController {
                 networkAnimation.start();
             }
         });
-    }
-    
-    private void register() {
-        if (
-            !emailTextField.isValid() ||
-                !passwordTextField.isValid() ||
-                !confirmPasswordTextField.isValid()
-        ) {
-            return;
-        }
-        
-        String email = emailTextField.getText();
-        String password = Utils.hashPassword(passwordTextField.getText());
-        
-        try {
-            Connection connection = DatabaseManager.getConnection();
-            Statement statement = connection.createStatement();
-            String query = "insert into users (email, password) values ('" + email + "', '" + password + "');";
-            statement.executeQuery(query);
-        } catch (Exception e) {
-            System.out.println(e);
-        }
     }
 }

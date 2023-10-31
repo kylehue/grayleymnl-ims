@@ -1,19 +1,16 @@
 package com.ims.controller;
 
 import com.ims.canvas.network.Network;
-import com.ims.utils.SceneManager;
-import com.ims.utils.LayoutUtils;
+import com.ims.model.LoginModel;
+import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
+import io.github.palexdev.materialfx.controls.MFXPasswordField;
+import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class LoginController {
     @FXML
@@ -35,12 +32,18 @@ public class LoginController {
     public MFXButton forgotPasswordButton;
     
     @FXML
+    public MFXTextField emailTextField;
+    
+    @FXML
+    public MFXPasswordField passwordTextField;
+    
+    @FXML
     public void initialize() {
         this.initializeNetworkAnimation();
         LayoutUtils.fitImageViewToParent(vectorImage);
         
         loginButton.setOnMouseClicked((MouseEvent event) -> {
-            SceneManager.setScene("base");
+            LoginModel.login();
         });
         
         registerButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
@@ -50,6 +53,21 @@ public class LoginController {
         forgotPasswordButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             SceneManager.setScene("forgot-password");
         });
+        
+        TextFieldValidator validator = new TextFieldValidator(passwordTextField);
+        validator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "The email or password is invalid.",
+            () -> LoginModel.validProperty.get(),
+            LoginModel.validProperty
+        );
+        
+        SceneManager.onChangeScene(($1, $2) -> {
+            LoginModel.validProperty.set(true);
+        });
+        
+        Utils.bindModelToTextField(LoginModel.emailProperty, emailTextField);
+        Utils.bindModelToTextField(LoginModel.passwordProperty, passwordTextField);
     }
     
     private void initializeNetworkAnimation() {
