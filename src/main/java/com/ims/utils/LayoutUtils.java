@@ -25,7 +25,7 @@ import java.util.List;
 
 import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
-public class LayoutUtils {
+public abstract class LayoutUtils {
     /**
      * Makes an ImageView fill its parent container.
      *
