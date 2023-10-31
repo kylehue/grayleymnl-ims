@@ -49,8 +49,8 @@
                      </GridPane.margin>
                      <children>
                         <Label styleClass="h4" text="Let's dive in!" />
-                        <MFXTextField floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1" />
-                        <MFXPasswordField floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.rowIndex="2" />
+                        <MFXTextField fx:id="emailTextField" floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1" />
+                        <MFXPasswordField fx:id="passwordTextField" floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.rowIndex="2" />
                         <MFXButton fx:id="forgotPasswordButton" styleClass="link-button" text="Forgot your password?" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
                         <GridPane hgap="10.0" GridPane.rowIndex="4">
                            <columnConstraints>
