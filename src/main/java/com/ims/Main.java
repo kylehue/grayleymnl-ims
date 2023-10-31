@@ -1,6 +1,6 @@
 package com.ims;
 
-import com.ims.utils.DatabaseManager;
+import com.ims.database.Database;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, URISyntaxException {
-        DatabaseManager.connect();
+        Database.connect();
         
         SceneManager.setStage(stage);
         SceneManager.registerScene("login", "login-view.fxml");
