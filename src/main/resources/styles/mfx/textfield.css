@@ -2,7 +2,7 @@
 
 .mfx-text-field {
     -mfx-main: -accent;
-    -fx-background-color: -text-field-background-color;
+    -fx-background-color: transparent;
     -fx-background-radius: 5 5 0 0;
     -fx-border-radius: 5 5 0 0;
     -fx-border-width: 0 0 1 0;

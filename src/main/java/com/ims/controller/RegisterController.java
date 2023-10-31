@@ -91,9 +91,9 @@ public class RegisterController {
         
         registerButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             if (
-                emailTextField.isValid() &&
-                    passwordTextField.isValid() &&
-                    confirmPasswordTextField.isValid()
+                emailTextFieldValidator.isValid() &&
+                    passwordTextFieldValidator.isValid() &&
+                    confirmPasswordTextFieldValidator.isValid()
             ) {
                 RegisterModel.register();
             }

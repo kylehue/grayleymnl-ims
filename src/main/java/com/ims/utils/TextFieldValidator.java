@@ -1,7 +1,6 @@
 package com.ims.utils;
 
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import io.github.palexdev.materialfx.validation.Severity;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -23,21 +22,21 @@ public class TextFieldValidator {
     private VBox wrapper;
     private String invalidMessage = "...";
     private TextFieldValidatorSeverity severity = null;
-    private final BooleanProperty isValid = new SimpleBooleanProperty(true);
+    private final BooleanProperty validProperty = new SimpleBooleanProperty(true);
     private ArrayList<TextFieldValidatorConstraint> constraints = new ArrayList<>();
     
     public TextFieldValidator(MFXTextField textField) {
         this.textField = textField;
         this.messageLabel = this.initializeMessageLabel(textField);
   
-        this.isValid.addListener(($1, $2, $3) -> {
+        this.validProperty.addListener(($1, $2, $3) -> {
             initializeStyleValidation();
         });
 
         SceneManager.onChangeScene((currentScene, oldScene) -> {
             if (currentScene != oldScene && textField.getText().isEmpty()) {
                 this.resetConstraints();
-                this.isValid.set(true);
+                this.validProperty.set(true);
             }
         });
     }
@@ -60,10 +59,10 @@ public class TextFieldValidator {
             if (!isValid) {
                 this.invalidMessage = constraint.getInvalidMessage();
                 this.severity = constraint.getSeverity();
-                this.isValid.set(false);
+                this.validProperty.set(false);
             } else {
                 if (this.getInvalidConstraint() == null) {
-                    this.isValid.set(true);
+                    this.validProperty.set(true);
                 }
             }
         });
@@ -73,6 +72,10 @@ public class TextFieldValidator {
         for (TextFieldValidatorConstraint constraint : constraints) {
             constraint.validProperty.set(true);
         }
+    }
+    
+    public boolean isValid() {
+        return this.validProperty.get() && this.getInvalidConstraint() == null;
     }
     
     private TextFieldValidatorConstraint getInvalidConstraint() {
@@ -87,7 +90,7 @@ public class TextFieldValidator {
     private void initializeStyleValidation() {
         ObservableList<String> textFieldStyleClass = textField.getStyleClass();
         ObservableList<String> messageLabelStyleClass = messageLabel.getStyleClass();
-        if (this.isValid.get()) {
+        if (this.validProperty.get()) {
             textFieldStyleClass.removeAll(
                 INFO_STYLE_CLASS,
                 WARNING_STYLE_CLASS,
