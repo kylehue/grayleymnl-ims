@@ -1,10 +1,15 @@
-package com.ims.utils;
+package com.ims.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class DatabaseManager {
+public class Database {
     private static Connection connection;
+    
+    public static Connection getConnection() {
+        return connection;
+    }
     
     public static void connect() {
         try {
@@ -20,12 +25,8 @@ public class DatabaseManager {
             } else {
                 System.out.println("Database connection has failed.");
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
-    }
-    
-    public static Connection getConnection() {
-        return connection;
     }
 }
