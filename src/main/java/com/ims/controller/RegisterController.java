@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.Config;
 import com.ims.canvas.network.Network;
 import com.ims.database.DBUsers;
 import com.ims.database.DBUsersColumn;
@@ -58,6 +59,14 @@ public class RegisterController {
                 // TODO: add delay before checking in database
                 return DBUsers.get(DBUsersColumn.EMAIL, email).isEmpty();
             },
+            registerButton.armedProperty()
+        );
+        emailTextFieldValidator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "Email must be at most %s characters long.".formatted(
+                Config.maxEmailLength
+            ),
+            () -> emailTextField.getText().length() <= Config.maxEmailLength,
             emailTextField.textProperty()
         );
 
