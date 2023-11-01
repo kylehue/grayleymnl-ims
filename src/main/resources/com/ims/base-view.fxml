@@ -214,7 +214,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <MFXScrollPane fitToHeight="true" fitToWidth="true" GridPane.rowIndex="1">
+                  <MFXScrollPane fx:id="tabCategoriesScrollPane" fitToHeight="true" fitToWidth="true" GridPane.rowIndex="1">
                      <content>
                         <FlowPane fx:id="categoriesFlowPane" hgap="10.0" vgap="10.0" />
                      </content>

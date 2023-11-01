@@ -8,6 +8,7 @@ import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
+import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
@@ -48,6 +49,10 @@ public class BaseController {
     // The container of the categories page
     @FXML
     private GridPane tabCategoriesPane;
+    
+    // The scroll pane containing the categories.
+    @FXML
+    private MFXScrollPane tabCategoriesScrollPane;
     
     // The settings button on the top right area
     @FXML
@@ -120,34 +125,6 @@ public class BaseController {
             false
         );
         
-        BaseModel.categoriesProperty.addListener((MapChangeListener) change -> this.handleCategoryChange(change));
-        
-        
-        // this.addCategoryTag("All", true);
-        // this.addCategoryTag("Dog", false);
-        // this.addCategoryTag("Cat", false);
-        // this.addCategoryTag("Bird", false);
-        // this.addCategoryTag("Cat Food", false);
-        // this.addCategoryTag("Dog Food", false);
-        // this.addCategoryTag("Bird Food", false);
-        // this.addCategory("hello");
-        // this.addCategory("uhuh");
-        // this.addCategory("test");
-        // this.addCategory("hello");
-        // this.addCategory("uhuh");
-        // this.addCategory("test");
-        //
-        // for (int i = 0; i < 12; i++) {
-        //     this.addProduct(
-        //         "Some Cat",
-        //         "Cat",
-        //         "https://i0.wp.com/suddenlycat.com/wp-content/uploads/2020/09/b31.jpg?resize=680%2C839&ssl=1",
-        //         i * 4,
-        //         i * 7,
-        //         i * 2.99f
-        //     );
-        // }
-        
         ContextMenu ctx = new ContextMenu();
         ctx.bindToNode(settingsButton);
         // TODO: change this based on user's current session
@@ -156,6 +133,11 @@ public class BaseController {
         MFXButton managerUsersButton = ctx.addButtonItem("Manage Users");
         MFXButton logoutButton = ctx.addButtonItem("Logout");
         LayoutUtils.addIconToButton(logoutButton, "/icons/logout.svg");
+        
+        BaseModel.categoriesProperty.addListener(
+            (MapChangeListener) change -> this.handleCategoryChange(change)
+        );
+        this.initializeCategoryLoader();
         
         logoutButton.setOnMouseClicked((e) -> {
             this.goBack();
@@ -169,9 +151,8 @@ public class BaseController {
             SceneManager.setScene("user-manager");
         });
         
-        BaseModel.loadCategories(12);
         addCategoryButton.setOnMouseClicked((e) -> {
-            BaseModel.addCategory("Unnamed Category");
+            BaseModel.addCategory("New Category");
         });
         
         saveAllCategoriesButton.setOnMouseClicked((e) -> {
@@ -182,6 +163,32 @@ public class BaseController {
                 );
             }
         });
+    }
+    
+    /**
+     * Autoload categories whenever needed.
+     */
+    private void initializeCategoryLoader() {
+        // Load categories whenever the scrollbar hits the bottom.
+        tabCategoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+            if (scrollValue.doubleValue() == 1.0) {
+                BaseModel.loadCategories(12);
+            }
+        });
+        
+        // The listener above won't work if there is no scrollbar.
+        // So here, we add components until the scroll pane gets a scrollbar.
+        tabCategoriesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+            double contentHeight = categoriesFlowPane.getBoundsInLocal().getHeight();
+            double viewportHeight = newValue.getHeight();
+            if (contentHeight < viewportHeight) {
+                BaseModel.loadCategories(4);
+            }
+        });
+        
+        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+        // So here, we can trigger it by loading initial categories.
+        BaseModel.loadCategories(12);
     }
     
     private void handleCategoryChange(
