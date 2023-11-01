@@ -19,11 +19,10 @@ public class TextFieldValidator {
     private final String INFO_STYLE_CLASS = "mfx-text-field-info";
     private final Label messageLabel;
     private final MFXTextField textField;
-    private VBox wrapper;
     private String invalidMessage = "...";
     private TextFieldValidatorSeverity severity = null;
     private final BooleanProperty validProperty = new SimpleBooleanProperty(true);
-    private ArrayList<TextFieldValidatorConstraint> constraints = new ArrayList<>();
+    private final ArrayList<TextFieldValidatorConstraint> constraints = new ArrayList<>();
     
     public TextFieldValidator(MFXTextField textField) {
         this.textField = textField;
@@ -106,9 +105,8 @@ public class TextFieldValidator {
                 "text-error"
             );
             messageLabel.setText("");
-            if (wrapper.getChildren().contains(messageLabel)) {
-                wrapper.getChildren().remove(messageLabel);
-            }
+            messageLabel.setVisible(false);
+            messageLabel.setManaged(false);
         } else {
             if (this.severity == TextFieldValidatorSeverity.ERROR) {
                 if (!textFieldStyleClass.contains(ERROR_STYLE_CLASS)) {
@@ -127,29 +125,29 @@ public class TextFieldValidator {
                 }
             }
             messageLabel.setText(this.invalidMessage);
-            if (!wrapper.getChildren().contains(messageLabel)) {
-                wrapper.getChildren().add(1, messageLabel);
-            }
+            messageLabel.setVisible(true);
+            messageLabel.setManaged(true);
         }
     }
     
     private Label initializeMessageLabel(MFXTextField textField) {
         Label label = new Label();
+        label.setVisible(false);
+        label.setManaged(false);
         label.setWrapText(true);
         label.setStyle("-fx-font-size: 0.9em;");
         VBox wrapper = new VBox();
         wrapper.setSpacing(5);
-        this.wrapper = wrapper;
         if (textField.getParent() instanceof GridPane parent) {
             int columnIndex = GridPane.getColumnIndex(textField) == null ? 0 : GridPane.getColumnIndex(textField);
             int rowIndex = GridPane.getRowIndex(textField) == null ? 0 : GridPane.getRowIndex(textField);
             parent.getChildren().remove(textField);
-            wrapper.getChildren().add(textField);
+            wrapper.getChildren().addAll(textField, label);
             parent.add(wrapper, columnIndex, rowIndex);
         } else if (textField.getParent() instanceof Pane parent) {
             int index = parent.getChildren().indexOf(textField);
             parent.getChildren().remove(textField);
-            wrapper.getChildren().add(textField);
+            wrapper.getChildren().addAll(textField, label);
             parent.getChildren().add(index, wrapper);
         } else {
             throw new Error("TextField's parent must be an instance of Pane.");
