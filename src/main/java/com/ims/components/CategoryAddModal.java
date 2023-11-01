@@ -1,5 +1,6 @@
 package com.ims.components;
 
+import com.ims.Config;
 import com.ims.utils.TextFieldValidator;
 import com.ims.utils.TextFieldValidatorSeverity;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -26,6 +27,16 @@ public class CategoryAddModal extends Modal {
             TextFieldValidatorSeverity.ERROR,
             "Please enter the category name.",
             () -> !nameTextField.getText().isEmpty(),
+            nameTextField.textProperty(),
+            addButton.armedProperty()
+        );
+        
+        nameTextFieldValidator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "Category name must be at most %s characters long.".formatted(
+                Config.maxCategoryNameLength
+            ),
+            () -> nameTextField.getText().length() <= Config.maxCategoryNameLength,
             nameTextField.textProperty(),
             addButton.armedProperty()
         );

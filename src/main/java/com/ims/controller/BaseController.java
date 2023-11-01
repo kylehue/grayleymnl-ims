@@ -94,6 +94,10 @@ public class BaseController {
         
         saveAllCategoriesButton.setOnMouseClicked((e) -> {
             for (Category category : this.categories.values()) {
+                if (!category.nameTextFieldValidator.isValid()) {
+                    continue;
+                }
+                
                 BaseModel.updateCategory(
                     category.getCategoryID(),
                     category.getCategoryName()
@@ -167,6 +171,9 @@ public class BaseController {
             });
             
             category.saveButton.setOnMouseClicked((e) -> {
+                if (!category.nameTextFieldValidator.isValid()) {
+                    return;
+                }
                 BaseModel.updateCategory(id, category.getCategoryName());
             });
         });

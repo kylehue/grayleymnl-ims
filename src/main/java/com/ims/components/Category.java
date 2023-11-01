@@ -1,6 +1,9 @@
 package com.ims.components;
 
+import com.ims.Config;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.TextFieldValidator;
+import com.ims.utils.TextFieldValidatorSeverity;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.collections.ObservableList;
@@ -12,7 +15,8 @@ import javafx.scene.layout.HBox;
 public class Category extends GridPane {
     private final int categoryID;
     private final ObservableList<String> styleClass = this.getStyleClass();
-    private final MFXTextField nameTextField = new MFXTextField();
+    public final MFXTextField nameTextField = new MFXTextField();
+    public final TextFieldValidator nameTextFieldValidator;
     public final MFXButton deleteButton = new MFXButton();
     public final MFXButton saveButton = new MFXButton();
     
@@ -28,6 +32,16 @@ public class Category extends GridPane {
         this.nameTextField.setMaxWidth(Double.MAX_VALUE);
         this.nameTextField.setPrefWidth(USE_COMPUTED_SIZE);
         this.nameTextField.setFloatingText("Category Name");
+        
+        nameTextFieldValidator = new TextFieldValidator(nameTextField);
+        nameTextFieldValidator.addConstraint(
+            TextFieldValidatorSeverity.ERROR,
+            "Category name must be at most %s characters long.".formatted(
+                Config.maxCategoryNameLength
+            ),
+            () -> nameTextField.getText().length() <= Config.maxCategoryNameLength,
+            nameTextField.textProperty()
+        );
         
         // Setup buttons
         HBox controlContainer = new HBox();
