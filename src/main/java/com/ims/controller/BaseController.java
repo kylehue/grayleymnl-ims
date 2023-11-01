@@ -71,7 +71,9 @@ public class BaseController {
     
     private HashMap<Integer, Category> categories = new HashMap<>();
     
-    private AddCategoryModal addCategoryModal = new AddCategoryModal();
+    private CategoryAddModal addCategoryModal = new CategoryAddModal();
+    
+    private CategoryDeleteModal deleteCategoryModal = new CategoryDeleteModal();
     
     private void initializeCategoryPage() {
         BaseModel.categoriesProperty.addListener(
@@ -154,7 +156,14 @@ public class BaseController {
             this.categories.put(id, category);
             
             category.deleteButton.setOnMouseClicked((e) -> {
-                BaseModel.removeCategory(category.getCategoryID());
+                deleteCategoryModal.setCategoryName(
+                    BaseModel.getCategoryById(id).getName()
+                );
+                deleteCategoryModal.deleteButton.setOnMouseClicked((ev) -> {
+                    BaseModel.removeCategory(category.getCategoryID());
+                    deleteCategoryModal.hide();
+                });
+                deleteCategoryModal.show(SceneManager.getStage());
             });
             
             category.saveButton.setOnMouseClicked((e) -> {

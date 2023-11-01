@@ -5,12 +5,12 @@ import com.ims.utils.TextFieldValidatorSeverity;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 
-public class AddCategoryModal extends Modal {
+public class CategoryAddModal extends Modal {
     public final MFXButton addButton = new MFXButton("Add");
     public final MFXTextField nameTextField = new MFXTextField();
     public final TextFieldValidator nameTextFieldValidator;
     
-    public AddCategoryModal() {
+    public CategoryAddModal() {
         this.headerText.setText("Add Category");
         this.controlContainer.getChildren().add(addButton);
         nameTextField.setFloatingText("Category Name");
