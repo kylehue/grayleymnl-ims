@@ -4,15 +4,19 @@ import com.ims.components.Category;
 import com.ims.components.ContextMenu;
 import com.ims.components.Product;
 import com.ims.components.TagButton;
+import com.ims.model.BaseModel;
+import com.ims.model.objects.CategoryObject;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import com.ims.utils.LayoutUtils;
 
@@ -69,6 +73,16 @@ public class BaseController {
     @FXML
     private MFXTextField searchProductTextField;
     
+    // The button used to save all categories
+    @FXML
+    private MFXButton saveAllCategoriesButton;
+    
+    // The button used to add a category
+    @FXML
+    private MFXButton addCategoryButton;
+    
+    private HashMap<Integer, Category> categories = new HashMap<>();
+    
     @FXML
     public void initialize() {
         LayoutUtils.addIconToButton(tabDashboardButton, "/icons/home.svg");
@@ -106,33 +120,37 @@ public class BaseController {
             false
         );
         
-        this.addCategoryTag("All", true);
-        this.addCategoryTag("Dog", false);
-        this.addCategoryTag("Cat", false);
-        this.addCategoryTag("Bird", false);
-        this.addCategoryTag("Cat Food", false);
-        this.addCategoryTag("Dog Food", false);
-        this.addCategoryTag("Bird Food", false);
-        this.addCategory("hello");
-        this.addCategory("uhuh");
-        this.addCategory("test");
-        this.addCategory("hello");
-        this.addCategory("uhuh");
-        this.addCategory("test");
+        BaseModel.categoriesProperty.addListener((MapChangeListener) change -> this.handleCategoryChange(change));
         
-        for (int i = 0; i < 12; i++) {
-            this.addProduct(
-                "Some Cat",
-                "Cat",
-                "https://i0.wp.com/suddenlycat.com/wp-content/uploads/2020/09/b31.jpg?resize=680%2C839&ssl=1",
-                i * 4,
-                i * 7,
-                i * 2.99f
-            );
-        }
+        
+        // this.addCategoryTag("All", true);
+        // this.addCategoryTag("Dog", false);
+        // this.addCategoryTag("Cat", false);
+        // this.addCategoryTag("Bird", false);
+        // this.addCategoryTag("Cat Food", false);
+        // this.addCategoryTag("Dog Food", false);
+        // this.addCategoryTag("Bird Food", false);
+        // this.addCategory("hello");
+        // this.addCategory("uhuh");
+        // this.addCategory("test");
+        // this.addCategory("hello");
+        // this.addCategory("uhuh");
+        // this.addCategory("test");
+        //
+        // for (int i = 0; i < 12; i++) {
+        //     this.addProduct(
+        //         "Some Cat",
+        //         "Cat",
+        //         "https://i0.wp.com/suddenlycat.com/wp-content/uploads/2020/09/b31.jpg?resize=680%2C839&ssl=1",
+        //         i * 4,
+        //         i * 7,
+        //         i * 2.99f
+        //     );
+        // }
         
         ContextMenu ctx = new ContextMenu();
         ctx.bindToNode(settingsButton);
+        // TODO: change this based on user's current session
         ctx.setHeaderText("someemail12@gmail.com");
         MFXButton accountSettingsButton = ctx.addButtonItem("My Account");
         MFXButton managerUsersButton = ctx.addButtonItem("Manage Users");
@@ -150,6 +168,39 @@ public class BaseController {
         managerUsersButton.setOnMouseClicked((e) -> {
             SceneManager.setScene("user-manager");
         });
+        
+        BaseModel.loadCategories(12);
+        addCategoryButton.setOnMouseClicked((e) -> {
+            BaseModel.addCategory("Unnamed Category");
+        });
+        
+        saveAllCategoriesButton.setOnMouseClicked((e) -> {
+            for (Category category : this.categories.values()) {
+                BaseModel.updateCategory(
+                    category.getCategoryID(),
+                    category.getCategoryName()
+                );
+            }
+        });
+    }
+    
+    private void handleCategoryChange(
+        MapChangeListener.Change<Integer, CategoryObject> change
+    ) {
+        int id = change.getKey();
+        boolean isAddedAlready = this.categories.get(id) != null;
+        boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
+        boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
+        boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
+        if (needsToBeAdded) {
+            CategoryObject value = change.getValueAdded();
+            this.addCategory(id, value.getName());
+        } else if (needsToBeUpdated) {
+            CategoryObject value = change.getValueAdded();
+            this.categories.get(id).setCategoryName(value.getName());
+        } else if (needsToBeRemoved) {
+            this.removeCategory(id);
+        }
     }
     
     private TagButton addCategoryTag(String categoryName, boolean isActive) {
@@ -161,11 +212,28 @@ public class BaseController {
         return categoryButton;
     }
     
-    private Category addCategory(String name) {
-        Category category = new Category();
-        category.setName(name);
+    private Category addCategory(int id, String name) {
+        Category category = new Category(id, name);
         categoriesFlowPane.getChildren().add(category);
+        this.categories.put(id, category);
+        
+        category.deleteButton.setOnMouseClicked((e) -> {
+            BaseModel.removeCategory(category.getCategoryID());
+        });
+        
+        category.saveButton.setOnMouseClicked((e) -> {
+            BaseModel.updateCategory(id, category.getCategoryName());
+        });
+        
         return category;
+    }
+    
+    private void removeCategory(int id) {
+        Category categoryToRemove = this.categories.get(id);
+        if (categoryToRemove != null) {
+            categoriesFlowPane.getChildren().remove(categoryToRemove);
+            this.categories.remove(categoryToRemove.getCategoryID());
+        }
     }
     
     private Product addProduct(

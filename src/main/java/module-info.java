@@ -14,4 +14,8 @@ module com.imsgrayleymnl {
     opens com.ims.controller to javafx.fxml;
     exports com.ims.database;
     opens com.ims.database to javafx.fxml;
+    exports com.ims.model;
+    opens com.ims.model to javafx.fxml;
+    exports com.ims.model.objects;
+    opens com.ims.model.objects to javafx.fxml;
 }

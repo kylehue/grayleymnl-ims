@@ -233,8 +233,8 @@
                      <children>
                         <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.columnIndex="1">
                            <children>
-                              <MFXButton styleClass="outline-button" text="Save All" />
-                              <MFXButton text="Add Category" />
+                              <MFXButton fx:id="saveAllCategoriesButton" styleClass="outline-button" text="Save All" />
+                              <MFXButton fx:id="addCategoryButton" text="Add Category" />
                            </children>
                         </HBox>
                         <MFXTextField floatingText="Search" maxWidth="300.0" minWidth="100.0" />

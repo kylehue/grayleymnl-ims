@@ -11,9 +11,14 @@ import java.util.HashMap;
 public class DBUsers {
     private static Connection connection = Database.getConnection();
     
-    public static void insertToUsers(String email, String password) {
+    public static void add(String email, String password) {
         try {
-            String query = "INSERT INTO USERS (EMAIL, PASSWORD) VALUES (?, ?);";
+            String query = """
+                INSERT INTO USERS (%s, %s) VALUES (?, ?);
+                """.formatted(
+                DBUsersColumn.EMAIL,
+                DBUsersColumn.PASSWORD
+            );
             
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, email);
@@ -25,7 +30,7 @@ public class DBUsers {
         }
     }
     
-    public static ArrayList<HashMap<DBUsersColumn, Object>> getUsersWithLabel(
+    public static ArrayList<HashMap<DBUsersColumn, Object>> get(
         DBUsersColumn columnLabel,
         Object compareValue
     ) {
@@ -34,7 +39,11 @@ public class DBUsers {
         PreparedStatement preparedStatement = null;
         
         try {
-            String query = "SELECT * FROM USERS WHERE " + columnLabel.toString() + " = ?;";
+            String query = """
+                SELECT * FROM USERS WHERE %s = ?;
+                """.formatted(
+                columnLabel
+            );
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
@@ -73,7 +82,7 @@ public class DBUsers {
                     retrievedJoinedDate
                 );
                 
-                Date retrievedLastActivityDate = resultSet.getDate(
+                Date retrievedLastActivityDate = resultSet.getTimestamp(
                     DBUsersColumn.LAST_ACTIVITY_DATE.toString()
                 );
                 data.put(

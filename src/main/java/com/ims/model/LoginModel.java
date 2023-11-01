@@ -26,7 +26,7 @@ public abstract class LoginModel {
             return;
         }
         
-        ArrayList<HashMap<DBUsersColumn, Object>> users = DBUsers.getUsersWithLabel(
+        ArrayList<HashMap<DBUsersColumn, Object>> users = DBUsers.get(
             DBUsersColumn.EMAIL,
             email
         );

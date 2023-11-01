@@ -17,7 +17,7 @@ public abstract class RegisterModel {
         
         if (email.isEmpty() || password.isEmpty()) return;
         
-        DBUsers.insertToUsers(email, Utils.hashPassword(password));
+        DBUsers.add(email, Utils.hashPassword(password));
         
         LoginModel.emailProperty.set(email);
         LoginModel.passwordProperty.set(password);

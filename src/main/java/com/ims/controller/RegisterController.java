@@ -56,7 +56,7 @@ public class RegisterController {
                 String email = emailTextField.getText();
                 // TODO: why is this getting triggered twice?
                 // TODO: add delay before checking in database
-                return DBUsers.getUsersWithLabel(DBUsersColumn.EMAIL, email).isEmpty();
+                return DBUsers.get(DBUsersColumn.EMAIL, email).isEmpty();
             },
             emailTextField.textProperty()
         );

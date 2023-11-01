@@ -10,10 +10,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
 public class Category extends GridPane {
+    private final int categoryID;
     private final ObservableList<String> styleClass = this.getStyleClass();
     private final MFXTextField nameTextField = new MFXTextField();
+    public final MFXButton deleteButton = new MFXButton();
+    public final MFXButton saveButton = new MFXButton();
     
-    public Category() {
+    public Category(int id, String name) {
+        this.categoryID = id;
+        this.setCategoryName(name);
         this.styleClass.add("card");
         this.styleClass.add("category-container");
         LayoutUtils.setupGridPane(this, 2, 1);
@@ -31,21 +36,27 @@ public class Category extends GridPane {
         controlContainer.setPadding(new Insets(10, 0, 0, 0));
         
         // Setup delete button
-        MFXButton deleteButton = new MFXButton();
         controlContainer.getChildren().add(deleteButton);
         deleteButton.getStyleClass().addAll("icon-button", "icon-button-danger");
         deleteButton.setText("");
         LayoutUtils.addIconToButton(deleteButton, "/icons/delete.svg");
         
         // Setup save button
-        MFXButton saveButton = new MFXButton();
         controlContainer.getChildren().add(saveButton);
         saveButton.getStyleClass().addAll("icon-button");
         saveButton.setText("");
         LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
     }
     
-    public void setName(String name) {
+    public void setCategoryName(String name) {
         this.nameTextField.setText(name);
+    }
+    
+    public String getCategoryName() {
+        return this.nameTextField.getText();
+    }
+    
+    public int getCategoryID() {
+        return categoryID;
     }
 }
