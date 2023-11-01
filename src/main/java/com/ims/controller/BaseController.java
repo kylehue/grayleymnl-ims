@@ -80,6 +80,7 @@ public class BaseController {
             (MapChangeListener) change -> this.handleCategoryChange(change)
         );
         
+        LayoutUtils.applyVirtualScrolling(tabCategoriesScrollPane, categoriesFlowPane);
         this.initializeCategoryLazyLoad();
         addCategoryButton.setOnMouseClicked((e) -> {
             addCategoryModal.show(SceneManager.getStage());

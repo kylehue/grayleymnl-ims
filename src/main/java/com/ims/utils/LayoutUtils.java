@@ -1,10 +1,12 @@
 package com.ims.utils;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
+import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -335,5 +337,29 @@ public abstract class LayoutUtils {
         GridPane gridPane = new GridPane();
         setupGridPane(gridPane, rowCount, columnCount);
         return gridPane;
+    }
+    
+    public static void applyVirtualScrolling(
+        MFXScrollPane scrollPane,
+        FlowPane flowPane
+    ) {
+        scrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
+            double viewportHeight = scrollPane.getHeight();
+            double scrollHeight = flowPane.getHeight() - viewportHeight;
+            double scrollValue = scrollHeight * newValue.doubleValue();
+            
+            double visibleMinY = scrollValue;
+            double visibleMaxY = scrollValue + viewportHeight;
+            
+            double bufferOffset = 10;
+            
+            for (Node child : flowPane.getChildren()) {
+                double childMinY = child.getBoundsInParent().getMinY() - bufferOffset;
+                double childMaxY = child.getBoundsInParent().getMaxY() + bufferOffset;
+
+                boolean isVisible = childMaxY >= visibleMinY && childMinY <= visibleMaxY;
+                child.setVisible(isVisible);
+            }
+        });
     }
 }

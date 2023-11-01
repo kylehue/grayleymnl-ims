@@ -3,6 +3,7 @@ package com.ims.utils;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.property.StringProperty;
 import org.mindrot.jbcrypt.BCrypt;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -24,7 +25,7 @@ public abstract class Utils {
         }
     }
     
-    public static String hashPassword(String plainTextPassword){
+    public static String hashPassword(String plainTextPassword) {
         return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
     }
     
