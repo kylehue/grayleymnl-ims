@@ -3,6 +3,7 @@ package com.ims.utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -129,7 +130,7 @@ public abstract class LayoutUtils {
         double flowPaneWidth = flowPane.getWidth();
         
         // Get number of children that can fit without reaching minWidth
-        int numChildrenInRow = (int) (flowPaneWidth / minWidth);
+        int numChildrenInRow = Math.max((int) (flowPaneWidth / minWidth), 1);
         
         double computedWidth = flowPaneWidth / numChildrenInRow;
         
@@ -190,6 +191,17 @@ public abstract class LayoutUtils {
         flowPane.setMinWidth(0);
         flowPane.setMaxWidth(Double.MAX_VALUE);
         flowPane.widthProperty().addListener(($1, $2, $3) -> {
+            Platform.runLater(() -> {
+                resizeFlowPaneChildren(
+                    flowPane,
+                    minWidth,
+                    aspectRatio,
+                    fillEmptySpace
+                );
+            });
+        });
+        
+        flowPane.getChildren().addListener((ListChangeListener<? super Node>) (e) -> {
             Platform.runLater(() -> {
                 resizeFlowPaneChildren(
                     flowPane,
