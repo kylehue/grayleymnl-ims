@@ -49,9 +49,7 @@
                      </GridPane.margin>
                      <children>
                         <Label styleClass="h4" text="Let's dive in!" />
-                        <MFXTextField fx:id="emailTextField" floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1" />
-                        <MFXPasswordField fx:id="passwordTextField" floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.rowIndex="2" />
-                        <MFXButton fx:id="forgotPasswordButton" styleClass="link-button" text="Forgot your password?" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                        <MFXButton fx:id="forgotPasswordButton" styleClass="link-button" text="Forgot your password?" viewOrder="2.0" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
                         <GridPane hgap="10.0" GridPane.rowIndex="4">
                            <columnConstraints>
                               <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" minWidth="10.0" />
@@ -61,13 +59,15 @@
                               <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                            </rowConstraints>
                            <children>
-                              <MFXButton fx:id="registerButton" maxWidth="1.7976931348623157E308" styleClass="link-button" text="Create an account" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
-                              <MFXButton fx:id="loginButton" maxWidth="1.7976931348623157E308" text="Login" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
+                              <MFXButton fx:id="registerButton" maxWidth="1.7976931348623157E308" styleClass="link-button" text="Create an account" viewOrder="3.0" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+                              <MFXButton fx:id="loginButton" maxWidth="1.7976931348623157E308" text="Login" viewOrder="4.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
                            </children>
                            <GridPane.margin>
                               <Insets top="40.0" />
                            </GridPane.margin>
                         </GridPane>
+                        <MFXPasswordField fx:id="passwordTextField" floatingText="Password" maxWidth="300.0" minWidth="100.0" GridPane.rowIndex="2" />
+                        <MFXTextField fx:id="emailTextField" floatingText="Email" maxWidth="300.0" minWidth="100.0" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                </children>
