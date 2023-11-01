@@ -61,12 +61,12 @@ public class Modal extends Popup {
             this.hide();
         });
         
+        GridPane.setMargin(contentContainer, new Insets(15, 0, 15, 0));
         container.add(contentContainer, 0, 1);
         
         controlContainer.setSpacing(10);
         container.add(controlContainer, 0, 2);
         controlContainer.setAlignment(Pos.CENTER_RIGHT);
-        GridPane.setMargin(controlContainer, new Insets(10, 0, 0, 0));
         
         SceneManager.onChangeScene(($1, $2) -> {
             this.hide();
