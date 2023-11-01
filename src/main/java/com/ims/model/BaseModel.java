@@ -4,8 +4,10 @@ import com.ims.database.DBCategories;
 import com.ims.database.DBCategoriesColumn;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -29,16 +31,20 @@ public abstract class BaseModel {
     public static void addCategory(String name) {
         if (name.isEmpty()) return;
         
-        HashMap<DBCategoriesColumn, Object> newCategory = DBCategories.add(name);
-        int newID = (Integer) newCategory.get(DBCategoriesColumn.ID);
-        String newName = (String) newCategory.get(DBCategoriesColumn.NAME);
-        Timestamp newLastModified = (Timestamp) newCategory.get(DBCategoriesColumn.LAST_MODIFIED);
+        Thread task = new Thread(() -> {
+            HashMap<DBCategoriesColumn, Object> newCategory = DBCategories.add(name);
+            int newID = (Integer) newCategory.get(DBCategoriesColumn.ID);
+            String newName = (String) newCategory.get(DBCategoriesColumn.NAME);
+            Timestamp newLastModified = (Timestamp) newCategory.get(DBCategoriesColumn.LAST_MODIFIED);
+            
+            categoriesProperty.put(newID, new CategoryObject(
+                newID,
+                newName,
+                newLastModified
+            ));
+        });
         
-        categoriesProperty.put(newID, new CategoryObject(
-            newID,
-            newName,
-            newLastModified
-        ));
+        task.start();
     }
     
     /**
@@ -51,45 +57,57 @@ public abstract class BaseModel {
         boolean isUnmodified = name.equals(categoriesProperty.get(id).getName());
         if (isUnmodified) return;
         
-        HashMap<DBCategoriesColumn, Object> newCategory = DBCategories.update(id, name);
-        int newID = (Integer) newCategory.get(DBCategoriesColumn.ID);
-        String newName = (String) newCategory.get(DBCategoriesColumn.NAME);
-        Timestamp newLastModified = (Timestamp) newCategory.get(DBCategoriesColumn.LAST_MODIFIED);
+        Thread task = new Thread(() -> {
+            HashMap<DBCategoriesColumn, Object> newCategory = DBCategories.update(id, name);
+            int newID = (Integer) newCategory.get(DBCategoriesColumn.ID);
+            String newName = (String) newCategory.get(DBCategoriesColumn.NAME);
+            Timestamp newLastModified = (Timestamp) newCategory.get(DBCategoriesColumn.LAST_MODIFIED);
+            
+            categoriesProperty.put(newID, new CategoryObject(
+                newID,
+                newName,
+                newLastModified
+            ));
+        });
         
-        categoriesProperty.put(newID, new CategoryObject(
-            newID,
-            newName,
-            newLastModified
-        ));
+        task.start();
     }
     
     public static void removeCategory(int id) {
-        DBCategories.remove(id);
-        categoriesProperty.remove(id);
+        Thread task = new Thread(() -> {
+            DBCategories.remove(id);
+            categoriesProperty.remove(id);
+        });
+        
+        task.start();
     }
     
     public static void loadCategories(int limit) {
-        ArrayList<HashMap<DBCategoriesColumn, Object>> categoryRows = DBCategories.getInRange(
-            categoriesProperty.size(),
-            limit
-        );
-        
-        for (HashMap<DBCategoriesColumn, Object> row : categoryRows) {
-            int id = (Integer) row.get(DBCategoriesColumn.ID);
-            // Skip if already added
-            CategoryObject category = getCategoryById(id);
-            if (category != null) {
-                continue;
-            }
+        Thread task = new Thread(() -> {
+            ArrayList<HashMap<DBCategoriesColumn, Object>> categoryRows = DBCategories.getInRange(
+                categoriesProperty.size(),
+                limit
+            );
             
-            // Add
-            String name = (String) row.get(DBCategoriesColumn.NAME);
-            Timestamp lastModified = (Timestamp) row.get(DBCategoriesColumn.LAST_MODIFIED);
-            categoriesProperty.put(id, new CategoryObject(
-                id,
-                name,
-                lastModified
-            ));
-        }
+            for (HashMap<DBCategoriesColumn, Object> row : categoryRows) {
+                int id = (Integer) row.get(DBCategoriesColumn.ID);
+                // Skip if already added
+                CategoryObject category = getCategoryById(id);
+                if (category != null) {
+                    continue;
+                }
+                
+                // Add
+                String name = (String) row.get(DBCategoriesColumn.NAME);
+                Timestamp lastModified = (Timestamp) row.get(DBCategoriesColumn.LAST_MODIFIED);
+                categoriesProperty.put(id, new CategoryObject(
+                    id,
+                    name,
+                    lastModified
+                ));
+            }
+        });
+        
+        task.start();
     }
 }

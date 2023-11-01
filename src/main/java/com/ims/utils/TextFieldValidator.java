@@ -35,8 +35,7 @@ public class TextFieldValidator {
 
         SceneManager.onChangeScene((currentScene, oldScene) -> {
             if (currentScene != oldScene && textField.getText().isEmpty()) {
-                this.resetConstraints();
-                this.validProperty.set(true);
+                this.reset();
             }
         });
     }
@@ -72,6 +71,11 @@ public class TextFieldValidator {
         for (TextFieldValidatorConstraint constraint : constraints) {
             constraint.validProperty.set(true);
         }
+    }
+    
+    public void reset() {
+        this.resetConstraints();
+        this.validProperty.set(true);
     }
     
     public boolean isValid() {

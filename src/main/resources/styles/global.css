@@ -196,6 +196,23 @@
     -mfx-ripple-color: -accent;
 }
 
+.modal {
+    -fx-background-color: -card-background-color;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 10px;
+
+    -fx-min-width: 200px;
+    -fx-pref-width: 300px;
+    -fx-max-width: 800px;
+}
+
+.modal-header-text {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 1.2em;
+    -fx-text-fill: -text-color;
+}
+
 .button:armed {
     -fx-cursor: pointer !important;
 }

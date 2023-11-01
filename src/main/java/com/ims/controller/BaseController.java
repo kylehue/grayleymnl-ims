@@ -1,15 +1,13 @@
 package com.ims.controller;
 
-import com.ims.components.Category;
-import com.ims.components.ContextMenu;
-import com.ims.components.Product;
-import com.ims.components.TagButton;
+import com.ims.components.*;
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.layout.FlowPane;
@@ -22,9 +20,9 @@ import java.util.HashMap;
 import com.ims.utils.LayoutUtils;
 
 public class BaseController {
-    // The container of everything in here
-    @FXML
-    private GridPane rootContainer;
+    //////////////////////////////////////////////////////////////////////
+    // ----------------------- DASHBOARD PAGE ------------------------- //
+    //////////////////////////////////////////////////////////////////////
     
     // The button used to access the dashboard or analytics page
     @FXML
@@ -34,13 +32,18 @@ public class BaseController {
     @FXML
     private GridPane tabDashboardPane;
     
-    // The button used to access the products page
+    // The container of the analytics cards in dashboard page
     @FXML
-    private MFXButton tabProductsButton;
+    private FlowPane analyticsFlowPane;
     
-    // The container of the products page
-    @FXML
-    private GridPane tabProductsPane;
+    private void initializeDashboardPage() {
+    
+    }
+    
+    
+    //////////////////////////////////////////////////////////////////////
+    // ------------------------ CATEGORY PAGE ------------------------- //
+    //////////////////////////////////////////////////////////////////////
     
     // The button used to access the categories page
     @FXML
@@ -54,29 +57,9 @@ public class BaseController {
     @FXML
     private MFXScrollPane tabCategoriesScrollPane;
     
-    // The settings button on the top right area
-    @FXML
-    private MFXButton settingsButton;
-    
-    // The container of the analytics cards in dashboard page
-    @FXML
-    private FlowPane analyticsFlowPane;
-    
-    // The container of the product cards in products page
-    @FXML
-    private FlowPane productsFlowPane;
-    
-    // The container of the category chip buttons in products page
-    @FXML
-    private FlowPane productsCategoriesFlowPane;
-    
     // The container of the category cards in categories page
     @FXML
     private FlowPane categoriesFlowPane;
-    
-    // The search text field in products page
-    @FXML
-    private MFXTextField searchProductTextField;
     
     // The button used to save all categories
     @FXML
@@ -87,6 +70,178 @@ public class BaseController {
     private MFXButton addCategoryButton;
     
     private HashMap<Integer, Category> categories = new HashMap<>();
+    
+    private AddCategoryModal addCategoryModal = new AddCategoryModal();
+    
+    private void initializeCategoryPage() {
+        BaseModel.categoriesProperty.addListener(
+            (MapChangeListener) change -> this.handleCategoryChange(change)
+        );
+        
+        this.initializeCategoryLazyLoad();
+        addCategoryButton.setOnMouseClicked((e) -> {
+            addCategoryModal.show(SceneManager.getStage());
+        });
+        
+        addCategoryModal.addButton.setOnMouseClicked((e) -> {
+            String name = addCategoryModal.nameTextField.getText();
+            if (!addCategoryModal.nameTextFieldValidator.isValid()) return;
+            addCategoryModal.hide();
+            BaseModel.addCategory(name);
+        });
+        
+        saveAllCategoriesButton.setOnMouseClicked((e) -> {
+            for (Category category : this.categories.values()) {
+                BaseModel.updateCategory(
+                    category.getCategoryID(),
+                    category.getCategoryName()
+                );
+            }
+        });
+    }
+    
+    /**
+     * Autoload categories whenever needed.
+     */
+    private void initializeCategoryLazyLoad() {
+        // Load categories whenever the scrollbar hits the bottom.
+        tabCategoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+            if (scrollValue.doubleValue() == 1.0) {
+                BaseModel.loadCategories(12);
+            }
+        });
+        
+        // The listener above won't work if there is no scrollbar.
+        // So here, we add components until the scroll pane gets a scrollbar.
+        tabCategoriesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+            double contentHeight = categoriesFlowPane.getBoundsInLocal().getHeight();
+            double viewportHeight = newValue.getHeight();
+            if (contentHeight < viewportHeight) {
+                BaseModel.loadCategories(4);
+            }
+        });
+        
+        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+        // So here, we can trigger it by loading initial categories.
+        BaseModel.loadCategories(12);
+    }
+    
+    private void handleCategoryChange(
+        MapChangeListener.Change<Integer, CategoryObject> change
+    ) {
+        int id = change.getKey();
+        boolean isAddedAlready = this.categories.get(id) != null;
+        boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
+        boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
+        boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
+        
+        if (needsToBeAdded) {
+            CategoryObject value = change.getValueAdded();
+            addCategory(id, value.getName());
+        } else if (needsToBeUpdated) {
+            CategoryObject value = change.getValueAdded();
+            categories.get(id).setCategoryName(value.getName());
+        } else if (needsToBeRemoved) {
+            removeCategory(id);
+        }
+    }
+    
+    private Category addCategory(int id, String name) {
+        Category category = new Category(id, name);
+        
+        Platform.runLater(() -> {
+            categoriesFlowPane.getChildren().add(category);
+            this.categories.put(id, category);
+            
+            category.deleteButton.setOnMouseClicked((e) -> {
+                BaseModel.removeCategory(category.getCategoryID());
+            });
+            
+            category.saveButton.setOnMouseClicked((e) -> {
+                BaseModel.updateCategory(id, category.getCategoryName());
+            });
+        });
+        
+        return category;
+    }
+    
+    private void removeCategory(int id) {
+        Category categoryToRemove = this.categories.get(id);
+        if (categoryToRemove != null) {
+            Platform.runLater(() -> {
+                categoriesFlowPane.getChildren().remove(categoryToRemove);
+                this.categories.remove(categoryToRemove.getCategoryID());
+                
+            });
+        }
+    }
+    
+    //////////////////////////////////////////////////////////////////////
+    // ------------------------ PRODUCT PAGE -------------------------- //
+    //////////////////////////////////////////////////////////////////////
+    
+    // The button used to access the products page
+    @FXML
+    private MFXButton tabProductsButton;
+    
+    // The container of the products page
+    @FXML
+    private GridPane tabProductsPane;
+    
+    // The container of the product cards in products page
+    @FXML
+    private FlowPane productsFlowPane;
+    
+    // The container of the category chip buttons in products page
+    @FXML
+    private FlowPane productsCategoriesFlowPane;
+    
+    // The search text field in products page
+    @FXML
+    private MFXTextField searchProductTextField;
+    
+    private void initializeProductPage() {
+    
+    }
+    
+    private TagButton addCategoryTag(String categoryName, boolean isActive) {
+        TagButton categoryButton = new TagButton();
+        categoryButton.setText(categoryName);
+        categoryButton.setActive(isActive);
+        productsCategoriesFlowPane.getChildren().add(categoryButton);
+        
+        return categoryButton;
+    }
+    
+    private Product addProduct(
+        String name,
+        String category,
+        String imageUrl,
+        int currentStock,
+        int neededStock,
+        float price
+    ) {
+        Product product = new Product();
+        product.setName(name);
+        product.setCategory(category);
+        product.setStocks(currentStock, neededStock);
+        product.setPrice(price);
+        product.setImage(imageUrl);
+        productsFlowPane.getChildren().add(product);
+        return product;
+    }
+    
+    //////////////////////////////////////////////////////////////////////
+    // ---------------------------- MAIN ------------------------------ //
+    //////////////////////////////////////////////////////////////////////
+    
+    // The container of everything in here
+    @FXML
+    private GridPane rootContainer;
+    
+    // The settings button on the top right area
+    @FXML
+    private MFXButton settingsButton;
     
     @FXML
     public void initialize() {
@@ -134,13 +289,8 @@ public class BaseController {
         MFXButton logoutButton = ctx.addButtonItem("Logout");
         LayoutUtils.addIconToButton(logoutButton, "/icons/logout.svg");
         
-        BaseModel.categoriesProperty.addListener(
-            (MapChangeListener) change -> this.handleCategoryChange(change)
-        );
-        this.initializeCategoryLoader();
-        
         logoutButton.setOnMouseClicked((e) -> {
-            this.goBack();
+            SceneManager.setScene("login");
         });
         
         accountSettingsButton.setOnMouseClicked((e) -> {
@@ -151,118 +301,8 @@ public class BaseController {
             SceneManager.setScene("user-manager");
         });
         
-        addCategoryButton.setOnMouseClicked((e) -> {
-            BaseModel.addCategory("New Category");
-        });
-        
-        saveAllCategoriesButton.setOnMouseClicked((e) -> {
-            for (Category category : this.categories.values()) {
-                BaseModel.updateCategory(
-                    category.getCategoryID(),
-                    category.getCategoryName()
-                );
-            }
-        });
-    }
-    
-    /**
-     * Autoload categories whenever needed.
-     */
-    private void initializeCategoryLoader() {
-        // Load categories whenever the scrollbar hits the bottom.
-        tabCategoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-            if (scrollValue.doubleValue() == 1.0) {
-                BaseModel.loadCategories(12);
-            }
-        });
-        
-        // The listener above won't work if there is no scrollbar.
-        // So here, we add components until the scroll pane gets a scrollbar.
-        tabCategoriesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-            double contentHeight = categoriesFlowPane.getBoundsInLocal().getHeight();
-            double viewportHeight = newValue.getHeight();
-            if (contentHeight < viewportHeight) {
-                BaseModel.loadCategories(4);
-            }
-        });
-        
-        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial categories.
-        BaseModel.loadCategories(12);
-    }
-    
-    private void handleCategoryChange(
-        MapChangeListener.Change<Integer, CategoryObject> change
-    ) {
-        int id = change.getKey();
-        boolean isAddedAlready = this.categories.get(id) != null;
-        boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
-        boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
-        boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
-        if (needsToBeAdded) {
-            CategoryObject value = change.getValueAdded();
-            this.addCategory(id, value.getName());
-        } else if (needsToBeUpdated) {
-            CategoryObject value = change.getValueAdded();
-            this.categories.get(id).setCategoryName(value.getName());
-        } else if (needsToBeRemoved) {
-            this.removeCategory(id);
-        }
-    }
-    
-    private TagButton addCategoryTag(String categoryName, boolean isActive) {
-        TagButton categoryButton = new TagButton();
-        categoryButton.setText(categoryName);
-        categoryButton.setActive(isActive);
-        productsCategoriesFlowPane.getChildren().add(categoryButton);
-        
-        return categoryButton;
-    }
-    
-    private Category addCategory(int id, String name) {
-        Category category = new Category(id, name);
-        categoriesFlowPane.getChildren().add(category);
-        this.categories.put(id, category);
-        
-        category.deleteButton.setOnMouseClicked((e) -> {
-            BaseModel.removeCategory(category.getCategoryID());
-        });
-        
-        category.saveButton.setOnMouseClicked((e) -> {
-            BaseModel.updateCategory(id, category.getCategoryName());
-        });
-        
-        return category;
-    }
-    
-    private void removeCategory(int id) {
-        Category categoryToRemove = this.categories.get(id);
-        if (categoryToRemove != null) {
-            categoriesFlowPane.getChildren().remove(categoryToRemove);
-            this.categories.remove(categoryToRemove.getCategoryID());
-        }
-    }
-    
-    private Product addProduct(
-        String name,
-        String category,
-        String imageUrl,
-        int currentStock,
-        int neededStock,
-        float price
-    ) {
-        Product product = new Product();
-        product.setName(name);
-        product.setCategory(category);
-        product.setStocks(currentStock, neededStock);
-        product.setPrice(price);
-        product.setImage(imageUrl);
-        productsFlowPane.getChildren().add(product);
-        return product;
-    }
-    
-    @FXML
-    public void goBack() {
-        SceneManager.setScene("login");
+        this.initializeDashboardPage();
+        this.initializeProductPage();
+        this.initializeCategoryPage();
     }
 }
