@@ -2,7 +2,9 @@ package com.ims;
 
 import com.ims.database.Database;
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import com.ims.utils.SceneManager;
 
@@ -35,6 +37,10 @@ public class Main extends Application {
                 "/images/icon.png"
             ).toURI().toString())
         );
+        
+        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+        stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+        stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 1.5);
     }
     
     public static void main(String[] args) {

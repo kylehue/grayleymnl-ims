@@ -2,9 +2,11 @@ package com.ims.components;
 
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -30,22 +32,32 @@ public class ContextMenu extends Popup {
     }
     
     public void bindToNode(Node node) {
+        // We do this for the sake of it computing its bounds
+        Platform.runLater(() -> {
+            this.show(node, -999, -999);
+            Platform.runLater(() -> {
+                this.hide();
+            });
+        });
+        
         node.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             if (this.isShowing()) {
                 this.hide();
             } else {
+                double width = this.container.getBoundsInLocal().getWidth();
+                double height = this.container.getBoundsInLocal().getHeight();
                 double x = event.getScreenX();
                 double y = event.getScreenY();
-                double endX = x + this.getWidth();
-                double endY = y + this.getHeight();
+                double endX = x + width;
+                double endY = y + height;
                 Stage stage = SceneManager.getStage();
                 double stageEndX = stage.getX() + stage.getWidth();
                 double stageEndY = stage.getY() + stage.getHeight();
                 if (endX > stageEndX) {
-                    x = stageEndX - this.getWidth();
+                    x = stageEndX - width;
                 }
                 if (endY > stageEndY) {
-                    y = stageEndY - this.getHeight();
+                    y = stageEndY - height;
                 }
                 this.show(node, x, y);
             }

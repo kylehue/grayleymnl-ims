@@ -17,7 +17,8 @@ public class CategoryAddModal extends Modal {
         nameTextField.setFloatingText("Category Name");
         this.contentContainer.add(nameTextField, 0, 0);
         nameTextField.setMinWidth(100);
-        nameTextField.setMaxWidth(300);
+        nameTextField.setPrefWidth(300);
+        nameTextField.setMaxWidth(Double.MAX_VALUE);
         
         nameTextFieldValidator = new TextFieldValidator(
             nameTextField

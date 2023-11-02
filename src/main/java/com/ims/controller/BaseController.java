@@ -106,6 +106,10 @@ public class BaseController {
                 );
             }
         });
+        
+        BaseModel.isBusyCategoryProperty.addListener(($1, $2, isBusy) -> {
+            System.out.println(isBusy);
+        });
     }
     
     /**
@@ -317,12 +321,12 @@ public class BaseController {
         );
         
         ContextMenu ctx = new ContextMenu();
-        ctx.bindToNode(settingsButton);
         // TODO: change this based on user's current session
         ctx.setHeaderText("someemail12@gmail.com");
         MFXButton accountSettingsButton = ctx.addButtonItem("My Account");
         MFXButton managerUsersButton = ctx.addButtonItem("Manage Users");
         MFXButton logoutButton = ctx.addButtonItem("Logout");
+        ctx.bindToNode(settingsButton);
         LayoutUtils.addIconToButton(logoutButton, "/icons/logout.svg");
         
         logoutButton.setOnMouseClicked((e) -> {

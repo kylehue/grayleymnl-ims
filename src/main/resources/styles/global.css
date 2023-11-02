@@ -164,6 +164,7 @@
     -fx-background-color: -card-background-color;
     -fx-border-radius: 3;
     -fx-background-radius: 3;
+    -fx-font-size: 14px;
 }
 
 .context-menu-item-button,
@@ -201,10 +202,7 @@
     -fx-border-radius: 3;
     -fx-background-radius: 3;
     -fx-padding: 10px;
-
-    -fx-min-width: 200px;
-    -fx-pref-width: 300px;
-    -fx-max-width: 800px;
+    -fx-font-size: 14px;
 }
 
 .modal-header-text {

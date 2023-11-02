@@ -4,10 +4,8 @@ import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.mfxcore.collections.Grid;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
+import javafx.application.Platform;
+import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -17,6 +15,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class Modal extends Popup {
@@ -41,6 +40,9 @@ public class Modal extends Popup {
         container.getStylesheets().add(
             getClass().getResource("/styles/global.css").toExternalForm()
         );
+        container.setMinWidth(Region.USE_COMPUTED_SIZE);
+        container.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        container.setMaxWidth(Double.MAX_VALUE);
         
         container.setOnMousePressed(this::onMousePressed);
         container.setOnMouseDragged(this::onMouseDragged);
@@ -61,6 +63,9 @@ public class Modal extends Popup {
             this.hide();
         });
         
+        contentContainer.setMinWidth(Region.USE_COMPUTED_SIZE);
+        contentContainer.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        contentContainer.setMaxWidth(Double.MAX_VALUE);
         GridPane.setMargin(contentContainer, new Insets(15, 0, 15, 0));
         container.add(contentContainer, 0, 1);
         
@@ -70,6 +75,14 @@ public class Modal extends Popup {
         
         SceneManager.onChangeScene(($1, $2) -> {
             this.hide();
+        });
+        
+        this.showingProperty().addListener((e) -> {
+            Platform.runLater(() -> {
+                Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+                this.setX((primScreenBounds.getWidth() - this.getWidth()) / 2);
+                this.setY((primScreenBounds.getHeight() - this.getHeight()) / 2);
+            });
         });
     }
     
