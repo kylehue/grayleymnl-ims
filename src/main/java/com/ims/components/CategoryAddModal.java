@@ -14,8 +14,10 @@ public class CategoryAddModal extends Modal {
     public CategoryAddModal() {
         this.headerText.setText("Add Category");
         this.controlContainer.getChildren().add(addButton);
-        nameTextField.setFloatingText("Category Name");
         this.contentContainer.add(nameTextField, 0, 0);
+        this.contentContainer.setMaxWidth(400);
+        this.contentContainer.setMaxHeight(400);
+        nameTextField.setFloatingText("Category Name");
         nameTextField.setMinWidth(100);
         nameTextField.setPrefWidth(300);
         nameTextField.setMaxWidth(Double.MAX_VALUE);

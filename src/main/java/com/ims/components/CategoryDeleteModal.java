@@ -16,6 +16,8 @@ public class CategoryDeleteModal extends Modal {
         deleteButton.getStyleClass().add("button-danger");
         this.controlContainer.getChildren().add(deleteButton);
         this.contentContainer.add(label, 0, 0);
+        this.contentContainer.setMaxWidth(400);
+        this.contentContainer.setMaxHeight(400);
         label.setWrapText(true);
         this.setOnShown((e) -> {
             label.setText(
