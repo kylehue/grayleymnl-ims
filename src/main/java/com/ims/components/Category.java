@@ -67,7 +67,7 @@ public class Category extends GridPane {
         saveButton.setText("");
         LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
         
-        final double transitionDuration = 250;
+        final double transitionDuration = 150;
         FadeTransition fadeInTransition = new FadeTransition(
             Duration.millis(transitionDuration), this
         );
