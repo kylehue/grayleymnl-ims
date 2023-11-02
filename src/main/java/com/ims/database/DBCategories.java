@@ -8,15 +8,21 @@ import java.util.HashMap;
 public class DBCategories {
     private static Connection connection = Database.getConnection();
     
-    public static HashMap<DBCategoriesColumn, Object> add(String name) {
-        HashMap<DBCategoriesColumn, Object> row = null;
+    public enum Column {
+        ID,
+        NAME,
+        LAST_MODIFIED
+    }
+    
+    public static HashMap<Column, Object> add(String name) {
+        HashMap<Column, Object> row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
             String query = """
                 INSERT INTO CATEGORIES (%s) VALUES (?) RETURNING *;
                 """.formatted(
-                DBCategoriesColumn.NAME
+                Column.NAME
             );
             
             preparedStatement = connection.prepareStatement(query);
@@ -32,16 +38,16 @@ public class DBCategories {
         return row;
     }
     
-    public static HashMap<DBCategoriesColumn, Object> update(int id, String name) {
-        HashMap<DBCategoriesColumn, Object> row = null;
+    public static HashMap<Column, Object> update(int id, String name) {
+        HashMap<Column, Object> row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
             String query = """
                 UPDATE CATEGORIES SET %s=? WHERE %s=? RETURNING *;
                 """.formatted(
-                DBCategoriesColumn.NAME,
-                DBCategoriesColumn.ID
+                Column.NAME,
+                Column.ID
             );
             
             preparedStatement = connection.prepareStatement(query);
@@ -58,15 +64,15 @@ public class DBCategories {
         return row;
     }
     
-    public static HashMap<DBCategoriesColumn, Object> remove(int id) {
-        HashMap<DBCategoriesColumn, Object> row = null;
+    public static HashMap<Column, Object> remove(int id) {
+        HashMap<Column, Object> row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
             String query = """
                 DELETE FROM CATEGORIES WHERE %s=?;
                 """.formatted(
-                DBCategoriesColumn.ID
+                Column.ID
             );
             
             preparedStatement = connection.prepareStatement(query);
@@ -82,34 +88,34 @@ public class DBCategories {
         return row;
     }
     
-    private static ArrayList<HashMap<DBCategoriesColumn, Object>>
+    private static ArrayList<HashMap<Column, Object>>
     extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
-        ArrayList<HashMap<DBCategoriesColumn, Object>> rows = new ArrayList<>();
+        ArrayList<HashMap<Column, Object>> rows = new ArrayList<>();
         
         while (resultSet.next()) {
-            HashMap<DBCategoriesColumn, Object> data = new HashMap<>();
+            HashMap<Column, Object> data = new HashMap<>();
             
             int retrievedId = resultSet.getInt(
-                DBCategoriesColumn.ID.toString()
+                Column.ID.toString()
             );
             data.put(
-                DBCategoriesColumn.ID,
+                Column.ID,
                 retrievedId
             );
             
             String retrievedEmail = resultSet.getString(
-                DBCategoriesColumn.NAME.toString()
+                Column.NAME.toString()
             );
             data.put(
-                DBCategoriesColumn.NAME,
+                Column.NAME,
                 retrievedEmail
             );
             
             Timestamp retrievedLastModified = resultSet.getTimestamp(
-                DBCategoriesColumn.LAST_MODIFIED.toString()
+                Column.LAST_MODIFIED.toString()
             );
             data.put(
-                DBCategoriesColumn.LAST_MODIFIED,
+                Column.LAST_MODIFIED,
                 retrievedLastModified
             );
             
@@ -125,11 +131,11 @@ public class DBCategories {
      * @param length The limit of rows to retrieve.
      * @return An ArrayList of rows.
      */
-    public static ArrayList<HashMap<DBCategoriesColumn, Object>> getInRange(
+    public static ArrayList<HashMap<Column, Object>> getInRange(
         int startIndex,
         int length
     ) {
-        ArrayList<HashMap<DBCategoriesColumn, Object>> rows = null;
+        ArrayList<HashMap<Column, Object>> rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -137,7 +143,7 @@ public class DBCategories {
             String query = """
                 SELECT * FROM CATEGORIES ORDER BY %s DESC OFFSET %s LIMIT %s;
                 """.formatted(
-                DBCategoriesColumn.LAST_MODIFIED,
+                Column.LAST_MODIFIED,
                 startIndex,
                 length
             );
@@ -159,11 +165,11 @@ public class DBCategories {
      * @param compareValue The value used to check if it matches the column's value.
      * @return A row if found, and null if not.
      */
-    public static ArrayList<HashMap<DBCategoriesColumn, Object>> get(
-        DBCategoriesColumn columnLabel,
+    public static ArrayList<HashMap<Column, Object>> get(
+        Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<DBCategoriesColumn, Object>> rows = null;
+        ArrayList<HashMap<Column, Object>> rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -186,8 +192,8 @@ public class DBCategories {
         return rows;
     }
     
-    public static HashMap<DBCategoriesColumn, Object> getOne(
-        DBCategoriesColumn columnLabel,
+    public static HashMap<Column, Object> getOne(
+        Column columnLabel,
         Object compareValue
     ) {
         return get(columnLabel, compareValue).get(0);

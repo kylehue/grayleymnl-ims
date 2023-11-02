@@ -125,6 +125,10 @@ public abstract class SceneManager {
         SceneManager.stage.setHeight(height);
     }
     
+    public interface SceneChangeEvent {
+        void call(String currentScene, String oldScene);
+    }
+    
     /**
      * Execute a function whenever the scene changes.
      *

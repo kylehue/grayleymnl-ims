@@ -1,9 +1,6 @@
 package com.ims.components;
 
-import com.ims.utils.TextFieldValidator;
-import com.ims.utils.TextFieldValidatorSeverity;
 import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.scene.control.Label;
 
 public class CategoryDeleteModal extends Modal {

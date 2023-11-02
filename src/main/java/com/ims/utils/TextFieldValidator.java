@@ -1,6 +1,10 @@
 package com.ims.utils;
 
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.ParallelTransition;
+import javafx.animation.TranslateTransition;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -9,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -20,18 +25,24 @@ public class TextFieldValidator {
     private final Label messageLabel;
     private final MFXTextField textField;
     private String invalidMessage = "...";
-    private TextFieldValidatorSeverity severity = null;
+    private Severity severity = null;
     private final BooleanProperty validProperty = new SimpleBooleanProperty(true);
     private final ArrayList<TextFieldValidatorConstraint> constraints = new ArrayList<>();
+    
+    public enum Severity {
+        ERROR,
+        WARNING,
+        INFO
+    }
     
     public TextFieldValidator(MFXTextField textField) {
         this.textField = textField;
         this.messageLabel = this.initializeMessageLabel(textField);
-  
+        
         this.validProperty.addListener(($1, $2, $3) -> {
             initializeStyleValidation();
         });
-
+        
         SceneManager.onChangeScene((currentScene, oldScene) -> {
             if (currentScene != oldScene && textField.getText().isEmpty()) {
                 this.reset();
@@ -40,7 +51,7 @@ public class TextFieldValidator {
     }
     
     public void addConstraint(
-        TextFieldValidatorSeverity severity,
+        Severity severity,
         String invalidMessage,
         Callable<Boolean> validityChecker,
         Observable... dependencies
@@ -53,7 +64,7 @@ public class TextFieldValidator {
         );
         
         constraints.add(constraint);
-        constraint.validProperty.addListener(($1, $2, isValid) ->{
+        constraint.validProperty.addListener(($1, $2, isValid) -> {
             if (!isValid) {
                 this.invalidMessage = constraint.getInvalidMessage();
                 this.severity = constraint.getSeverity();
@@ -108,12 +119,12 @@ public class TextFieldValidator {
             messageLabel.setVisible(false);
             messageLabel.setManaged(false);
         } else {
-            if (this.severity == TextFieldValidatorSeverity.ERROR) {
+            if (this.severity == Severity.ERROR) {
                 if (!textFieldStyleClass.contains(ERROR_STYLE_CLASS)) {
                     textFieldStyleClass.add(ERROR_STYLE_CLASS);
                     messageLabelStyleClass.add("text-danger");
                 }
-            } else if (this.severity == TextFieldValidatorSeverity.WARNING) {
+            } else if (this.severity == Severity.WARNING) {
                 if (!textFieldStyleClass.contains(WARNING_STYLE_CLASS)) {
                     textFieldStyleClass.add(WARNING_STYLE_CLASS);
                     messageLabelStyleClass.add("text-warning");
@@ -136,6 +147,29 @@ public class TextFieldValidator {
         label.setManaged(false);
         label.setWrapText(true);
         label.setStyle("-fx-font-size: 0.9em;");
+        
+        label.visibleProperty().addListener((e) -> {
+            double transitionDuration = 150;
+            FadeTransition fadeInTransition = new FadeTransition(
+                Duration.millis(transitionDuration), label
+            );
+            fadeInTransition.setFromValue(0);
+            fadeInTransition.setToValue(1.0);
+            fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
+            
+            TranslateTransition translateTransition = new TranslateTransition(
+                Duration.millis(transitionDuration), label
+            );
+            translateTransition.setFromY(-30);
+            translateTransition.setToY(0);
+            translateTransition.setInterpolator(Interpolator.EASE_OUT);
+            
+            ParallelTransition parallelTransition = new ParallelTransition(
+                fadeInTransition, translateTransition
+            );
+            parallelTransition.play();
+        });
+        
         VBox wrapper = new VBox();
         wrapper.setSpacing(5);
         if (textField.getParent() instanceof GridPane parent) {
@@ -154,5 +188,38 @@ public class TextFieldValidator {
         }
         
         return label;
+    }
+    
+    private static class TextFieldValidatorConstraint {
+        public final BooleanProperty validProperty = new SimpleBooleanProperty(true);
+        private final TextFieldValidator.Severity severity;
+        private final String invalidMessage;
+        
+        public TextFieldValidatorConstraint(
+            TextFieldValidator.Severity severity,
+            String invalidMessage,
+            Callable<Boolean> validityChecker,
+            Observable... dependencies
+        ) {
+            this.severity = severity;
+            this.invalidMessage = invalidMessage;
+            for (Observable dep : dependencies) {
+                dep.addListener((e) -> {
+                    try {
+                        this.validProperty.set(validityChecker.call());
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+            }
+        }
+        
+        public String getInvalidMessage() {
+            return invalidMessage;
+        }
+        
+        public TextFieldValidator.Severity getSeverity() {
+            return severity;
+        }
     }
 }

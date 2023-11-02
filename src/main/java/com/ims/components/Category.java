@@ -4,7 +4,6 @@ import com.ims.Config;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
-import com.ims.utils.TextFieldValidatorSeverity;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.animation.FadeTransition;
@@ -41,7 +40,7 @@ public class Category extends GridPane {
         
         nameTextFieldValidator = new TextFieldValidator(nameTextField);
         nameTextFieldValidator.addConstraint(
-            TextFieldValidatorSeverity.ERROR,
+            TextFieldValidator.Severity.ERROR,
             "Category name must be at most %s characters long.".formatted(
                 Config.maxCategoryNameLength
             ),

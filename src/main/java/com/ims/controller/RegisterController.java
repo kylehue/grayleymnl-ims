@@ -3,7 +3,6 @@ package com.ims.controller;
 import com.ims.Config;
 import com.ims.canvas.network.Network;
 import com.ims.database.DBUsers;
-import com.ims.database.DBUsersColumn;
 import com.ims.model.RegisterModel;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -45,24 +44,24 @@ public class RegisterController {
         
         TextFieldValidator emailTextFieldValidator = new TextFieldValidator(emailTextField);
         emailTextFieldValidator.addConstraint(
-            TextFieldValidatorSeverity.ERROR,
+            TextFieldValidator.Severity.ERROR,
             "Invalid email address.",
             () -> Utils.validateEmail(emailTextField.getText()),
             emailTextField.textProperty()
         );
         emailTextFieldValidator.addConstraint(
-            TextFieldValidatorSeverity.ERROR,
+            TextFieldValidator.Severity.ERROR,
             "This email address already exists.",
             () -> {
                 String email = emailTextField.getText();
                 // TODO: why is this getting triggered twice?
                 // TODO: add delay before checking in database
-                return DBUsers.get(DBUsersColumn.EMAIL, email).isEmpty();
+                return DBUsers.get(DBUsers.Column.EMAIL, email).isEmpty();
             },
             registerButton.armedProperty()
         );
         emailTextFieldValidator.addConstraint(
-            TextFieldValidatorSeverity.ERROR,
+            TextFieldValidator.Severity.ERROR,
             "Email must be at most %s characters long.".formatted(
                 Config.maxEmailLength
             ),
@@ -72,7 +71,7 @@ public class RegisterController {
 
         TextFieldValidator passwordTextFieldValidator = new TextFieldValidator(passwordTextField);
         passwordTextFieldValidator.addConstraint(
-            TextFieldValidatorSeverity.ERROR,
+            TextFieldValidator.Severity.ERROR,
             "Password must be at least 8 characters long.",
             () -> passwordTextField.getText().length() >= 8,
             passwordTextField.textProperty()
@@ -80,7 +79,7 @@ public class RegisterController {
         
         TextFieldValidator confirmPasswordTextFieldValidator = new TextFieldValidator(confirmPasswordTextField);
         confirmPasswordTextFieldValidator.addConstraint(
-            TextFieldValidatorSeverity.ERROR,
+            TextFieldValidator.Severity.ERROR,
             "Passwords doesn't match.",
             () -> Objects.equals(
                 passwordTextField.getText(),

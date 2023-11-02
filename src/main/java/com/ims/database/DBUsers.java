@@ -11,13 +11,21 @@ import java.util.HashMap;
 public class DBUsers {
     private static Connection connection = Database.getConnection();
     
+    public enum Column {
+        ID,
+        EMAIL,
+        PASSWORD,
+        JOINED_DATE,
+        LAST_ACTIVITY_DATE
+    }
+    
     public static void add(String email, String password) {
         try {
             String query = """
                 INSERT INTO USERS (%s, %s) VALUES (?, ?);
                 """.formatted(
-                DBUsersColumn.EMAIL,
-                DBUsersColumn.PASSWORD
+                DBUsers.Column.EMAIL,
+                DBUsers.Column.PASSWORD
             );
             
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -30,11 +38,11 @@ public class DBUsers {
         }
     }
     
-    public static ArrayList<HashMap<DBUsersColumn, Object>> get(
-        DBUsersColumn columnLabel,
+    public static ArrayList<HashMap<DBUsers.Column, Object>> get(
+        DBUsers.Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<DBUsersColumn, Object>> rows = new ArrayList<>();
+        ArrayList<HashMap<DBUsers.Column, Object>> rows = new ArrayList<>();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -48,45 +56,45 @@ public class DBUsers {
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
             
-            HashMap<DBUsersColumn, Object> data = new HashMap<>();
+            HashMap<DBUsers.Column, Object> data = new HashMap<>();
             while (resultSet.next()) {
                 int retrievedId = resultSet.getInt(
-                    DBUsersColumn.ID.toString()
+                    DBUsers.Column.ID.toString()
                 );
                 data.put(
-                    DBUsersColumn.ID,
+                    DBUsers.Column.ID,
                     retrievedId
                 );
                 
                 String retrievedEmail = resultSet.getString(
-                    DBUsersColumn.EMAIL.toString()
+                    DBUsers.Column.EMAIL.toString()
                 );
                 data.put(
-                    DBUsersColumn.EMAIL,
+                    DBUsers.Column.EMAIL,
                     retrievedEmail
                 );
                 
                 String retrievedPassword = resultSet.getString(
-                    DBUsersColumn.PASSWORD.toString()
+                    DBUsers.Column.PASSWORD.toString()
                 );
                 data.put(
-                    DBUsersColumn.PASSWORD,
+                    DBUsers.Column.PASSWORD,
                     retrievedPassword
                 );
                 
                 Date retrievedJoinedDate = resultSet.getDate(
-                    DBUsersColumn.JOINED_DATE.toString()
+                    DBUsers.Column.JOINED_DATE.toString()
                 );
                 data.put(
-                    DBUsersColumn.JOINED_DATE,
+                    DBUsers.Column.JOINED_DATE,
                     retrievedJoinedDate
                 );
                 
                 Date retrievedLastActivityDate = resultSet.getTimestamp(
-                    DBUsersColumn.LAST_ACTIVITY_DATE.toString()
+                    DBUsers.Column.LAST_ACTIVITY_DATE.toString()
                 );
                 data.put(
-                    DBUsersColumn.LAST_ACTIVITY_DATE,
+                    DBUsers.Column.LAST_ACTIVITY_DATE,
                     retrievedLastActivityDate
                 );
                 

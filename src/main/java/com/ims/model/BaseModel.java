@@ -1,10 +1,8 @@
 package com.ims.model;
 
 import com.ims.database.DBCategories;
-import com.ims.database.DBCategoriesColumn;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -41,10 +39,10 @@ public abstract class BaseModel {
             @Override
             protected Void call() throws Exception {
                 isBusyCategoryProperty.set(true);
-                HashMap<DBCategoriesColumn, Object> newCategory = DBCategories.add(name);
-                int newID = (Integer) newCategory.get(DBCategoriesColumn.ID);
-                String newName = (String) newCategory.get(DBCategoriesColumn.NAME);
-                Timestamp newLastModified = (Timestamp) newCategory.get(DBCategoriesColumn.LAST_MODIFIED);
+                HashMap<DBCategories.Column, Object> newCategory = DBCategories.add(name);
+                int newID = (Integer) newCategory.get(DBCategories.Column.ID);
+                String newName = (String) newCategory.get(DBCategories.Column.NAME);
+                Timestamp newLastModified = (Timestamp) newCategory.get(DBCategories.Column.LAST_MODIFIED);
                 
                 categoriesProperty.put(newID, new CategoryObject(
                     newID,
@@ -73,15 +71,15 @@ public abstract class BaseModel {
         if (name.isEmpty()) return;
         boolean isUnmodified = name.equals(categoriesProperty.get(id).getName());
         if (isUnmodified) return;
-
+        
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 isBusyCategoryProperty.set(true);
-                HashMap<DBCategoriesColumn, Object> newCategory = DBCategories.update(id, name);
-                int newID = (Integer) newCategory.get(DBCategoriesColumn.ID);
-                String newName = (String) newCategory.get(DBCategoriesColumn.NAME);
-                Timestamp newLastModified = (Timestamp) newCategory.get(DBCategoriesColumn.LAST_MODIFIED);
+                HashMap<DBCategories.Column, Object> newCategory = DBCategories.update(id, name);
+                int newID = (Integer) newCategory.get(DBCategories.Column.ID);
+                String newName = (String) newCategory.get(DBCategories.Column.NAME);
+                Timestamp newLastModified = (Timestamp) newCategory.get(DBCategories.Column.LAST_MODIFIED);
                 
                 categoriesProperty.put(newID, new CategoryObject(
                     newID,
@@ -126,13 +124,13 @@ public abstract class BaseModel {
             @Override
             protected Void call() throws Exception {
                 isBusyCategoryProperty.set(true);
-                ArrayList<HashMap<DBCategoriesColumn, Object>> categoryRows = DBCategories.getInRange(
+                ArrayList<HashMap<DBCategories.Column, Object>> categoryRows = DBCategories.getInRange(
                     categoriesProperty.size(),
                     limit
                 );
                 
-                for (HashMap<DBCategoriesColumn, Object> row : categoryRows) {
-                    int id = (Integer) row.get(DBCategoriesColumn.ID);
+                for (HashMap<DBCategories.Column, Object> row : categoryRows) {
+                    int id = (Integer) row.get(DBCategories.Column.ID);
                     // Skip if already added
                     CategoryObject category = getCategoryById(id);
                     if (category != null) {
@@ -140,8 +138,8 @@ public abstract class BaseModel {
                     }
                     
                     // Add
-                    String name = (String) row.get(DBCategoriesColumn.NAME);
-                    Timestamp lastModified = (Timestamp) row.get(DBCategoriesColumn.LAST_MODIFIED);
+                    String name = (String) row.get(DBCategories.Column.NAME);
+                    Timestamp lastModified = (Timestamp) row.get(DBCategories.Column.LAST_MODIFIED);
                     categoriesProperty.put(id, new CategoryObject(
                         id,
                         name,

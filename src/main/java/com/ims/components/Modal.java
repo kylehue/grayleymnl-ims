@@ -85,33 +85,13 @@ public class Modal extends Popup {
             });
             
             FadeTransition fadeInTransition = new FadeTransition(
-                Duration.millis(100), container
-            );
-            fadeInTransition.setFromValue(0.5);
-            fadeInTransition.setToValue(1.0);
-            fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
-            
-            ScaleTransition scaleTransition = new ScaleTransition(
                 Duration.millis(150), container
             );
-            scaleTransition.setFromX(0.8);
-            scaleTransition.setToX(1);
-            scaleTransition.setFromY(0.8);
-            scaleTransition.setToY(1);
-            scaleTransition.setInterpolator(new OneTimeBounceInterpolator());
-            
-            ParallelTransition parallelTransition = new ParallelTransition(
-                fadeInTransition, scaleTransition
-            );
-            parallelTransition.play();
+            fadeInTransition.setFromValue(0);
+            fadeInTransition.setToValue(1.0);
+            fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
+            fadeInTransition.play();
         });
-    }
-    
-    private class OneTimeBounceInterpolator extends Interpolator {
-        @Override
-        protected double curve(double t) {
-            return 1.0 - 2.0 * (t - 0.5) * (t - 0.5);
-        }
     }
     
     private void onMousePressed(MouseEvent event) {

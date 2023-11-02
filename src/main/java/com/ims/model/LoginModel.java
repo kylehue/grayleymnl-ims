@@ -1,7 +1,6 @@
 package com.ims.model;
 
 import com.ims.database.DBUsers;
-import com.ims.database.DBUsersColumn;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Utils;
 import javafx.beans.property.BooleanProperty;
@@ -26,8 +25,8 @@ public abstract class LoginModel {
             return;
         }
         
-        ArrayList<HashMap<DBUsersColumn, Object>> users = DBUsers.get(
-            DBUsersColumn.EMAIL,
+        ArrayList<HashMap<DBUsers.Column, Object>> users = DBUsers.get(
+            DBUsers.Column.EMAIL,
             email
         );
         
@@ -36,10 +35,10 @@ public abstract class LoginModel {
             return;
         }
         
-        HashMap<DBUsersColumn, Object> user = users.get(0);
+        HashMap<DBUsers.Column, Object> user = users.get(0);
         boolean isCorrectPassword = Utils.checkPassword(
             password,
-            user.get(DBUsersColumn.PASSWORD).toString()
+            user.get(DBUsers.Column.PASSWORD).toString()
         );
         
         if (isCorrectPassword) {

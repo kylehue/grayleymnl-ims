@@ -56,7 +56,7 @@ public class LoginController {
         
         TextFieldValidator validator = new TextFieldValidator(passwordTextField);
         validator.addConstraint(
-            TextFieldValidatorSeverity.ERROR,
+            TextFieldValidator.Severity.ERROR,
             "The email or password is invalid.",
             () -> LoginModel.validProperty.get(),
             LoginModel.validProperty
