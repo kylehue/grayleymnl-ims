@@ -4,6 +4,7 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -343,23 +344,28 @@ public abstract class LayoutUtils {
         MFXScrollPane scrollPane,
         FlowPane flowPane
     ) {
-        scrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
-            double viewportHeight = scrollPane.getHeight();
-            double scrollHeight = flowPane.getHeight() - viewportHeight;
-            double scrollValue = scrollHeight * newValue.doubleValue();
-            
-            double visibleMinY = scrollValue;
-            double visibleMaxY = scrollValue + viewportHeight;
-            
-            double bufferOffset = 10;
-            
-            for (Node child : flowPane.getChildren()) {
-                double childMinY = child.getBoundsInParent().getMinY() - bufferOffset;
-                double childMaxY = child.getBoundsInParent().getMaxY() + bufferOffset;
-
-                boolean isVisible = childMaxY >= visibleMinY && childMinY <= visibleMaxY;
-                child.setVisible(isVisible);
-            }
-        });
+        InvalidationListener listener = (e) -> {
+            Platform.runLater(() -> {
+                double viewportHeight = scrollPane.getHeight();
+                double scrollHeight = flowPane.getHeight() - viewportHeight;
+                double scrollValue = scrollHeight * scrollPane.getVvalue();
+                
+                double visibleMinY = scrollValue;
+                double visibleMaxY = scrollValue + viewportHeight;
+                
+                double bufferOffset = 10;
+                
+                for (Node child : flowPane.getChildren()) {
+                    double childMinY = child.getBoundsInParent().getMinY() - bufferOffset;
+                    double childMaxY = child.getBoundsInParent().getMaxY() + bufferOffset;
+                    
+                    boolean isVisible = childMaxY >= visibleMinY && childMinY <= visibleMaxY;
+                    child.setVisible(isVisible);
+                }
+            });
+        };
+        
+        scrollPane.vvalueProperty().addListener(listener);
+        scrollPane.widthProperty().addListener(listener);
     }
 }
