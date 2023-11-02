@@ -9,6 +9,7 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
+import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -66,14 +67,13 @@ public class Category extends GridPane {
         saveButton.setText("");
         LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
         
-        final double transitionDuration = 300;
+        final double transitionDuration = 250;
         FadeTransition fadeInTransition = new FadeTransition(
             Duration.millis(transitionDuration), this
         );
-        fadeInTransition.setFromValue(0.4);
+        fadeInTransition.setFromValue(0);
         fadeInTransition.setToValue(1.0);
         fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
-        fadeInTransition.play();
         
         TranslateTransition translateTransition = new TranslateTransition(
             Duration.millis(transitionDuration), this
@@ -81,7 +81,11 @@ public class Category extends GridPane {
         translateTransition.setFromY(30);
         translateTransition.setToY(0);
         translateTransition.setInterpolator(Interpolator.EASE_OUT);
-        translateTransition.play();
+        
+        ParallelTransition parallelTransition = new ParallelTransition(
+            fadeInTransition, translateTransition
+        );
+        parallelTransition.play();
     }
     
     public void setCategoryName(String name) {
