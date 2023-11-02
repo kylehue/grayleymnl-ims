@@ -7,11 +7,15 @@ import com.ims.utils.TextFieldValidator;
 import com.ims.utils.TextFieldValidatorSeverity;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
 public class Category extends GridPane {
     public final CategoryObject categoryObject;
@@ -61,6 +65,23 @@ public class Category extends GridPane {
         saveButton.getStyleClass().addAll("icon-button");
         saveButton.setText("");
         LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
+        
+        final double transitionDuration = 300;
+        FadeTransition fadeInTransition = new FadeTransition(
+            Duration.millis(transitionDuration), this
+        );
+        fadeInTransition.setFromValue(0.4);
+        fadeInTransition.setToValue(1.0);
+        fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
+        fadeInTransition.play();
+        
+        TranslateTransition translateTransition = new TranslateTransition(
+            Duration.millis(transitionDuration), this
+        );
+        translateTransition.setFromY(30);
+        translateTransition.setToY(0);
+        translateTransition.setInterpolator(Interpolator.EASE_OUT);
+        translateTransition.play();
     }
     
     public void setCategoryName(String name) {
