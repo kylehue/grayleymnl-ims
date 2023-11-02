@@ -366,6 +366,6 @@ public abstract class LayoutUtils {
         };
         
         scrollPane.vvalueProperty().addListener(listener);
-        scrollPane.widthProperty().addListener(listener);
+        flowPane.heightProperty().addListener(listener);
     }
 }
