@@ -13,7 +13,7 @@ public class CategoryObject {
         this.lastModified = lastModified;
     }
     
-    public int getId() {
+    public int getID() {
         return id;
     }
     

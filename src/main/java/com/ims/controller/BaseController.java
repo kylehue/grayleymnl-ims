@@ -9,13 +9,15 @@ import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ims.utils.LayoutUtils;
 
@@ -39,7 +41,6 @@ public class BaseController {
     private void initializeDashboardPage() {
     
     }
-    
     
     //////////////////////////////////////////////////////////////////////
     // ------------------------ CATEGORY PAGE ------------------------- //
@@ -100,7 +101,7 @@ public class BaseController {
                 }
                 
                 BaseModel.updateCategory(
-                    category.getCategoryID(),
+                    category.categoryObject.getID(),
                     category.getCategoryName()
                 );
             }
@@ -144,7 +145,7 @@ public class BaseController {
         
         if (needsToBeAdded) {
             CategoryObject value = change.getValueAdded();
-            addCategory(id, value.getName());
+            addCategory(value);
         } else if (needsToBeUpdated) {
             CategoryObject value = change.getValueAdded();
             categories.get(id).setCategoryName(value.getName());
@@ -153,19 +154,23 @@ public class BaseController {
         }
     }
     
-    private Category addCategory(int id, String name) {
-        Category category = new Category(id, name);
-        
+    private Category addCategory(CategoryObject categoryObject) {
+        Category category = new Category(categoryObject);
+        int id = categoryObject.getID();
         Platform.runLater(() -> {
-            categoriesFlowPane.getChildren().add(category);
             this.categories.put(id, category);
+            
+            categoriesFlowPane.getChildren().add(
+                this.getSortedCategories().indexOf(category),
+                category
+            );
             
             category.deleteButton.setOnMouseClicked((e) -> {
                 deleteCategoryModal.setCategoryName(
                     BaseModel.getCategoryById(id).getName()
                 );
                 deleteCategoryModal.deleteButton.setOnMouseClicked((ev) -> {
-                    BaseModel.removeCategory(category.getCategoryID());
+                    BaseModel.removeCategory(id);
                     deleteCategoryModal.hide();
                 });
                 deleteCategoryModal.show(SceneManager.getStage());
@@ -187,10 +192,24 @@ public class BaseController {
         if (categoryToRemove != null) {
             Platform.runLater(() -> {
                 categoriesFlowPane.getChildren().remove(categoryToRemove);
-                this.categories.remove(categoryToRemove.getCategoryID());
+                this.categories.remove(categoryToRemove.categoryObject.getID());
                 
             });
         }
+    }
+    
+    private ArrayList<Category> getSortedCategories() {
+        ArrayList<Category> sortedCategories = new ArrayList<>(
+            this.categories.values().stream().sorted(
+                (a, b) -> {
+                    return b.categoryObject.getLastModified().compareTo(
+                        a.categoryObject.getLastModified()
+                    );
+                }
+            ).toList()
+        );
+        
+        return sortedCategories;
     }
     
     //////////////////////////////////////////////////////////////////////

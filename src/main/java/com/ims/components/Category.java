@@ -1,6 +1,7 @@
 package com.ims.components;
 
 import com.ims.Config;
+import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
 import com.ims.utils.TextFieldValidatorSeverity;
@@ -13,16 +14,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
 public class Category extends GridPane {
-    private final int categoryID;
+    public final CategoryObject categoryObject;
     private final ObservableList<String> styleClass = this.getStyleClass();
     public final MFXTextField nameTextField = new MFXTextField();
     public final TextFieldValidator nameTextFieldValidator;
     public final MFXButton deleteButton = new MFXButton();
     public final MFXButton saveButton = new MFXButton();
     
-    public Category(int id, String name) {
-        this.categoryID = id;
-        this.setCategoryName(name);
+    public Category(CategoryObject categoryObject) {
+        this.categoryObject = categoryObject;
+        this.setCategoryName(categoryObject.getName());
         this.styleClass.add("card");
         this.styleClass.add("category-container");
         LayoutUtils.setupGridPane(this, 2, 1);
@@ -68,9 +69,5 @@ public class Category extends GridPane {
     
     public String getCategoryName() {
         return this.nameTextField.getText();
-    }
-    
-    public int getCategoryID() {
-        return categoryID;
     }
 }

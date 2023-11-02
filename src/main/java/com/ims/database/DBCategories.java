@@ -135,8 +135,9 @@ public class DBCategories {
         
         try {
             String query = """
-                SELECT * FROM CATEGORIES OFFSET %s LIMIT %s;
+                SELECT * FROM CATEGORIES ORDER BY %s DESC OFFSET %s LIMIT %s;
                 """.formatted(
+                DBCategoriesColumn.LAST_MODIFIED,
                 startIndex,
                 length
             );
