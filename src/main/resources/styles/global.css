@@ -2,7 +2,6 @@
 @import "./mfx/textfield.css";
 @import "./mfx/button.css";
 @import "./mfx/scrollpane.css";
-@import "./mfx/combobox.css";
 @import "./mfx/toggle.css";
 @import "mfx/progress.css";
 
@@ -162,7 +161,7 @@
 }
 
 .context-menu {
-    -fx-background-color: -card-background-color;
+    -fx-background-color: -card-background-color !important;
     -fx-border-radius: 3;
     -fx-background-radius: 3;
     -fx-font-size: 14px;
@@ -200,11 +199,13 @@
 
 .modal {
     -fx-background-color: -card-background-color;
-    -fx-border-radius: 3;
-    -fx-background-radius: 3;
-    -fx-padding: 10px;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10 25 15 25;
     -fx-font-size: 14px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 12, 0, 0, 6);
+    -fx-border-width: 1;
+    -fx-border-color: rgba(0, 0, 0, 0.05);
 }
 
 .modal-header-text {
