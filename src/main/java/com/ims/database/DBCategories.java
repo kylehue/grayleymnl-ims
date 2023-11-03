@@ -32,7 +32,7 @@ public class DBCategories {
         } catch (SQLException e) {
             System.out.println(e);
         } finally {
-            closeStuff(resultSet, preparedStatement);
+            Database.closeStuff(resultSet, preparedStatement);
         }
         
         return row;
@@ -58,7 +58,7 @@ public class DBCategories {
         } catch (SQLException e) {
             System.out.println(e);
         } finally {
-            closeStuff(resultSet, preparedStatement);
+            Database.closeStuff(resultSet, preparedStatement);
         }
         
         return row;
@@ -82,7 +82,7 @@ public class DBCategories {
         } catch (SQLException e) {
             System.out.println(e);
         } finally {
-            closeStuff(resultSet, preparedStatement);
+            Database.closeStuff(resultSet, preparedStatement);
         }
         
         return row;
@@ -153,7 +153,7 @@ public class DBCategories {
         } catch (SQLException e) {
             System.out.println(e);
         } finally {
-            closeStuff(resultSet, preparedStatement);
+            Database.closeStuff(resultSet, preparedStatement);
         }
         
         return rows;
@@ -186,7 +186,7 @@ public class DBCategories {
         } catch (SQLException e) {
             System.out.println(e);
         } finally {
-            closeStuff(resultSet, preparedStatement);
+            Database.closeStuff(resultSet, preparedStatement);
         }
         
         return rows;
@@ -197,27 +197,5 @@ public class DBCategories {
         Object compareValue
     ) {
         return get(columnLabel, compareValue).get(0);
-    }
-    
-    
-    
-    private static void closeStuff(
-        ResultSet resultSet,
-        PreparedStatement preparedStatement
-    ) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                System.out.println(e);
-            }
-        }
-        if (preparedStatement != null) {
-            try {
-                preparedStatement.close();
-            } catch (SQLException e) {
-                System.out.println(e);
-            }
-        }
     }
 }

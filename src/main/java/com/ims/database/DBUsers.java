@@ -1,9 +1,6 @@
 package com.ims.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,30 +16,90 @@ public class DBUsers {
         LAST_ACTIVITY_DATE
     }
     
-    public static void add(String email, String password) {
+    public static HashMap<Column, Object> add(String email, String password) {
+        HashMap<Column, Object> row = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         try {
             String query = """
-                INSERT INTO USERS (%s, %s) VALUES (?, ?);
+                INSERT INTO USERS (%s, %s) VALUES (?, ?) RETURNING *;
                 """.formatted(
                 DBUsers.Column.EMAIL,
                 DBUsers.Column.PASSWORD
             );
             
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, email);
             preparedStatement.setString(2, password);
-            
-            preparedStatement.executeQuery();
+            resultSet = preparedStatement.executeQuery();
+            row = extractRowsFromResultSet(resultSet).get(0);
         } catch (SQLException e) {
             System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
         }
+        
+        return row;
+    }
+    
+    private static ArrayList<HashMap<Column, Object>>
+    extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
+        ArrayList<HashMap<Column, Object>> rows = new ArrayList<>();
+        
+        while (resultSet.next()) {
+            HashMap<Column, Object> data = new HashMap<>();
+            
+            int retrievedId = resultSet.getInt(
+                Column.ID.toString()
+            );
+            data.put(
+                Column.ID,
+                retrievedId
+            );
+            
+            String retrievedEmail = resultSet.getString(
+                Column.EMAIL.toString()
+            );
+            data.put(
+                Column.EMAIL,
+                retrievedEmail
+            );
+            
+            String retrievedPassword = resultSet.getString(
+                Column.PASSWORD.toString()
+            );
+            data.put(
+                Column.PASSWORD,
+                retrievedPassword
+            );
+            
+            Date retrievedJoinedDate = resultSet.getDate(
+                Column.JOINED_DATE.toString()
+            );
+            data.put(
+                Column.JOINED_DATE,
+                retrievedJoinedDate
+            );
+            
+            Date retrievedLastActivityDate = resultSet.getTimestamp(
+                Column.LAST_ACTIVITY_DATE.toString()
+            );
+            data.put(
+                Column.LAST_ACTIVITY_DATE,
+                retrievedLastActivityDate
+            );
+            
+            rows.add(data);
+        }
+        
+        return rows;
     }
     
     public static ArrayList<HashMap<DBUsers.Column, Object>> get(
         DBUsers.Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<DBUsers.Column, Object>> rows = new ArrayList<>();
+        ArrayList<HashMap<DBUsers.Column, Object>> rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -55,68 +112,11 @@ public class DBUsers {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
-            
-            HashMap<DBUsers.Column, Object> data = new HashMap<>();
-            while (resultSet.next()) {
-                int retrievedId = resultSet.getInt(
-                    DBUsers.Column.ID.toString()
-                );
-                data.put(
-                    DBUsers.Column.ID,
-                    retrievedId
-                );
-                
-                String retrievedEmail = resultSet.getString(
-                    DBUsers.Column.EMAIL.toString()
-                );
-                data.put(
-                    DBUsers.Column.EMAIL,
-                    retrievedEmail
-                );
-                
-                String retrievedPassword = resultSet.getString(
-                    DBUsers.Column.PASSWORD.toString()
-                );
-                data.put(
-                    DBUsers.Column.PASSWORD,
-                    retrievedPassword
-                );
-                
-                Date retrievedJoinedDate = resultSet.getDate(
-                    DBUsers.Column.JOINED_DATE.toString()
-                );
-                data.put(
-                    DBUsers.Column.JOINED_DATE,
-                    retrievedJoinedDate
-                );
-                
-                Date retrievedLastActivityDate = resultSet.getTimestamp(
-                    DBUsers.Column.LAST_ACTIVITY_DATE.toString()
-                );
-                data.put(
-                    DBUsers.Column.LAST_ACTIVITY_DATE,
-                    retrievedLastActivityDate
-                );
-                
-                rows.add(data);
-            }
+            rows = extractRowsFromResultSet(resultSet);
         } catch (SQLException e) {
             System.out.println(e);
         } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    System.out.println(e);
-                }
-            }
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    System.out.println(e);
-                }
-            }
+            Database.closeStuff(resultSet, preparedStatement);
         }
         
         return rows;

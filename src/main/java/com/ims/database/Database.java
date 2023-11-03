@@ -29,4 +29,25 @@ public class Database {
             System.out.println(e);
         }
     }
+    
+    public static void closeStuff(
+        ResultSet resultSet,
+        PreparedStatement preparedStatement
+    ) {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
+        }
+        
+        if (preparedStatement != null) {
+            try {
+                preparedStatement.close();
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
+        }
+    }
 }
