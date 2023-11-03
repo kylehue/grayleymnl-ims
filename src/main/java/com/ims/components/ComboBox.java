@@ -14,6 +14,7 @@ import javafx.collections.ObservableMap;
 import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -44,7 +45,8 @@ public class ComboBox<K, V> extends StackPane {
         // Set up dropdown button
         toggleDropDownButton.getStyleClass().add("icon-button");
         LayoutUtils.addIconToButton(toggleDropDownButton, "/icons/menu-down.svg");
-        StackPane.setAlignment(toggleDropDownButton, Pos.CENTER_RIGHT);
+        StackPane.setAlignment(toggleDropDownButton, Pos.TOP_RIGHT);
+        toggleDropDownButton.setTranslateY(5);
         this.getChildren().add(toggleDropDownButton);
         
         // Set up dropdown
@@ -83,6 +85,17 @@ public class ComboBox<K, V> extends StackPane {
                 toggleDropDownButton.getStyleClass().remove("icon-button-active");
             }
         });
+        
+        // clear selected value when text changed
+        // use event filter instead of event handler cuz mfx sucks
+        textField.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            this.value = null;
+        });
+    }
+    
+    public void clearValue() {
+        this.textField.clear();
+        this.value = null;
     }
     
     public interface Stringifier<T> {
