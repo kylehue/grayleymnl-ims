@@ -2,9 +2,12 @@ package com.ims.components;
 
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
+import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.*;
@@ -16,12 +19,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 
 public class ComboBox<K, V> extends StackPane {
     public final MFXTextField textField = new MFXTextField();
-    public final MFXButton toggleDropDownButton = new MFXButton("");
+    private final MFXButton toggleDropDownButton = new MFXButton("");
     private final HashMap<K, V> items = new HashMap<>();
     private final Dropdown<K> dropdown = new Dropdown<>();
     private Stringifier<V> stringifier = Object::toString;
@@ -44,6 +48,40 @@ public class ComboBox<K, V> extends StackPane {
         
         // Set up dropdown
         dropdown.bindToTextField(textField);
+        
+        RotateTransition rotateTransition = new RotateTransition();
+        rotateTransition.setDuration(Duration.millis(250));
+        rotateTransition.setNode(toggleDropDownButton);
+        rotateTransition.setInterpolator(Interpolator.EASE_OUT);
+        
+        toggleDropDownButton.setOnMouseClicked(e -> {
+            if (dropdown.isShowing()) {
+                dropdown.hide();
+            } else {
+                dropdown.showDropdown(textField);
+            }
+            textField.requestFocus();
+        });
+        
+        dropdown.setOnShown(e -> {
+            rotateTransition.setFromAngle(0);
+            rotateTransition.setToAngle(180);
+            rotateTransition.play();
+        });
+        
+        dropdown.setOnHidden(e -> {
+            rotateTransition.setFromAngle(180);
+            rotateTransition.setToAngle(0);
+            rotateTransition.play();
+        });
+        
+        textField.delegateFocusedProperty().addListener(e -> {
+            if (textField.delegateIsFocused()) {
+                toggleDropDownButton.getStyleClass().add("icon-button-active");
+            } else {
+                toggleDropDownButton.getStyleClass().remove("icon-button-active");
+            }
+        });
     }
     
     public interface Stringifier<T> {
@@ -144,6 +182,10 @@ public class ComboBox<K, V> extends StackPane {
             scrollPane.setContent(container);
             
             this.getContent().add(scrollPane);
+            
+            this.showingProperty().addListener(e -> {
+                Transition.fadeDown(scrollPane, 200);
+            });
         }
         
         private double[] getTextFieldCoordinates(MFXTextField textField) {
@@ -162,14 +204,18 @@ public class ComboBox<K, V> extends StackPane {
             return new double[]{nodeAX, nodeAY};
         }
         
+        public void showDropdown(MFXTextField textField) {
+            double[] coordinates = getTextFieldCoordinates(textField);
+            this.show(SceneManager.getStage(), coordinates[0], coordinates[1]);
+        }
+        
         public void bindToTextField(MFXTextField textField) {
             textField.delegateFocusedProperty().addListener(($1, $2, isFocused) -> {
                 scrollPane.setMinWidth(textField.getWidth());
                 if (!isFocused) {
                     this.hide();
                 } else {
-                    double[] coordinates = getTextFieldCoordinates(textField);
-                    this.show(SceneManager.getStage(), coordinates[0], coordinates[1]);
+                    showDropdown(textField);
                 }
             });
             

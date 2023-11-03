@@ -198,6 +198,10 @@
     -mfx-ripple-color: -danger !important;
 }
 
+.icon-button-active .icon {
+    -fx-background-color: -accent !important;
+}
+
 .mfx-ripple-generator {
      -mfx-auto-clip: true;
  }
