@@ -8,6 +8,7 @@ import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
+import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.*;
@@ -237,11 +238,15 @@ public class ComboBox<K, V> extends StackPane {
             MFXButton button = this.itemMap.get(id);
             if (button == null) return;
             this.itemMap.remove(id);
-            container.getChildren().remove(button);
+            Platform.runLater(() -> {
+                container.getChildren().remove(button);
+            });
         }
         
         public void updateItemByID(K id, String text) {
-            this.itemMap.get(id).setText(text);
+            Platform.runLater(() -> {
+                this.itemMap.get(id).setText(text);
+            });
         }
         
         public MFXButton getItemByID(K id) {
@@ -249,14 +254,15 @@ public class ComboBox<K, V> extends StackPane {
         }
         
         public MFXButton addItem(K id, String text) {
-            MFXButton button = new MFXButton();
-            button.getStyleClass().add("context-menu-item-button");
-            button.setText(text);
-            button.setMaxWidth(Double.MAX_VALUE);
-            button.setTextAlignment(TextAlignment.LEFT);
-            button.setAlignment(Pos.CENTER_LEFT);
-            container.getChildren().add(button);
-            this.itemMap.put(id, button);
+            MFXButton button = new MFXButton(text);
+            Platform.runLater(() -> {
+                button.getStyleClass().add("context-menu-item-button");
+                button.setMaxWidth(Double.MAX_VALUE);
+                button.setTextAlignment(TextAlignment.LEFT);
+                button.setAlignment(Pos.CENTER_LEFT);
+                container.getChildren().add(button);
+                this.itemMap.put(id, button);
+            });
             return button;
         }
     }
