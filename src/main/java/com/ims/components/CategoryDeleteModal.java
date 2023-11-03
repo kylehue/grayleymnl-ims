@@ -1,6 +1,7 @@
 package com.ims.components;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 
 public class CategoryDeleteModal extends Modal {
@@ -14,6 +15,7 @@ public class CategoryDeleteModal extends Modal {
         this.controlContainer.getChildren().add(deleteButton);
         this.contentContainer.add(label, 0, 0);
         this.contentContainer.setMaxWidth(400);
+        this.contentContainer.setPrefWidth(300);
         this.contentContainer.setMaxHeight(400);
         label.setWrapText(true);
         this.setOnShown((e) -> {

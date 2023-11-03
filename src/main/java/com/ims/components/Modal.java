@@ -11,6 +11,7 @@ import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.*;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
@@ -38,24 +39,20 @@ public class Modal extends Stage {
         container.getStylesheets().add(
             getClass().getResource("/styles/global.css").toExternalForm()
         );
-        
-        container.setFocusTraversable(true);
-        container.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> container.requestFocus());
-        
-        this.initOwner(SceneManager.getStage());
-        this.initModality(Modality.NONE);
-        this.initStyle(StageStyle.TRANSPARENT);
-        Scene scene = new Scene(container);
-        this.setScene(scene);
-        
-        container.setMinWidth(Region.USE_COMPUTED_SIZE);
+        container.setMinWidth(Region.USE_PREF_SIZE);
         container.setPrefWidth(Region.USE_COMPUTED_SIZE);
         container.setMaxWidth(Double.MAX_VALUE);
-
+        container.setMaxHeight(Double.MAX_VALUE);
+        container.setFocusTraversable(true);
+        container.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> container.requestFocus());
         container.setOnMousePressed(this::onMousePressed);
         container.setOnMouseDragged(this::onMouseDragged);
-
+        
         GridPane headerContainer = LayoutUtils.createGridPane(1, 2);
+        GridPane.setVgrow(headerContainer, Priority.NEVER);
+        container.getRowConstraints().get(0).setMinHeight(50);
+        container.getRowConstraints().get(0).setPrefHeight(50);
+        container.getRowConstraints().get(0).setMaxHeight(50);
         container.add(headerContainer, 0, 0);
         headerContainer.add(headerText, 0, 0);
         headerText.getStyleClass().add("modal-header-text");
@@ -78,6 +75,10 @@ public class Modal extends Stage {
         container.add(contentContainer, 0, 1);
 
         controlContainer.setSpacing(10);
+        GridPane.setVgrow(controlContainer, Priority.NEVER);
+        container.getRowConstraints().get(2).setMinHeight(50);
+        container.getRowConstraints().get(2).setPrefHeight(50);
+        container.getRowConstraints().get(2).setMaxHeight(50);
         container.add(controlContainer, 0, 2);
         controlContainer.setAlignment(Pos.CENTER_RIGHT);
 
@@ -94,6 +95,22 @@ public class Modal extends Stage {
             
             Transition.fadeIn(container, 150);
         });
+        
+        this.initOwner(SceneManager.getStage());
+        this.initModality(Modality.NONE);
+        this.initStyle(StageStyle.TRANSPARENT);
+        this.sizeToScene();
+        Scene scene = new Scene(container);
+        scene.setFill(Color.TRANSPARENT);
+        this.setScene(scene);
+        
+        for (Node node : container.getChildren()) {
+            if (node instanceof GridPane pane) {
+                pane.heightProperty().addListener(e ->{
+                    this.sizeToScene();
+                });
+            }
+        }
     }
     
     private void onMousePressed(MouseEvent event) {
