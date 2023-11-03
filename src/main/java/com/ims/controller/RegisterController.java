@@ -45,12 +45,6 @@ public class RegisterController {
         TextFieldValidator emailTextFieldValidator = new TextFieldValidator(emailTextField);
         emailTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
-            "Invalid email address.",
-            () -> Utils.validateEmail(emailTextField.getText()),
-            emailTextField.textProperty()
-        );
-        emailTextFieldValidator.addConstraint(
-            TextFieldValidator.Severity.ERROR,
             "This email address already exists.",
             () -> {
                 String email = emailTextField.getText();
@@ -62,11 +56,19 @@ public class RegisterController {
         );
         emailTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
+            "Invalid email address.",
+            () -> Utils.validateEmail(emailTextField.getText()),
+            emailTextField.textProperty(),
+            registerButton.armedProperty()
+        );
+        emailTextFieldValidator.addConstraint(
+            TextFieldValidator.Severity.ERROR,
             "Email must be at most %s characters long.".formatted(
                 Config.maxEmailLength
             ),
             () -> emailTextField.getText().length() <= Config.maxEmailLength,
-            emailTextField.textProperty()
+            emailTextField.textProperty(),
+            registerButton.armedProperty()
         );
 
         TextFieldValidator passwordTextFieldValidator = new TextFieldValidator(passwordTextField);
@@ -74,7 +76,8 @@ public class RegisterController {
             TextFieldValidator.Severity.ERROR,
             "Password must be at least 8 characters long.",
             () -> passwordTextField.getText().length() >= 8,
-            passwordTextField.textProperty()
+            passwordTextField.textProperty(),
+            registerButton.armedProperty()
         );
         
         TextFieldValidator confirmPasswordTextFieldValidator = new TextFieldValidator(confirmPasswordTextField);
@@ -86,7 +89,8 @@ public class RegisterController {
                 confirmPasswordTextField.getText()
             ),
             passwordTextField.textProperty(),
-            confirmPasswordTextField.textProperty()
+            confirmPasswordTextField.textProperty(),
+            registerButton.armedProperty()
         );
         
         Utils.bindModelToTextField(RegisterModel.emailProperty, emailTextField);
