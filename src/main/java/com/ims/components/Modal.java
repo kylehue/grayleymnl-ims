@@ -8,17 +8,19 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.*;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.stage.Popup;
-import javafx.stage.Screen;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.stage.*;
 import javafx.util.Duration;
 
-public class Modal extends Popup {
+public class Modal extends Stage {
     private double xOffset = 0;
     private double yOffset = 0;
     public final Label headerText = new Label("Header");
@@ -29,30 +31,35 @@ public class Modal extends Popup {
     );
     
     public Modal() {
-        this.setWidth(-1);
-        this.setHeight(-1);
-        this.setAutoHide(false);
         this.centerOnScreen();
-        this.setHideOnEscape(true);
         GridPane container = LayoutUtils.createGridPane(3, 1);
-        this.getContent().add(container);
         container.getStyleClass().addAll("card", "modal");
         container.getStylesheets().add(
             getClass().getResource("/styles/global.css").toExternalForm()
         );
+        
+        container.setFocusTraversable(true);
+        container.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> container.requestFocus());
+        
+        this.initOwner(SceneManager.getStage());
+        this.initModality(Modality.NONE);
+        this.initStyle(StageStyle.TRANSPARENT);
+        Scene scene = new Scene(container);
+        this.setScene(scene);
+        
         container.setMinWidth(Region.USE_COMPUTED_SIZE);
         container.setPrefWidth(Region.USE_COMPUTED_SIZE);
         container.setMaxWidth(Double.MAX_VALUE);
-        
+
         container.setOnMousePressed(this::onMousePressed);
         container.setOnMouseDragged(this::onMouseDragged);
-        
+
         GridPane headerContainer = LayoutUtils.createGridPane(1, 2);
         container.add(headerContainer, 0, 0);
         headerContainer.add(headerText, 0, 0);
         headerText.getStyleClass().add("modal-header-text");
         GridPane.setValignment(headerText, VPos.CENTER);
-        
+
         MFXButton closeButton = new MFXButton("");
         closeButton.getStyleClass().add("icon-button");
         LayoutUtils.addIconToButton(closeButton, "/icons/close.svg");
@@ -62,28 +69,28 @@ public class Modal extends Popup {
         closeButton.setOnMouseClicked((e) -> {
             this.hide();
         });
-        
+
         contentContainer.setMinWidth(Region.USE_COMPUTED_SIZE);
         contentContainer.setPrefWidth(Region.USE_COMPUTED_SIZE);
         contentContainer.setMaxWidth(Double.MAX_VALUE);
         GridPane.setMargin(contentContainer, new Insets(15, 0, 15, 0));
         container.add(contentContainer, 0, 1);
-        
+
         controlContainer.setSpacing(10);
         container.add(controlContainer, 0, 2);
         controlContainer.setAlignment(Pos.CENTER_RIGHT);
-        
+
         SceneManager.onChangeScene(($1, $2) -> {
             this.hide();
         });
-        
+
         this.showingProperty().addListener((e) -> {
             Platform.runLater(() -> {
                 Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
                 this.setX((primScreenBounds.getWidth() - this.getWidth()) / 2);
                 this.setY((primScreenBounds.getHeight() - this.getHeight()) / 2);
             });
-            
+
             FadeTransition fadeInTransition = new FadeTransition(
                 Duration.millis(150), container
             );
@@ -92,6 +99,7 @@ public class Modal extends Popup {
             fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
             fadeInTransition.play();
         });
+        
     }
     
     private void onMousePressed(MouseEvent event) {
@@ -102,5 +110,9 @@ public class Modal extends Popup {
     private void onMouseDragged(MouseEvent event) {
         this.setX(event.getScreenX() - xOffset);
         this.setY(event.getScreenY() - yOffset);
+    }
+    
+    public void showModal() {
+        this.show();
     }
 }
