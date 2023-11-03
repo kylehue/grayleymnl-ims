@@ -4,6 +4,7 @@
 @import "./mfx/scrollpane.css";
 @import "./mfx/combobox.css";
 @import "./mfx/toggle.css";
+@import "mfx/progress.css";
 
 @font-face {
     font-family: Roboto-Regular;

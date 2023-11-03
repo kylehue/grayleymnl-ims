@@ -353,7 +353,7 @@ public abstract class LayoutUtils {
                 double visibleMinY = scrollValue;
                 double visibleMaxY = scrollValue + viewportHeight;
                 
-                double bufferOffset = 10;
+                double bufferOffset = 0;
                 
                 for (Node child : flowPane.getChildren()) {
                     double childMinY = child.getBoundsInParent().getMinY() - bufferOffset;

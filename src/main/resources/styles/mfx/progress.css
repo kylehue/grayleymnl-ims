@@ -1,0 +1,45 @@
+@import "../variables.css";
+
+.mfx-progress-spinner:determinate .arc {
+    -fx-stroke: -accent;
+}
+
+.mfx-progress-spinner .percentage {
+    -fx-font-family: "Open Sans SemiBold";
+    -fx-font-smoothing-type: gray;
+    -fx-text-fill: -text-color;
+}
+
+.mfx-progress-spinner:determinate .percentage {
+    -fx-fill: #4d4d4d;
+}
+
+.mfx-progress-spinner:disabled .arc {
+    visibility: hidden;
+}
+
+.mfx-progress-spinner:disabled .track {
+    -fx-stroke: #bcbcbc;
+}
+
+.mfx-progress-bar .track {
+    -fx-fill: #E0E0E0;
+}
+
+.mfx-progress-bar .bar1,
+.mfx-progress-bar:indeterminate .bar1,
+.mfx-progress-bar:indeterminate .bar2 {
+    -fx-fill: -accent;
+}
+
+.mfx-progress-bar .track,
+.mfx-progress-bar .bar1,
+.mfx-progress-bar .bar2 {
+    -fx-arc-height: 6;
+    -fx-arc-width: 6;
+    -fx-pref-height: 4;
+}
+
+.mfx-progress-bar:disabled .track {
+    -fx-fill: #bcbcbc;
+}
