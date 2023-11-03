@@ -70,19 +70,11 @@ public abstract class SceneManager {
         Scene currentScene = getScene(currentSceneID);
         
         if (currentScene != null) {
-            final double transitionDuration = 200;
-            FadeTransition fadeOut = new FadeTransition(
-                Duration.millis(transitionDuration), currentScene.getRoot()
+            Transition.fadeInBetweenNodes(
+                currentScene.getRoot(),
+                targetScene.getRoot(),
+                200
             );
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
-            fadeOut.playFromStart();
-            FadeTransition fadeIn = new FadeTransition(
-                Duration.millis(transitionDuration), targetScene.getRoot()
-            );
-            fadeIn.setFromValue(0.0);
-            fadeIn.setToValue(1.0);
-            fadeIn.playFromStart();
         }
         
         SceneManager.stage.setScene(targetScene);

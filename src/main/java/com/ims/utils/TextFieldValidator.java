@@ -153,25 +153,7 @@ public class TextFieldValidator {
         label.setStyle("-fx-font-size: 0.9em;");
         
         label.visibleProperty().addListener((e) -> {
-            double transitionDuration = 150;
-            FadeTransition fadeInTransition = new FadeTransition(
-                Duration.millis(transitionDuration), label
-            );
-            fadeInTransition.setFromValue(0);
-            fadeInTransition.setToValue(1.0);
-            fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
-            
-            TranslateTransition translateTransition = new TranslateTransition(
-                Duration.millis(transitionDuration), label
-            );
-            translateTransition.setFromY(-30);
-            translateTransition.setToY(0);
-            translateTransition.setInterpolator(Interpolator.EASE_OUT);
-            
-            ParallelTransition parallelTransition = new ParallelTransition(
-                fadeInTransition, translateTransition
-            );
-            parallelTransition.play();
+            Transition.fadeDown(label, 150);
         });
         
         VBox wrapper = new VBox();

@@ -2,6 +2,7 @@ package com.ims.components;
 
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
+import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -90,16 +91,9 @@ public class Modal extends Stage {
                 this.setX((primScreenBounds.getWidth() - this.getWidth()) / 2);
                 this.setY((primScreenBounds.getHeight() - this.getHeight()) / 2);
             });
-
-            FadeTransition fadeInTransition = new FadeTransition(
-                Duration.millis(150), container
-            );
-            fadeInTransition.setFromValue(0);
-            fadeInTransition.setToValue(1.0);
-            fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
-            fadeInTransition.play();
+            
+            Transition.fadeIn(container, 150);
         });
-        
     }
     
     private void onMousePressed(MouseEvent event) {

@@ -4,18 +4,14 @@ import com.ims.Config;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
+import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import javafx.animation.FadeTransition;
-import javafx.animation.Interpolator;
-import javafx.animation.ParallelTransition;
-import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.util.Duration;
 
 public class Category extends GridPane {
     public final CategoryObject categoryObject;
@@ -66,25 +62,7 @@ public class Category extends GridPane {
         saveButton.setText("");
         LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
         
-        final double transitionDuration = 150;
-        FadeTransition fadeInTransition = new FadeTransition(
-            Duration.millis(transitionDuration), this
-        );
-        fadeInTransition.setFromValue(0);
-        fadeInTransition.setToValue(1.0);
-        fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
-        
-        TranslateTransition translateTransition = new TranslateTransition(
-            Duration.millis(transitionDuration), this
-        );
-        translateTransition.setFromY(30);
-        translateTransition.setToY(0);
-        translateTransition.setInterpolator(Interpolator.EASE_OUT);
-        
-        ParallelTransition parallelTransition = new ParallelTransition(
-            fadeInTransition, translateTransition
-        );
-        parallelTransition.play();
+        Transition.fadeUp(this, 150);
     }
     
     public void setCategoryName(String name) {
