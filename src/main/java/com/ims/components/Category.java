@@ -43,6 +43,12 @@ public class Category extends GridPane {
             () -> nameTextField.getText().length() <= Config.maxCategoryNameLength,
             nameTextField.textProperty()
         );
+        nameTextFieldValidator.addConstraint(
+            TextFieldValidator.Severity.ERROR,
+            "Please enter the category name.",
+            () -> !nameTextField.getText().isEmpty(),
+            nameTextField.textProperty()
+        );
         
         // Setup buttons
         HBox controlContainer = new HBox();
