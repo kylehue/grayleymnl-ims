@@ -10,12 +10,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 public class TextFieldValidator {
@@ -44,9 +46,11 @@ public class TextFieldValidator {
         });
         
         SceneManager.onChangeScene((currentScene, oldScene) -> {
-            if (currentScene != oldScene && textField.getText().isEmpty()) {
-                this.reset();
-            }
+            this.reset();
+        });
+        
+        textField.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+            textField.positionCaret(textField.getText().length());
         });
     }
     
