@@ -34,9 +34,6 @@
 
 .mfx-text-field .floating-text {
     -fx-text-fill: -text-field-label-color;
-}
-
-.mfx-text-field:floating .floating-text {
     -fx-background-color: transparent;
 }
 
