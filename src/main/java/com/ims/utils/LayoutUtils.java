@@ -311,6 +311,9 @@ public abstract class LayoutUtils {
         int rowCount,
         int columnCount
     ) {
+        gridPane.getRowConstraints().clear();
+        gridPane.getColumnConstraints().clear();
+        
         for (int i = 0; i < Math.max(rowCount, 1); i++) {
             RowConstraints rowConstraints = new RowConstraints();
             rowConstraints.setVgrow(Priority.SOMETIMES);
