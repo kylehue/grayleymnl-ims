@@ -1,10 +1,6 @@
 package com.ims.utils;
 
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import javafx.animation.FadeTransition;
-import javafx.animation.Interpolator;
-import javafx.animation.ParallelTransition;
-import javafx.animation.TranslateTransition;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,10 +10,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 public class TextFieldValidator {
@@ -29,7 +23,7 @@ public class TextFieldValidator {
     private String invalidMessage = "...";
     private Severity severity = null;
     private final BooleanProperty validProperty = new SimpleBooleanProperty(true);
-    private final ArrayList<TextFieldValidatorConstraint> constraints = new ArrayList<>();
+    private final ArrayList<Constraint> constraints = new ArrayList<>();
     
     public enum Severity {
         ERROR,
@@ -54,13 +48,13 @@ public class TextFieldValidator {
         });
     }
     
-    public void addConstraint(
+    public Constraint addConstraint(
         Severity severity,
         String invalidMessage,
         Callable<Boolean> validityChecker,
         Observable... dependencies
     ) {
-        TextFieldValidatorConstraint constraint = new TextFieldValidatorConstraint(
+        Constraint constraint = new Constraint(
             severity,
             invalidMessage,
             validityChecker,
@@ -79,10 +73,12 @@ public class TextFieldValidator {
                 }
             }
         });
+        
+        return constraint;
     }
     
     private void resetConstraints() {
-        for (TextFieldValidatorConstraint constraint : constraints) {
+        for (Constraint constraint : constraints) {
             constraint.validProperty.set(true);
         }
     }
@@ -96,8 +92,8 @@ public class TextFieldValidator {
         return this.validProperty.get() && this.getInvalidConstraint() == null;
     }
     
-    private TextFieldValidatorConstraint getInvalidConstraint() {
-        for (TextFieldValidatorConstraint constraint : constraints) {
+    private Constraint getInvalidConstraint() {
+        for (Constraint constraint : constraints) {
             if (!constraint.validProperty.get()) {
                 return constraint;
             }
@@ -176,12 +172,12 @@ public class TextFieldValidator {
         return label;
     }
     
-    private static class TextFieldValidatorConstraint {
+    public static class Constraint {
         public final BooleanProperty validProperty = new SimpleBooleanProperty(true);
         private final TextFieldValidator.Severity severity;
         private final String invalidMessage;
         
-        public TextFieldValidatorConstraint(
+        public Constraint(
             TextFieldValidator.Severity severity,
             String invalidMessage,
             Callable<Boolean> validityChecker,
