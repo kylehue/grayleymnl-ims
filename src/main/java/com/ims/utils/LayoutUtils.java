@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.SVGPath;
 import javafx.util.Pair;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -237,7 +238,6 @@ public abstract class LayoutUtils {
         
         // Get all path elements in the SVG
         NodeList pathNodes = doc.getElementsByTagName("path");
-        
         if (pathNodes.getLength() > 0) {
             Element pathElement = (Element) pathNodes.item(0);
             return pathElement.getAttribute("d");
@@ -262,11 +262,16 @@ public abstract class LayoutUtils {
             Pane icon = new Pane();
             icon.setStyle("-fx-shape: \"" + path + "\";");
             
-            double size = 16;
-            icon.setPrefWidth(size);
-            icon.setMaxWidth(size);
-            icon.setPrefHeight(size);
-            icon.setMaxHeight(size);
+            // Get bounds
+            SVGPath svgPath = new SVGPath();
+            svgPath.setContent(path);
+            Bounds bounds = svgPath.getBoundsInLocal();
+            
+            // Set size
+            icon.setPrefWidth(bounds.getWidth());
+            icon.setMaxWidth(bounds.getWidth());
+            icon.setPrefHeight(bounds.getHeight());
+            icon.setMaxHeight(bounds.getHeight());
             icon.setFocusTraversable(false);
             icon.getStyleClass().add("icon");
             
