@@ -20,7 +20,9 @@ public class DBCategories {
         ResultSet resultSet = null;
         try {
             String query = """
-                INSERT INTO CATEGORIES (%s) VALUES (?) RETURNING *;
+                INSERT INTO categories (%s)
+                VALUES (?)
+                RETURNING *;
                 """.formatted(
                 Column.NAME
             );
@@ -44,7 +46,10 @@ public class DBCategories {
         ResultSet resultSet = null;
         try {
             String query = """
-                UPDATE CATEGORIES SET %s=? WHERE %s=? RETURNING *;
+                UPDATE categories
+                SET %s=?
+                WHERE %s=?
+                RETURNING *;
                 """.formatted(
                 Column.NAME,
                 Column.ID
@@ -70,7 +75,8 @@ public class DBCategories {
         ResultSet resultSet = null;
         try {
             String query = """
-                DELETE FROM CATEGORIES WHERE %s=?;
+                DELETE FROM categories
+                WHERE %s=?;
                 """.formatted(
                 Column.ID
             );
@@ -103,12 +109,12 @@ public class DBCategories {
                 retrievedId
             );
             
-            String retrievedEmail = resultSet.getString(
+            String retrievedName = resultSet.getString(
                 Column.NAME.toString()
             );
             data.put(
                 Column.NAME,
-                retrievedEmail
+                retrievedName
             );
             
             Timestamp retrievedLastModified = resultSet.getTimestamp(
@@ -141,7 +147,10 @@ public class DBCategories {
         
         try {
             String query = """
-                SELECT * FROM CATEGORIES ORDER BY %s DESC OFFSET %s LIMIT %s;
+                SELECT * FROM categories
+                ORDER BY %s DESC
+                OFFSET %s
+                LIMIT %s;
                 """.formatted(
                 Column.LAST_MODIFIED,
                 startIndex,
@@ -175,7 +184,8 @@ public class DBCategories {
         
         try {
             String query = """
-                SELECT * FROM CATEGORIES WHERE %s = ?;
+                SELECT * FROM categories
+                WHERE %s = ?;
                 """.formatted(
                 columnLabel
             );
