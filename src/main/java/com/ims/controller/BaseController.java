@@ -1,6 +1,8 @@
 package com.ims.controller;
 
 import com.ims.components.*;
+import com.ims.database.DBCategories;
+import com.ims.database.DBProducts;
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.SceneManager;
@@ -13,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ims.utils.LayoutUtils;
 
@@ -79,8 +82,26 @@ public class BaseController {
         });
         
         addProductModal.addButton.setOnMouseClicked((e) -> {
+            if (
+                !addProductModal.nameTextFieldValidator.isValid() ||
+                    !addProductModal.categoryComboBoxValidator.isValid()
+            ) {
+                return;
+            }
+            
             String name = addProductModal.nameTextField.getText();
-            // String category = addProductModal.categoryComboBox.getSelectedText();
+            CategoryObject category = addProductModal.categoryComboBox.getValue();
+            
+            DBProducts.add(
+                name,
+                category.getID(),
+                "",
+                0,
+                0
+            );
+            SceneManager.setScene("product");
+            
+            addProductModal.hide();
         });
     }
     

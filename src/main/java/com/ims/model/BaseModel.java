@@ -1,6 +1,7 @@
 package com.ims.model;
 
 import com.ims.database.DBCategories;
+import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import com.ims.utils.Utils;
@@ -30,9 +31,249 @@ public abstract class BaseModel {
     //////////////////////////////////////////////////////////////////////
     public static final ObservableMap<Integer, ProductObject>
         productMap = FXCollections.observableHashMap();
+    public static final BooleanProperty
+        isBusyProduct = new SimpleBooleanProperty(false);
     
     public static ProductObject getProductById(int id) {
         return productMap.get(id);
+    }
+    
+    /**
+     * Adds product in the database.
+     *
+     * @param name The name of the product to add.
+     */
+    public static void addProduct(String name, int categoryID) {
+        if (name.isEmpty()) return;
+        
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                isBusyProduct.set(true);
+                // First, we have to make sure the category exists in the database
+                HashMap<DBCategories.Column, Object> retrievedCategory =
+                    DBCategories.getOne(DBCategories.Column.ID, categoryID);
+                if (retrievedCategory == null) {
+                    System.out.println(
+                        "Category with the id of %s doesn't exist.".formatted(
+                            categoryID
+                        )
+                    );
+                    return null;
+                }
+                
+                // Add the product
+                HashMap<DBProducts.Column, Object> newProduct = DBProducts.add(
+                    name,
+                    categoryID,
+                    null,
+                    0,
+                    0
+                );
+                int newID = (Integer) newProduct.get(DBProducts.Column.ID);
+                String newName = (String) newProduct.get(DBProducts.Column.NAME);
+                int newCategoryID = (Integer) newProduct.get(
+                    DBProducts.Column.CATEGORY_ID
+                );
+                String newImageURL = (String) newProduct.get(
+                    DBProducts.Column.IMAGE_URL
+                );
+                int newCurrentStocks = (Integer) newProduct.get(
+                    DBProducts.Column.CURRENT_STOCKS
+                );
+                int newExpectedStocks = (Integer) newProduct.get(
+                    DBProducts.Column.EXPECTED_STOCKS
+                );
+                Timestamp newLastModified = (Timestamp) newProduct.get(
+                    DBProducts.Column.LAST_MODIFIED
+                );
+                productMap.put(newID, new ProductObject(
+                    newID,
+                    newName,
+                    newCategoryID,
+                    newImageURL,
+                    newCurrentStocks,
+                    newExpectedStocks,
+                    newLastModified
+                ));
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyProduct.set(false);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    /**
+     * Updates a product in the database.
+     *
+     * @param id   The id of the product to update.
+     * @param name The new name of the product.
+     */
+    public static void updateProduct(
+        int id,
+        String name,
+        Integer categoryID,
+        String imageURL,
+        Integer currentStocks,
+        Integer expectedStocks
+    ) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                isBusyProduct.set(true);
+                
+                // Update in database
+                HashMap<DBProducts.Column, Object> newProduct = DBProducts.update(
+                    id,
+                    name,
+                    categoryID,
+                    imageURL,
+                    currentStocks,
+                    expectedStocks
+                );
+                
+                // Update in list if it exists
+                ProductObject productObject = productMap.get(id);
+                if (productObject != null) {
+                    String newName = (String) newProduct.get(
+                        DBProducts.Column.NAME
+                    );
+                    Integer newCategoryID = (Integer) newProduct.get(
+                        DBProducts.Column.NAME
+                    );
+                    String newImageURL = (String) newProduct.get(
+                        DBProducts.Column.NAME
+                    );
+                    Integer newCurrentStocks = (Integer) newProduct.get(
+                        DBProducts.Column.NAME
+                    );
+                    Integer newExpectedStocks = (Integer) newProduct.get(
+                        DBProducts.Column.NAME
+                    );
+                    Timestamp newLastModified = (Timestamp) newProduct.get(
+                        DBProducts.Column.LAST_MODIFIED
+                    );
+                    productMap.put(id, new ProductObject(
+                        id,
+                        newName,
+                        newCategoryID,
+                        newImageURL,
+                        newCurrentStocks,
+                        newExpectedStocks,
+                        newLastModified
+                    ));
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyProduct.set(false);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    /**
+     * Remove a product in the database.
+     *
+     * @param id The id of the category to remove.
+     */
+    public static void removeProduct(int id) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                isBusyProduct.set(true);
+                
+                DBProducts.remove(id);
+                productMap.remove(id);
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyProduct.set(false);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    /**
+     * Load more products from the database.
+     *
+     * @param limit The limit of the rows to retrieve.
+     */
+    public static void loadProducts(int limit) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                isBusyProduct.set(true);
+                ArrayList<HashMap<DBProducts.Column, Object>> productRows = DBProducts.getInRange(
+                    productMap.size(),
+                    limit
+                );
+                
+                for (HashMap<DBProducts.Column, Object> row : productRows) {
+                    int id = (Integer) row.get(DBProducts.Column.ID);
+                    // Skip if already added (this shouldn't happen but just to be sure)
+                    ProductObject product = productMap.get(id);
+                    if (product != null) {
+                        continue;
+                    }
+                    
+                    // Add in list
+                    String name = (String) row.get(
+                        DBProducts.Column.NAME
+                    );
+                    Integer categoryID = (Integer) row.get(
+                        DBProducts.Column.NAME
+                    );
+                    String imageURL = (String) row.get(
+                        DBProducts.Column.NAME
+                    );
+                    Integer currentStocks = (Integer) row.get(
+                        DBProducts.Column.NAME
+                    );
+                    Integer expectedStocks = (Integer) row.get(
+                        DBProducts.Column.NAME
+                    );
+                    Timestamp lastModified = (Timestamp) row.get(
+                        DBProducts.Column.LAST_MODIFIED
+                    );
+                    productMap.put(id, new ProductObject(
+                        id,
+                        name,
+                        categoryID,
+                        imageURL,
+                        currentStocks,
+                        expectedStocks,
+                        lastModified
+                    ));
+                }
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyProduct.set(false);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
     }
     
     
@@ -152,7 +393,7 @@ public abstract class BaseModel {
         executor.submit(task);
         executor.shutdown();
     }
-
+    
     /**
      * Load more categories from the database.
      *
