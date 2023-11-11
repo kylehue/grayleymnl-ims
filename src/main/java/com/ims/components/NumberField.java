@@ -24,12 +24,12 @@ public class NumberField extends HBox {
         MFXButton decrementButton = new MFXButton();
         decrementButton.getStyleClass().addAll("icon-button");
         decrementButton.setText("");
-        LayoutUtils.addIconToButton(decrementButton, "/icons/minus-circle-outline.svg");
+        LayoutUtils.addIconToButton(decrementButton, "/icons/minus.svg");
         
         MFXButton incrementButton = new MFXButton();
         incrementButton.getStyleClass().addAll("icon-button");
         incrementButton.setText("");
-        LayoutUtils.addIconToButton(incrementButton, "/icons/plus-circle-outline.svg");
+        LayoutUtils.addIconToButton(incrementButton, "/icons/plus.svg");
         
         textField.setFloatingText("Number");
         this.getChildren().addAll(decrementButton, textField, incrementButton);
