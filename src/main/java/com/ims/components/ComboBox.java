@@ -163,6 +163,18 @@ public class ComboBox<K, V> extends StackPane {
                 }
             }
         );
+        
+        // for (K key : map.keySet()) {
+        //     this.addItem(key, map.get(key));
+        // }
+    }
+    
+    public MFXScrollPane getDropDownScrollPane() {
+        return this.dropdown.getScrollPane();
+    }
+    
+    public VBox getDropdownContainer() {
+        return this.dropdown.getContainer();
     }
     
     private static class Dropdown<K> extends Popup {
@@ -219,6 +231,7 @@ public class ComboBox<K, V> extends StackPane {
         }
         
         public void showDropdown(MFXTextField textField) {
+            if (this.itemMap.isEmpty()) return;
             double[] coordinates = getTextFieldCoordinates(textField);
             this.show(SceneManager.getStage(), coordinates[0], coordinates[1]);
         }
@@ -277,6 +290,14 @@ public class ComboBox<K, V> extends StackPane {
                 this.itemMap.put(id, button);
             });
             return button;
+        }
+        
+        public MFXScrollPane getScrollPane() {
+            return this.scrollPane;
+        }
+        
+        public VBox getContainer() {
+            return this.container;
         }
     }
 }
