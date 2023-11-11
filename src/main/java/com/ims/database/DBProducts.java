@@ -29,16 +29,16 @@ public class DBProducts {
         ResultSet resultSet = null;
         try {
             String query = """
-                INSERT INTO products (%s, %s, %s, %s, %s)
+                INSERT INTO products (
+                    name,
+                    category_id,
+                    image_url,
+                    current_stocks,
+                    expected_stocks
+                )
                 VALUES (?, ?, ?, ?, ?)
                 RETURNING *;
-                """.formatted(
-                Column.NAME,
-                Column.CATEGORY_ID,
-                Column.IMAGE_URL,
-                Column.CURRENT_STOCKS,
-                Column.EXPECTED_STOCKS
-            );
+                """;
             
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, name);
@@ -60,10 +60,10 @@ public class DBProducts {
     public static HashMap<Column, Object> update(
         int id,
         String name,
-        int categoryID,
+        Integer categoryID,
         String imageURL,
-        int currentStocks,
-        int expectedStocks
+        Integer currentStocks,
+        Integer expectedStocks
     ) {
         HashMap<Column, Object> row = null;
         PreparedStatement preparedStatement = null;
@@ -71,17 +71,14 @@ public class DBProducts {
         try {
             String query = """
                 UPDATE products
-                SET %s=?, %s=?, %s=?, %s=?, %s=?
-                WHERE %s=?
+                SET name = COALESCE(?, name),
+                category_id = COALESCE(?, category_id),
+                image_url = COALESCE(?, image_url),
+                current_stocks = COALESCE(?, current_stocks),
+                expected_stocks = COALESCE(?, expected_stocks)
+                WHERE id = ?
                 RETURNING *;
-                """.formatted(
-                Column.NAME,
-                Column.CATEGORY_ID,
-                Column.IMAGE_URL,
-                Column.CURRENT_STOCKS,
-                Column.EXPECTED_STOCKS,
-                Column.ID
-            );
+                """;
             
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, name);
@@ -108,10 +105,8 @@ public class DBProducts {
         try {
             String query = """
                 DELETE FROM products
-                WHERE %s=?;
-                """.formatted(
-                Column.ID
-            );
+                WHERE id = ?;
+                """;
             
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, id);
@@ -197,8 +192,9 @@ public class DBProducts {
     
     /**
      * Get rows that are in specified range.
+     *
      * @param startIndex The starting row index.
-     * @param length The limit of rows to retrieve.
+     * @param length     The limit of rows to retrieve.
      * @return An ArrayList of rows.
      */
     public static ArrayList<HashMap<Column, Object>> getInRange(
@@ -212,15 +208,13 @@ public class DBProducts {
         try {
             String query = """
                 SELECT * FROM products
-                ORDER BY %s DESC
-                OFFSET %s
-                LIMIT %s;
-                """.formatted(
-                Column.LAST_MODIFIED,
-                startIndex,
-                length
-            );
+                ORDER BY last_modified DESC
+                OFFSET ?
+                LIMIT ?;
+                """;
             preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, startIndex);
+            preparedStatement.setInt(2, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
         } catch (SQLException e) {
@@ -234,7 +228,8 @@ public class DBProducts {
     
     /**
      * Find a row that matches the specified conditions.
-     * @param columnLabel The column name where the `compareValue` will be compared to.
+     *
+     * @param columnLabel  The column name where the `compareValue` will be compared to.
      * @param compareValue The value used to check if it matches the column's value.
      * @return A row if found, and null if not.
      */

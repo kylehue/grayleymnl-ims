@@ -2,7 +2,6 @@ package com.ims.database;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 public class DBCategories {
@@ -20,12 +19,10 @@ public class DBCategories {
         ResultSet resultSet = null;
         try {
             String query = """
-                INSERT INTO categories (%s)
+                INSERT INTO categories (name)
                 VALUES (?)
                 RETURNING *;
-                """.formatted(
-                Column.NAME
-            );
+                """;
             
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, name);
@@ -47,13 +44,10 @@ public class DBCategories {
         try {
             String query = """
                 UPDATE categories
-                SET %s=?
-                WHERE %s=?
+                SET name = ?
+                WHERE id = ?
                 RETURNING *;
-                """.formatted(
-                Column.NAME,
-                Column.ID
-            );
+                """;
             
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, name);
@@ -76,10 +70,8 @@ public class DBCategories {
         try {
             String query = """
                 DELETE FROM categories
-                WHERE %s=?;
-                """.formatted(
-                Column.ID
-            );
+                WHERE id = ?;
+                """;
             
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, id);
@@ -148,15 +140,13 @@ public class DBCategories {
         try {
             String query = """
                 SELECT * FROM categories
-                ORDER BY %s DESC
-                OFFSET %s
-                LIMIT %s;
-                """.formatted(
-                Column.LAST_MODIFIED,
-                startIndex,
-                length
-            );
+                ORDER BY last_modified DESC
+                OFFSET ?
+                LIMIT ?;
+                """;
             preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, startIndex);
+            preparedStatement.setInt(2, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
         } catch (SQLException e) {
@@ -206,6 +196,7 @@ public class DBCategories {
         Column columnLabel,
         Object compareValue
     ) {
-        return get(columnLabel, compareValue).get(0);
+        ArrayList<HashMap<Column, Object>> rows = get(columnLabel, compareValue);
+        return !rows.isEmpty() ? rows.getFirst() : null;
     }
 }
