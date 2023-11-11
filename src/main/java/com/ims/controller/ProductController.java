@@ -1,10 +1,12 @@
 package com.ims.controller;
 
+import com.ims.components.CategoryComboBox;
 import com.ims.components.NumberField;
+import com.ims.model.BaseModel;
+import com.ims.model.ProductModel;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
@@ -41,13 +43,18 @@ public class ProductController {
     MFXButton backButton;
     
     @FXML
+    VBox stocksPaneFieldsContainer;
+    
+    @FXML
+    VBox generalPaneFieldsContainer;
+    
+    @FXML
     MFXTextField productNameTextField;
     
     @FXML
     MFXTextField productPriceTextField;
     
-    @FXML
-    MFXComboBox productCategoryComboBox;
+    CategoryComboBox productCategoryComboBox = new CategoryComboBox();
     
     @FXML
     ImageView productImageView;
@@ -56,7 +63,7 @@ public class ProductController {
     MFXButton uploadImageButton;
     
     @FXML
-    VBox stocksPaneFieldsContainer;
+    MFXTextField productImageURLTextField;
     
     NumberField currentStocksNumberField = new NumberField();
     
@@ -75,6 +82,13 @@ public class ProductController {
                 new Pair<>(tabStocksButton, tabStocksPane),
                 new Pair<>(tabOthersButton, tabOthersPane)
             )
+        );
+        
+        uploadImageButton.setText("");
+        uploadImageButton.getStyleClass().add("icon-button");
+        LayoutUtils.addIconToButton(
+            uploadImageButton,
+            "/icons/upload.svg"
         );
         
         uploadImageButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
@@ -108,6 +122,50 @@ public class ProductController {
         stocksPaneFieldsContainer.getChildren().addAll(
             currentStocksNumberField,
             expectedStocksNumberField
+        );
+        generalPaneFieldsContainer.getChildren().add(
+            2,
+            productCategoryComboBox
+        );
+        productCategoryComboBox.setMinWidth(100);
+        productCategoryComboBox.setMaxWidth(300);
+        
+        ProductModel.nameProperty.addListener(($1, $2, name) -> {
+            productNameTextField.setText(name);
+        });
+        
+        ProductModel.priceProperty.addListener(($1, $2, price) -> {
+            productPriceTextField.setText(String.format(
+                "%.2f", price.doubleValue()
+            ));
+        });
+        
+        ProductModel.categoryIDProperty.addListener(($1, $2, categoryID) -> {
+            productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
+                categoryID.intValue()
+            ));
+        });
+        
+        ProductModel.imageURLProperty.addListener(($1, $2, imageURL) -> {
+            if (imageURL.isEmpty()) return;
+            productImageURLTextField.setText(imageURL);
+            productImageView.setImage(new Image(imageURL));
+        });
+        
+        ProductModel.currentStocksProperty.addListener(
+            ($1, $2, currentStocks) -> {
+                currentStocksNumberField.textField.setText(
+                    currentStocks.toString()
+                );
+            }
+        );
+        
+        ProductModel.expectedStocksProperty.addListener(
+            ($1, $2, expectedStocks) -> {
+                expectedStocksNumberField.textField.setText(
+                    expectedStocks.toString()
+                );
+            }
         );
     }
     

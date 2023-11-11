@@ -4,12 +4,9 @@ import com.ims.database.DBCategories;
 import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
-import com.ims.utils.Utils;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 
@@ -392,6 +389,26 @@ public abstract class BaseModel {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
         executor.shutdown();
+    }
+    
+    public static CategoryObject loadAndGetCategory(int id) {
+        CategoryObject categoryObject = categoryMap.get(id);
+        if (categoryObject != null) {
+            return categoryObject;
+        }
+        
+        HashMap<DBCategories.Column, Object> row = DBCategories.getOne(DBCategories.Column.ID, id);
+        if (row != null) {
+            categoryObject = new CategoryObject(
+                id,
+                (String) row.get(DBCategories.Column.NAME),
+                (Timestamp) row.get(DBCategories.Column.LAST_MODIFIED)
+            );
+            categoryMap.put(id, categoryObject);
+            return categoryObject;
+        }
+        
+        return null;
     }
     
     /**

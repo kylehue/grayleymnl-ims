@@ -12,9 +12,10 @@ public abstract class Transition {
         FadeTransition fadeInTransition = new FadeTransition(
             Duration.millis(durationMillis), node
         );
-        fadeInTransition.setFromValue(0);
+        fadeInTransition.setFromValue(0.25);
         fadeInTransition.setToValue(1.0);
         fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
+        fadeInTransition.play();
         
         TranslateTransition translateTransition = new TranslateTransition(
             Duration.millis(durationMillis), node
@@ -22,20 +23,17 @@ public abstract class Transition {
         translateTransition.setFromY(30);
         translateTransition.setToY(0);
         translateTransition.setInterpolator(Interpolator.EASE_OUT);
-        
-        ParallelTransition parallelTransition = new ParallelTransition(
-            fadeInTransition, translateTransition
-        );
-        parallelTransition.play();
+        translateTransition.play();
     }
     
     public static void fadeDown(Node node, double durationMillis) {
         FadeTransition fadeInTransition = new FadeTransition(
             Duration.millis(durationMillis), node
         );
-        fadeInTransition.setFromValue(0);
+        fadeInTransition.setFromValue(0.25);
         fadeInTransition.setToValue(1.0);
         fadeInTransition.setInterpolator(Interpolator.EASE_OUT);
+        fadeInTransition.play();
         
         TranslateTransition translateTransition = new TranslateTransition(
             Duration.millis(durationMillis), node
@@ -43,11 +41,7 @@ public abstract class Transition {
         translateTransition.setFromY(-30);
         translateTransition.setToY(0);
         translateTransition.setInterpolator(Interpolator.EASE_OUT);
-        
-        ParallelTransition parallelTransition = new ParallelTransition(
-            fadeInTransition, translateTransition
-        );
-        parallelTransition.play();
+        translateTransition.play();
     }
     
     public static void fadeInBetweenNodes(Node nodeA, Node nodeB, double durationMillis) {

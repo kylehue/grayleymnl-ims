@@ -4,6 +4,7 @@ import com.ims.components.*;
 import com.ims.database.DBCategories;
 import com.ims.database.DBProducts;
 import com.ims.model.BaseModel;
+import com.ims.model.ProductModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.*;
@@ -99,6 +100,14 @@ public class BaseController {
                 0,
                 0
             );
+            
+            ProductModel.nameProperty.set(name);
+            ProductModel.categoryIDProperty.set(category.getID());
+            ProductModel.imageURLProperty.set("");
+            ProductModel.priceProperty.set(0);
+            ProductModel.currentStocksProperty.set(0);
+            ProductModel.expectedStocksProperty.set(0);
+            
             SceneManager.setScene("product");
             
             addProductModal.hide();

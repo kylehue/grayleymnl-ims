@@ -350,12 +350,12 @@ public abstract class LayoutUtils {
     
     public static void applyVirtualScrolling(
         MFXScrollPane scrollPane,
-        FlowPane flowPane
+        Pane container
     ) {
         InvalidationListener listener = (e) -> {
             Platform.runLater(() -> {
                 double viewportHeight = scrollPane.getHeight();
-                double scrollHeight = flowPane.getHeight() - viewportHeight;
+                double scrollHeight = container.getHeight() - viewportHeight;
                 double scrollValue = scrollHeight * scrollPane.getVvalue();
                 
                 double visibleMinY = scrollValue;
@@ -363,7 +363,7 @@ public abstract class LayoutUtils {
                 
                 double bufferOffset = 0;
                 
-                for (Node child : flowPane.getChildren()) {
+                for (Node child : container.getChildren()) {
                     double childMinY = child.getBoundsInParent().getMinY() - bufferOffset;
                     double childMaxY = child.getBoundsInParent().getMaxY() + bufferOffset;
                     
@@ -374,6 +374,6 @@ public abstract class LayoutUtils {
         };
         
         scrollPane.vvalueProperty().addListener(listener);
-        flowPane.heightProperty().addListener(listener);
+        container.heightProperty().addListener(listener);
     }
 }

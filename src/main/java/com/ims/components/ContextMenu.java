@@ -34,7 +34,7 @@ public class ContextMenu extends Popup {
     public void bindToNode(Node node) {
         // We do this for the sake of it computing its bounds
         Platform.runLater(() -> {
-            this.show(node, -999, -999);
+            this.show(SceneManager.getStage(), -999, -999);
             Platform.runLater(() -> {
                 this.hide();
             });

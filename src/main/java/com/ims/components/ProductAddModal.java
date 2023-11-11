@@ -7,12 +7,11 @@ import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import javafx.scene.input.MouseEvent;
 
 public class ProductAddModal extends Modal {
     public final MFXButton addButton = new MFXButton("Add");
     public final MFXTextField nameTextField = new MFXTextField();
-    public final ComboBox<Integer, CategoryObject> categoryComboBox = new ComboBox<>();
+    public final CategoryComboBox categoryComboBox = new CategoryComboBox();
     public final TextFieldValidator nameTextFieldValidator;
     public final TextFieldValidator categoryComboBoxValidator;
     
