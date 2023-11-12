@@ -40,12 +40,15 @@ public abstract class BaseModel {
      *
      * @param name The name of the product to add.
      */
-    public static void addProduct(String name, int categoryID) {
-        if (name.isEmpty()) return;
+    public static HashMap<DBProducts.Column, Object> addProduct(
+        String name,
+        int categoryID
+    ) {
+        if (name.isEmpty()) return null;
         
-        Task<Void> task = new Task<>() {
+        Task<HashMap<DBProducts.Column, Object>> task = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected HashMap<DBProducts.Column, Object> call() throws Exception {
                 isBusyProduct.set(true);
                 // First, we have to make sure the category exists in the database
                 HashMap<DBCategories.Column, Object> retrievedCategory =
@@ -68,7 +71,12 @@ public abstract class BaseModel {
                     0
                 );
                 int newID = (Integer) newProduct.get(DBProducts.Column.ID);
-                String newName = (String) newProduct.get(DBProducts.Column.NAME);
+                String newName = (String) newProduct.get(
+                    DBProducts.Column.NAME
+                );
+                double newPrice = (double) newProduct.get(
+                    DBProducts.Column.PRICE
+                );
                 int newCategoryID = (Integer) newProduct.get(
                     DBProducts.Column.CATEGORY_ID
                 );
@@ -87,6 +95,7 @@ public abstract class BaseModel {
                 productMap.put(newID, new ProductObject(
                     newID,
                     newName,
+                    newPrice,
                     newCategoryID,
                     newImageURL,
                     newCurrentStocks,
@@ -94,7 +103,7 @@ public abstract class BaseModel {
                     newLastModified
                 ));
                 
-                return null;
+                return newProduct;
             }
         };
         
@@ -102,9 +111,15 @@ public abstract class BaseModel {
             isBusyProduct.set(false);
         });
         
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
         executor.shutdown();
+        
+        return task.getValue();
     }
     
     /**
@@ -116,6 +131,7 @@ public abstract class BaseModel {
     public static void updateProduct(
         int id,
         String name,
+        Double price,
         Integer categoryID,
         String imageURL,
         Integer currentStocks,
@@ -130,6 +146,7 @@ public abstract class BaseModel {
                 HashMap<DBProducts.Column, Object> newProduct = DBProducts.update(
                     id,
                     name,
+                    price,
                     categoryID,
                     imageURL,
                     currentStocks,
@@ -142,17 +159,20 @@ public abstract class BaseModel {
                     String newName = (String) newProduct.get(
                         DBProducts.Column.NAME
                     );
+                    Double newPrice = (Double) newProduct.get(
+                        DBProducts.Column.PRICE
+                    );
                     Integer newCategoryID = (Integer) newProduct.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.CATEGORY_ID
                     );
                     String newImageURL = (String) newProduct.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.IMAGE_URL
                     );
                     Integer newCurrentStocks = (Integer) newProduct.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.CURRENT_STOCKS
                     );
                     Integer newExpectedStocks = (Integer) newProduct.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.EXPECTED_STOCKS
                     );
                     Timestamp newLastModified = (Timestamp) newProduct.get(
                         DBProducts.Column.LAST_MODIFIED
@@ -160,6 +180,7 @@ public abstract class BaseModel {
                     productMap.put(id, new ProductObject(
                         id,
                         newName,
+                        newPrice,
                         newCategoryID,
                         newImageURL,
                         newCurrentStocks,
@@ -174,6 +195,10 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
         });
         
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -203,6 +228,10 @@ public abstract class BaseModel {
             isBusyProduct.set(false);
         });
         
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
         executor.shutdown();
@@ -216,7 +245,7 @@ public abstract class BaseModel {
     public static void loadProducts(int limit) {
         Task<Void> task = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 isBusyProduct.set(true);
                 ArrayList<HashMap<DBProducts.Column, Object>> productRows = DBProducts.getInRange(
                     productMap.size(),
@@ -225,27 +254,31 @@ public abstract class BaseModel {
                 
                 for (HashMap<DBProducts.Column, Object> row : productRows) {
                     int id = (Integer) row.get(DBProducts.Column.ID);
+                    
                     // Skip if already added (this shouldn't happen but just to be sure)
                     ProductObject product = productMap.get(id);
                     if (product != null) {
                         continue;
                     }
-                    
+
                     // Add in list
                     String name = (String) row.get(
                         DBProducts.Column.NAME
                     );
+                    Double price = (Double) row.get(
+                        DBProducts.Column.PRICE
+                    );
                     Integer categoryID = (Integer) row.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.CATEGORY_ID
                     );
                     String imageURL = (String) row.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.IMAGE_URL
                     );
                     Integer currentStocks = (Integer) row.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.CURRENT_STOCKS
                     );
                     Integer expectedStocks = (Integer) row.get(
-                        DBProducts.Column.NAME
+                        DBProducts.Column.EXPECTED_STOCKS
                     );
                     Timestamp lastModified = (Timestamp) row.get(
                         DBProducts.Column.LAST_MODIFIED
@@ -253,6 +286,7 @@ public abstract class BaseModel {
                     productMap.put(id, new ProductObject(
                         id,
                         name,
+                        price,
                         categoryID,
                         imageURL,
                         currentStocks,
@@ -266,6 +300,10 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
         });
         
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -311,6 +349,10 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyCategory.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
         });
         
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -359,6 +401,10 @@ public abstract class BaseModel {
             isBusyCategory.set(false);
         });
         
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
         executor.shutdown();
@@ -384,6 +430,10 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyCategory.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
         });
         
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -449,6 +499,10 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyCategory.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
         });
         
         ExecutorService executor = Executors.newSingleThreadExecutor();

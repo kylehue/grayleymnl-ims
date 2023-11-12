@@ -1,6 +1,12 @@
 package com.ims.components;
 
+import com.ims.database.DBProducts;
+import com.ims.model.ProductModel;
+import com.ims.model.objects.CategoryObject;
+import com.ims.model.objects.ProductObject;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.SceneManager;
+import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -15,11 +21,14 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class Product extends GridPane {
+    public final ProductObject productObject;
     private final ObservableList<String> styleClass = this.getStyleClass();
     
     private final GridPane textGridPane = LayoutUtils.createGridPane(4, 1);
+    private final ImageView imgView = new ImageView();
     
-    public Product() {
+    public Product(ProductObject productObject) {
+        this.productObject = productObject;
         this.styleClass.add("card");
         this.styleClass.add("product-container");
         
@@ -55,29 +64,32 @@ public class Product extends GridPane {
         LayoutUtils.addIconToButton(editButton, "/icons/pencil.svg");
         editButton.getStyleClass().add("icon-button");
         controlFlowPane.getChildren().add(editButton);
-    }
-    
-    /**
-     * Set the image of the product.
-     *
-     * @param imageUrl The URL of the image.
-     */
-    public void setImage(String imageUrl) {
-        Image img = new Image(imageUrl);
         
-        ImageView imgView = new ImageView(img);
+        editButton.setOnMouseClicked(e -> {
+            ProductModel.idProperty.set(productObject.getID());
+            ProductModel.nameProperty.set(productObject.getName());
+            ProductModel.categoryIDProperty.set(productObject.getCategoryID());
+            ProductModel.imageURLProperty.set(productObject.getImageURL());
+            ProductModel.priceProperty.set(productObject.getPrice());
+            ProductModel.currentStocksProperty.set(productObject.getCurrentStocks());
+            ProductModel.expectedStocksProperty.set(productObject.getExpectedStocks());
+            SceneManager.setScene("product");
+        });
+        
+        Transition.fadeUp(this, 150);
+        
+        // Setup image
         imgView.setPreserveRatio(true);
         imgView.getStyleClass().add("product-image");
         
         StackPane imgContainer = new StackPane(imgView);
-        imgContainer.setAlignment(Pos.CENTER);
-        
         Rectangle rectClip = new Rectangle(0, 0, 0, 0);
         rectClip.setArcWidth(10);
         rectClip.setArcHeight(10);
         rectClip.widthProperty().bind(imgContainer.widthProperty());
         rectClip.heightProperty().bind(imgContainer.heightProperty());
         
+        imgContainer.setAlignment(Pos.CENTER);
         imgContainer.setClip(rectClip);
         
         this.widthProperty().addListener(($1, $2, $3) -> {
@@ -93,6 +105,20 @@ public class Product extends GridPane {
         });
         
         this.add(imgContainer, 0, 0);
+        this.setImage(getClass().getResource("/images/image-placeholder.png").toExternalForm());
+    }
+    
+    /**
+     * Set the image of the product.
+     *
+     * @param imageUrl The URL of the image.
+     */
+    public void setImage(String imageUrl) {
+        if (imageUrl == null) return;
+        if (imageUrl.isEmpty()) return;
+        
+        Image img = new Image(imageUrl);
+        this.imgView.setImage(img);
     }
     
     public void setName(String name) {

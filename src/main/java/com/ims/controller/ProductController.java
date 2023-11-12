@@ -69,6 +69,12 @@ public class ProductController {
     NumberField expectedStocksNumberField = new NumberField(true);
     
     @FXML
+    MFXButton saveAllButton;
+    
+    @FXML
+    MFXButton cancelButton;
+    
+    @FXML
     public void initialize() {
         LayoutUtils.addIconToButton(backButton, "/icons/arrow-left.svg");
         backButton.getStyleClass().add("icon-button");
@@ -82,6 +88,8 @@ public class ProductController {
                 new Pair<>(tabOthersButton, tabOthersPane)
             )
         );
+        
+        productImageURLTextField.setStyle("-fx-padding: 5 40 5 0 !important");
         
         uploadImageButton.setText("");
         uploadImageButton.getStyleClass().add("icon-button");
@@ -106,11 +114,19 @@ public class ProductController {
             File file = fileChooser.showOpenDialog(SceneManager.getStage());
             
             if (file != null) {
-                String imageUrl = file.toURI().toString();
-                Image image = new Image(imageUrl);
-                productImageView.setImage(image);
+                String imageURL = file.toURI().toString();
+                productImageURLTextField.setText(imageURL);
             }
         });
+        
+        productImageURLTextField.textProperty().addListener(
+            ($1, $2, imageURL) -> {
+                if (imageURL == null) return;
+                if (imageURL.isEmpty()) return;
+                Image image = new Image(imageURL);
+                productImageView.setImage(image);
+            }
+        );
         
         currentStocksNumberField.textField.setFloatingText("Current # of Stocks");
         currentStocksNumberField.setAllowDecimal(false);
@@ -142,46 +158,98 @@ public class ProductController {
         productCategoryComboBox.setMaxWidth(300);
         
         ProductModel.nameProperty.addListener(($1, $2, name) -> {
-            productNameTextField.setText(name);
+            if (name == null) {
+                productNameTextField.setText("");
+            } else {
+                productNameTextField.setText(name);
+            }
         });
         
         ProductModel.priceProperty.addListener(($1, $2, price) -> {
-            productPriceNumberField.textField.setText(String.format(
-                "%.2f", price.doubleValue()
-            ));
+            if (price == null) {
+                productPriceNumberField.textField.setText("0");
+            } else {
+                productPriceNumberField.textField.setText(String.format(
+                    "%.2f", price.doubleValue()
+                ));
+            }
         });
         
         ProductModel.categoryIDProperty.addListener(($1, $2, categoryID) -> {
-            productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
-                categoryID.intValue()
-            ));
+            if (categoryID == null) {
+                productCategoryComboBox.clearValue();
+            } else {
+                productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
+                    categoryID.intValue()
+                ));
+            }
         });
         
         ProductModel.imageURLProperty.addListener(($1, $2, imageURL) -> {
-            if (imageURL.isEmpty()) return;
-            productImageURLTextField.setText(imageURL);
-            productImageView.setImage(new Image(imageURL));
+            if (imageURL == null) {
+                productImageURLTextField.setText("");
+                productImageView.setImage(
+                    new Image(
+                        getClass().getResource(
+                            "/images/image-placeholder.png"
+                        ).toExternalForm()
+                    )
+                );
+            } else {
+                if (imageURL.isEmpty()) return;
+                productImageURLTextField.setText(imageURL);
+                productImageView.setImage(new Image(imageURL));
+            }
         });
         
         ProductModel.currentStocksProperty.addListener(
             ($1, $2, currentStocks) -> {
-                currentStocksNumberField.textField.setText(
-                    currentStocks.toString()
-                );
+                if (currentStocks == null) {
+                    currentStocksNumberField.textField.setText("0");
+                } else {
+                    currentStocksNumberField.textField.setText(
+                        currentStocks.toString()
+                    );
+                }
             }
         );
         
         ProductModel.expectedStocksProperty.addListener(
             ($1, $2, expectedStocks) -> {
-                expectedStocksNumberField.textField.setText(
-                    expectedStocks.toString()
-                );
+                if (expectedStocks == null) {
+                    expectedStocksNumberField.textField.setText("0");
+                } else {
+                    expectedStocksNumberField.textField.setText(
+                        expectedStocks.toString()
+                    );
+                }
             }
         );
+        
+        saveAllButton.setOnMouseClicked(e -> {
+            BaseModel.updateProduct(
+                ProductModel.idProperty.get(),
+                productNameTextField.getText(),
+                Double.parseDouble(productPriceNumberField.textField.getText()),
+                productCategoryComboBox.getValue().getID(),
+                productImageURLTextField.getText(),
+                Integer.parseInt(currentStocksNumberField.textField.getText()),
+                Integer.parseInt(expectedStocksNumberField.textField.getText())
+            );
+        });
+        
+        backButton.setOnMouseClicked(e -> {
+            goBack();
+        });
+        
+        cancelButton.setOnMouseClicked(e -> {
+            goBack();
+        });
     }
     
     @FXML
     public void goBack() {
         SceneManager.setScene("base");
+        ProductModel.clearState();
     }
 }

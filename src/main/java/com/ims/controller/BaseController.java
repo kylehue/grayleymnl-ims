@@ -6,6 +6,7 @@ import com.ims.database.DBProducts;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.objects.CategoryObject;
+import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
@@ -75,8 +76,28 @@ public class BaseController {
     
     private ProductAddModal addProductModal = new ProductAddModal();
     
+    private HashMap<Integer, Product> products = new HashMap<>();
+    
     private void initializeProductPage() {
+        BaseModel.productMap.addListener(
+            (MapChangeListener<Integer, ProductObject>) change -> {
+                int id = change.getKey();
+                boolean isAddedAlready = products.get(id) != null;
+                boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
+                boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
+                boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
+                if (needsToBeAdded) {
+                    addProduct(change.getValueAdded());
+                } else if (needsToBeUpdated) {
+                    products.get(id).setName(change.getValueAdded().getName());
+                } else if (needsToBeRemoved) {
+                    removeProduct(id);
+                }
+            }
+        );
+        
         LayoutUtils.applyVirtualScrolling(productsScrollPane, productsFlowPane);
+        this.initializeProductLazyLoad();
         
         addProductButton.setOnMouseClicked((e) -> {
             addProductModal.showModal();
@@ -93,25 +114,47 @@ public class BaseController {
             String name = addProductModal.nameTextField.getText();
             CategoryObject category = addProductModal.categoryComboBox.getValue();
             
-            DBProducts.add(
-                name,
-                category.getID(),
-                "",
-                0,
-                0
-            );
+            HashMap<DBProducts.Column, Object> addedProductObject = BaseModel.addProduct(name, category.getID());
             
+            ProductModel.idProperty.set((Integer) addedProductObject.get(
+                DBProducts.Column.ID
+            ));
             ProductModel.nameProperty.set(name);
             ProductModel.categoryIDProperty.set(category.getID());
             ProductModel.imageURLProperty.set("");
             ProductModel.priceProperty.set(0);
             ProductModel.currentStocksProperty.set(0);
             ProductModel.expectedStocksProperty.set(0);
-            
             SceneManager.setScene("product");
             
             addProductModal.hide();
         });
+    }
+    
+    /**
+     * Autoload products whenever needed.
+     */
+    private void initializeProductLazyLoad() {
+        // Load products whenever the scrollbar hits the bottom.
+        productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+            if (scrollValue.doubleValue() == 1) {
+                BaseModel.loadProducts(12);
+            }
+        });
+        
+        // The listener above won't work if there is no scrollbar.
+        // So here, we add components until the scroll pane gets a scrollbar.
+        productsScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+            double contentHeight = productsFlowPane.getBoundsInLocal().getHeight();
+            double viewportHeight = newValue.getHeight();
+            if (contentHeight < viewportHeight) {
+                BaseModel.loadProducts(4);
+            }
+        });
+        
+        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+        // So here, we can trigger it by loading initial products.
+        BaseModel.loadProducts(12);
     }
     
     private TagButton addCategoryTag(String categoryName, boolean isActive) {
@@ -124,21 +167,54 @@ public class BaseController {
     }
     
     private Product addProduct(
-        String name,
-        String category,
-        String imageUrl,
-        int currentStock,
-        int neededStock,
-        float price
+        ProductObject productObject
     ) {
-        Product product = new Product();
-        product.setName(name);
-        product.setCategory(category);
-        product.setStocks(currentStock, neededStock);
-        product.setPrice(price);
-        product.setImage(imageUrl);
-        productsFlowPane.getChildren().add(product);
+        Product product = new Product(productObject);
+        Platform.runLater(() -> {
+            this.products.put(productObject.getID(), product);
+            productsFlowPane.getChildren().add(
+                this.getSortedProducts().indexOf(product),
+                product
+            );
+            
+            product.setName(productObject.getName());
+            product.setCategory(
+                BaseModel.loadAndGetCategory(
+                    productObject.getCategoryID()
+                ).getName()
+            );
+            product.setStocks(
+                productObject.getCurrentStocks(),
+                productObject.getExpectedStocks()
+            );
+            product.setPrice((float) productObject.getPrice());
+            product.setImage(productObject.getImageURL());
+        });
         return product;
+    }
+    
+    private void removeProduct(int id) {
+        Product productToRemove = this.products.get(id);
+        if (productToRemove != null) {
+            Platform.runLater(() -> {
+                productsFlowPane.getChildren().remove(productToRemove);
+                this.products.remove(id);
+            });
+        }
+    }
+    
+    private ArrayList<Product> getSortedProducts() {
+        ArrayList<Product> sortedProducts = new ArrayList<>(
+            this.products.values().stream().sorted(
+                (a, b) -> {
+                    return b.productObject.getLastModified().compareTo(
+                        a.productObject.getLastModified()
+                    );
+                }
+            ).toList()
+        );
+        
+        return sortedProducts;
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -285,7 +361,6 @@ public class BaseController {
             Platform.runLater(() -> {
                 categoriesFlowPane.getChildren().remove(categoryToRemove);
                 this.categories.remove(categoryToRemove.categoryObject.getID());
-                
             });
         }
     }

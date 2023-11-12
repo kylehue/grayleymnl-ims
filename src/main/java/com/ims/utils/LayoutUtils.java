@@ -106,10 +106,6 @@ public abstract class LayoutUtils {
             if (!hasActiveTab) hasActiveTab = isActiveTabButton;
         }
         
-        SceneManager.onChangeScene((newScene, oldScene) -> {
-            makeTabActive(tabs.get(0), tabs, activeClass);
-        });
-        
         if (!hasActiveTab) {
             Pair firstTab = tabs.get(0);
             makeTabActive(firstTab, tabs, activeClass);

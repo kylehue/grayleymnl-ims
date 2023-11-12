@@ -115,6 +115,10 @@ public class ComboBox<K, V> extends StackPane {
     }
     
     public void setValue(V value) {
+        if (value == null) {
+            this.clearValue();
+            return;
+        }
         this.value = value;
         this.textField.setText(this.stringifier.call(this.value));
         textField.positionCaret(textField.getText().length());

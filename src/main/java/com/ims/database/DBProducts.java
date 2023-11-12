@@ -10,6 +10,7 @@ public class DBProducts {
     public enum Column {
         ID,
         NAME,
+        PRICE,
         CATEGORY_ID,
         IMAGE_URL,
         CURRENT_STOCKS,
@@ -60,6 +61,7 @@ public class DBProducts {
     public static HashMap<Column, Object> update(
         int id,
         String name,
+        Double price,
         Integer categoryID,
         String imageURL,
         Integer currentStocks,
@@ -72,6 +74,7 @@ public class DBProducts {
             String query = """
                 UPDATE products
                 SET name = COALESCE(?, name),
+                price = COALESCE(?, price),
                 category_id = COALESCE(?, category_id),
                 image_url = COALESCE(?, image_url),
                 current_stocks = COALESCE(?, current_stocks),
@@ -82,11 +85,12 @@ public class DBProducts {
             
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, name);
-            preparedStatement.setInt(2, categoryID);
-            preparedStatement.setString(3, imageURL);
-            preparedStatement.setInt(4, currentStocks);
-            preparedStatement.setInt(5, expectedStocks);
-            preparedStatement.setInt(6, id);
+            preparedStatement.setDouble(2, price);
+            preparedStatement.setInt(3, categoryID);
+            preparedStatement.setString(4, imageURL);
+            preparedStatement.setInt(5, currentStocks);
+            preparedStatement.setInt(6, expectedStocks);
+            preparedStatement.setInt(7, id);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
         } catch (SQLException e) {
@@ -142,6 +146,14 @@ public class DBProducts {
             data.put(
                 Column.NAME,
                 retrievedName
+            );
+            
+            double retrievedPrice = resultSet.getDouble(
+                Column.PRICE.toString()
+            );
+            data.put(
+                Column.PRICE,
+                retrievedPrice
             );
             
             int retrievedCategoryID = resultSet.getInt(
