@@ -3,13 +3,17 @@ package com.ims.components;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
 
-public class NumberField extends HBox {
+public class NumberField extends StackPane {
     public final MFXTextField textField = new MFXTextField();
     
     private double step = 1.0;
@@ -17,31 +21,41 @@ public class NumberField extends HBox {
     private boolean allowDecimal = true;
     private boolean allowNegative = true;
     
-    public NumberField() {
+    public NumberField(boolean showButtons) {
         this.setAlignment(Pos.CENTER_LEFT);
-        this.setSpacing(5);
         
-        MFXButton decrementButton = new MFXButton();
-        decrementButton.getStyleClass().addAll("icon-button");
-        decrementButton.setText("");
-        LayoutUtils.addIconToButton(decrementButton, "/icons/minus.svg");
+        this.getChildren().add(textField);
         
-        MFXButton incrementButton = new MFXButton();
-        incrementButton.getStyleClass().addAll("icon-button");
-        incrementButton.setText("");
-        LayoutUtils.addIconToButton(incrementButton, "/icons/plus.svg");
+        this.prefWidthProperty().bind(textField.prefWidthProperty());
+        this.minWidthProperty().bind(textField.minWidthProperty());
+        this.maxWidthProperty().bind(textField.maxWidthProperty());
+        
+        if (showButtons) {
+            textField.setStyle("-fx-padding: 5 50 5 50 !important;");
+            MFXButton decrementButton = new MFXButton();
+            decrementButton.getStyleClass().addAll("icon-button");
+            decrementButton.setText("");
+            LayoutUtils.addIconToButton(decrementButton, "/icons/minus.svg");
+            StackPane.setAlignment(decrementButton, Pos.CENTER_LEFT);
+            this.getChildren().add(decrementButton);
+            
+            MFXButton incrementButton = new MFXButton();
+            incrementButton.getStyleClass().addAll("icon-button");
+            incrementButton.setText("");
+            LayoutUtils.addIconToButton(incrementButton, "/icons/plus.svg");
+            StackPane.setAlignment(incrementButton, Pos.CENTER_RIGHT);
+            this.getChildren().add(incrementButton);
+            
+            decrementButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
+                this.decrement();
+            });
+            
+            incrementButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
+                this.increment();
+            });
+        }
         
         textField.setFloatingText("Number");
-        this.getChildren().addAll(decrementButton, textField, incrementButton);
-        
-        decrementButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-            this.decrement();
-        });
-        
-        incrementButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-            this.increment();
-        });
-        
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!isValid(newValue)) {
                 this.value = !oldValue.isEmpty() ? Double.parseDouble(oldValue) : 0;
@@ -69,6 +83,7 @@ public class NumberField extends HBox {
             } else if (event.getDeltaY() < 0) {
                 this.decrement();
             }
+            event.consume();
         });
         
         this.setValue(this.value);

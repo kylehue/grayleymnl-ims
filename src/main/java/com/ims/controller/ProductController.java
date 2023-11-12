@@ -51,8 +51,7 @@ public class ProductController {
     @FXML
     MFXTextField productNameTextField;
     
-    @FXML
-    MFXTextField productPriceTextField;
+    NumberField productPriceNumberField = new NumberField(false);
     
     CategoryComboBox productCategoryComboBox = new CategoryComboBox();
     
@@ -65,9 +64,9 @@ public class ProductController {
     @FXML
     MFXTextField productImageURLTextField;
     
-    NumberField currentStocksNumberField = new NumberField();
+    NumberField currentStocksNumberField = new NumberField(true);
     
-    NumberField expectedStocksNumberField = new NumberField();
+    NumberField expectedStocksNumberField = new NumberField(true);
     
     @FXML
     public void initialize() {
@@ -116,13 +115,25 @@ public class ProductController {
         currentStocksNumberField.textField.setFloatingText("Current # of Stocks");
         currentStocksNumberField.setAllowDecimal(false);
         currentStocksNumberField.setAllowNegative(false);
+        currentStocksNumberField.textField.setMinWidth(100);
+        currentStocksNumberField.textField.setMaxWidth(300);
         expectedStocksNumberField.textField.setFloatingText("Needed # of Stocks");
         expectedStocksNumberField.setAllowDecimal(false);
         expectedStocksNumberField.setAllowNegative(false);
+        expectedStocksNumberField.textField.setMinWidth(100);
+        expectedStocksNumberField.textField.setMaxWidth(300);
         stocksPaneFieldsContainer.getChildren().addAll(
             currentStocksNumberField,
             expectedStocksNumberField
         );
+        generalPaneFieldsContainer.getChildren().add(
+            1,
+            productPriceNumberField
+        );
+        productPriceNumberField.textField.setFloatingText("Price");
+        productPriceNumberField.textField.setMinWidth(100);
+        productPriceNumberField.textField.setMaxWidth(300);
+        productPriceNumberField.setAllowNegative(false);
         generalPaneFieldsContainer.getChildren().add(
             2,
             productCategoryComboBox
@@ -135,7 +146,7 @@ public class ProductController {
         });
         
         ProductModel.priceProperty.addListener(($1, $2, price) -> {
-            productPriceTextField.setText(String.format(
+            productPriceNumberField.textField.setText(String.format(
                 "%.2f", price.doubleValue()
             ));
         });

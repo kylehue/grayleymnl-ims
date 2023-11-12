@@ -72,7 +72,6 @@
                         <VBox fx:id="generalPaneFieldsContainer" spacing="10.0">
                            <children>
                               <MFXTextField fx:id="productNameTextField" floatingText="Product Name" maxWidth="300.0" minWidth="100.0" />
-                              <MFXTextField fx:id="productPriceTextField" floatingText="Price" maxWidth="300.0" minWidth="100.0" />
                               <GridPane vgap="5.0">
                                  <columnConstraints>
                                     <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" />
