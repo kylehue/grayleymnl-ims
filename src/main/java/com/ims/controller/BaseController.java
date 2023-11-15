@@ -17,6 +17,7 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ims.utils.LayoutUtils;
@@ -89,7 +90,19 @@ public class BaseController {
                 if (needsToBeAdded) {
                     addProduct(change.getValueAdded());
                 } else if (needsToBeUpdated) {
-                    products.get(id).setName(change.getValueAdded().getName());
+                    ProductObject productObject = change.getValueAdded();
+                    Product oldProduct = products.get(id);
+                    oldProduct.setProductObject(productObject);
+                    oldProduct.setName(productObject.getName());
+                    oldProduct.setStocks(
+                        productObject.getCurrentStocks(),
+                        productObject.getExpectedStocks()
+                    );
+                    oldProduct.setCategory(
+                        BaseModel.loadAndGetCategory(productObject.getCategoryID()).getName()
+                    );
+                    oldProduct.setImage(productObject.getImageURL());
+                    oldProduct.setPrice((float) productObject.getPrice());
                 } else if (needsToBeRemoved) {
                     removeProduct(id);
                 }
@@ -114,17 +127,16 @@ public class BaseController {
             String name = addProductModal.nameTextField.getText();
             CategoryObject category = addProductModal.categoryComboBox.getValue();
             
-            HashMap<DBProducts.Column, Object> addedProductObject = BaseModel.addProduct(name, category.getID());
+            ProductObject addedProductObject = null;
+            try {
+                addedProductObject = BaseModel.addProduct(name, category.getID());
+            } catch (ExecutionException ex) {
+                throw new RuntimeException(ex);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
             
-            ProductModel.idProperty.set((Integer) addedProductObject.get(
-                DBProducts.Column.ID
-            ));
-            ProductModel.nameProperty.set(name);
-            ProductModel.categoryIDProperty.set(category.getID());
-            ProductModel.imageURLProperty.set("");
-            ProductModel.priceProperty.set(0);
-            ProductModel.currentStocksProperty.set(0);
-            ProductModel.expectedStocksProperty.set(0);
+            ProductModel.currentProduct.set(addedProductObject);
             SceneManager.setScene("product");
             
             addProductModal.hide();

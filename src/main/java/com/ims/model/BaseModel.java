@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,15 +41,15 @@ public abstract class BaseModel {
      *
      * @param name The name of the product to add.
      */
-    public static HashMap<DBProducts.Column, Object> addProduct(
+    public static ProductObject addProduct(
         String name,
         int categoryID
-    ) {
+    ) throws ExecutionException, InterruptedException {
         if (name.isEmpty()) return null;
         
-        Task<HashMap<DBProducts.Column, Object>> task = new Task<>() {
+        Task<ProductObject> task = new Task<>() {
             @Override
-            protected HashMap<DBProducts.Column, Object> call() throws Exception {
+            protected ProductObject call() throws Exception {
                 isBusyProduct.set(true);
                 // First, we have to make sure the category exists in the database
                 HashMap<DBCategories.Column, Object> retrievedCategory =
@@ -92,7 +93,7 @@ public abstract class BaseModel {
                 Timestamp newLastModified = (Timestamp) newProduct.get(
                     DBProducts.Column.LAST_MODIFIED
                 );
-                productMap.put(newID, new ProductObject(
+                ProductObject productObject = new ProductObject(
                     newID,
                     newName,
                     newPrice,
@@ -101,9 +102,10 @@ public abstract class BaseModel {
                     newCurrentStocks,
                     newExpectedStocks,
                     newLastModified
-                ));
+                );
+                productMap.put(newID, productObject);
                 
-                return newProduct;
+                return productObject;
             }
         };
         
@@ -119,7 +121,7 @@ public abstract class BaseModel {
         executor.submit(task);
         executor.shutdown();
         
-        return task.getValue();
+        return task.get();
     }
     
     /**

@@ -21,11 +21,16 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class Product extends GridPane {
-    public final ProductObject productObject;
+    public ProductObject productObject;
     private final ObservableList<String> styleClass = this.getStyleClass();
     
     private final GridPane textGridPane = LayoutUtils.createGridPane(4, 1);
     private final ImageView imgView = new ImageView();
+    
+    private final Label nameLabel = new Label();
+    private final Label categoryLabel = new Label();
+    private final Label stocksLabel = new Label();
+    private final Label priceLabel = new Label();
     
     public Product(ProductObject productObject) {
         this.productObject = productObject;
@@ -66,28 +71,22 @@ public class Product extends GridPane {
         controlFlowPane.getChildren().add(editButton);
         
         editButton.setOnMouseClicked(e -> {
-            ProductModel.idProperty.set(productObject.getID());
-            ProductModel.nameProperty.set(productObject.getName());
-            ProductModel.categoryIDProperty.set(productObject.getCategoryID());
-            ProductModel.imageURLProperty.set(productObject.getImageURL());
-            ProductModel.priceProperty.set(productObject.getPrice());
-            ProductModel.currentStocksProperty.set(productObject.getCurrentStocks());
-            ProductModel.expectedStocksProperty.set(productObject.getExpectedStocks());
+            ProductModel.currentProduct.set(productObject);
             SceneManager.setScene("product");
         });
         
         Transition.fadeUp(this, 150);
         
         // Setup image
-        imgView.setPreserveRatio(true);
-        imgView.getStyleClass().add("product-image");
-        
         StackPane imgContainer = new StackPane(imgView);
         Rectangle rectClip = new Rectangle(0, 0, 0, 0);
         rectClip.setArcWidth(10);
         rectClip.setArcHeight(10);
         rectClip.widthProperty().bind(imgContainer.widthProperty());
         rectClip.heightProperty().bind(imgContainer.heightProperty());
+        
+        imgView.setPreserveRatio(true);
+        imgView.getStyleClass().add("product-image");
         
         imgContainer.setAlignment(Pos.CENTER);
         imgContainer.setClip(rectClip);
@@ -101,11 +100,21 @@ public class Product extends GridPane {
                 imgView.setFitHeight(innerHeight);
                 imgContainer.setPrefHeight(innerHeight);
                 imgContainer.setPrefWidth(Math.max(this.getWidth() / 3, 150));
+                imgContainer.setMinWidth(Math.max(this.getWidth() / 3, 150));
+                imgContainer.setMaxWidth(Math.max(this.getWidth() / 3, 150));
             });
         });
         
         this.add(imgContainer, 0, 0);
-        this.setImage(getClass().getResource("/images/image-placeholder.png").toExternalForm());
+        this.setImage(
+            getClass().getResource("/images/image-placeholder.png").toExternalForm()
+        );
+        
+        // Setup labels
+        this.textGridPane.add(nameLabel, 0, 0);
+        this.textGridPane.add(categoryLabel, 0, 1);
+        this.textGridPane.add(stocksLabel, 0, 2);
+        this.textGridPane.add(priceLabel, 0, 3);
     }
     
     /**
@@ -122,36 +131,32 @@ public class Product extends GridPane {
     }
     
     public void setName(String name) {
-        Label label = new Label();
-        label.setText(name);
-        label.getStyleClass().add("product-name-label");
-        this.textGridPane.add(label, 0, 0);
+        nameLabel.setText(name);
+        nameLabel.getStyleClass().add("product-name-label");
     }
     
     public void setCategory(String category) {
-        Label label = new Label();
-        label.setText(category);
-        label.getStyleClass().add("product-category-label");
-        this.textGridPane.add(label, 0, 1);
+        categoryLabel.setText(category);
+        categoryLabel.getStyleClass().add("product-category-label");
     }
     
     public void setStocks(int current, int max) {
-        Label label = new Label();
-        label.setText("In stock: " + current + "/" + max);
-        label.setAlignment(Pos.TOP_LEFT);
-        label.setWrapText(true);
+        stocksLabel.setText("In stock: " + current + "/" + max);
+        stocksLabel.setAlignment(Pos.TOP_LEFT);
+        stocksLabel.setWrapText(true);
         this.heightProperty().addListener(($1, $2, $3) -> {
-            label.setMaxHeight(this.getHeight() / 3);
+            stocksLabel.setMaxHeight(this.getHeight() / 3);
         });
         
-        label.getStyleClass().add("product-description-label");
-        this.textGridPane.add(label, 0, 2);
+        stocksLabel.getStyleClass().add("product-description-label");
     }
     
     public void setPrice(float price) {
-        Label label = new Label();
-        label.setText("₱" + String.format("%.2f", price));
-        label.getStyleClass().add("product-price-label");
-        this.textGridPane.add(label, 0, 3);
+        priceLabel.setText("₱" + String.format("%.2f", price));
+        priceLabel.getStyleClass().add("product-price-label");
+    }
+    
+    public void setProductObject(ProductObject productObject) {
+        this.productObject = productObject;
     }
 }

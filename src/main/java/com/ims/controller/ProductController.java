@@ -157,36 +157,26 @@ public class ProductController {
         productCategoryComboBox.setMinWidth(100);
         productCategoryComboBox.setMaxWidth(300);
         
-        ProductModel.nameProperty.addListener(($1, $2, name) -> {
-            if (name == null) {
+        ProductModel.currentProduct.addListener(($1, $2, currentProduct) -> {
+            String name = currentProduct.getName();
+            if (name == null || name.isEmpty()) {
                 productNameTextField.setText("");
             } else {
                 productNameTextField.setText(name);
             }
-        });
-        
-        ProductModel.priceProperty.addListener(($1, $2, price) -> {
-            if (price == null) {
-                productPriceNumberField.textField.setText("0");
-            } else {
-                productPriceNumberField.textField.setText(String.format(
-                    "%.2f", price.doubleValue()
-                ));
-            }
-        });
-        
-        ProductModel.categoryIDProperty.addListener(($1, $2, categoryID) -> {
-            if (categoryID == null) {
-                productCategoryComboBox.clearValue();
-            } else {
-                productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
-                    categoryID.intValue()
-                ));
-            }
-        });
-        
-        ProductModel.imageURLProperty.addListener(($1, $2, imageURL) -> {
-            if (imageURL == null) {
+            
+            double price = currentProduct.getPrice();
+            productPriceNumberField.textField.setText(String.format(
+                "%.2f", price
+            ));
+            
+            int categoryID = currentProduct.getCategoryID();
+            productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
+                categoryID
+            ));
+            
+            String imageURL = currentProduct.getImageURL();
+            if (imageURL == null || imageURL.isEmpty()) {
                 productImageURLTextField.setText("");
                 productImageView.setImage(
                     new Image(
@@ -196,39 +186,24 @@ public class ProductController {
                     )
                 );
             } else {
-                if (imageURL.isEmpty()) return;
                 productImageURLTextField.setText(imageURL);
                 productImageView.setImage(new Image(imageURL));
             }
+            
+            int currentStocks = currentProduct.getCurrentStocks();
+            currentStocksNumberField.textField.setText(
+                String.valueOf(currentStocks)
+            );
+            
+            int expectedStocks = currentProduct.getExpectedStocks();
+            expectedStocksNumberField.textField.setText(
+                String.valueOf(expectedStocks)
+            );
         });
-        
-        ProductModel.currentStocksProperty.addListener(
-            ($1, $2, currentStocks) -> {
-                if (currentStocks == null) {
-                    currentStocksNumberField.textField.setText("0");
-                } else {
-                    currentStocksNumberField.textField.setText(
-                        currentStocks.toString()
-                    );
-                }
-            }
-        );
-        
-        ProductModel.expectedStocksProperty.addListener(
-            ($1, $2, expectedStocks) -> {
-                if (expectedStocks == null) {
-                    expectedStocksNumberField.textField.setText("0");
-                } else {
-                    expectedStocksNumberField.textField.setText(
-                        expectedStocks.toString()
-                    );
-                }
-            }
-        );
         
         saveAllButton.setOnMouseClicked(e -> {
             BaseModel.updateProduct(
-                ProductModel.idProperty.get(),
+                ProductModel.currentProduct.get().getID(),
                 productNameTextField.getText(),
                 Double.parseDouble(productPriceNumberField.textField.getText()),
                 productCategoryComboBox.getValue().getID(),
