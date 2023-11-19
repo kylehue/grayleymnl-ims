@@ -76,7 +76,9 @@ public class ComboBox<K, V> extends StackPane {
             rotateTransition.setFromAngle(180);
             rotateTransition.setToAngle(0);
             rotateTransition.play();
-            toggleDropDownButton.requestFocus();
+            if (textField.delegateIsFocused()) {
+                toggleDropDownButton.requestFocus();
+            }
         });
         
         textField.delegateFocusedProperty().addListener(e -> {
