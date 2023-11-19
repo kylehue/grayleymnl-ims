@@ -1,8 +1,8 @@
 package com.ims.controller;
 
 import com.ims.components.CategoryComboBox;
-import com.ims.components.ConfirmDeleteProductModal;
 import com.ims.components.NumberField;
+import com.ims.components.PopupService;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.utils.SceneManager;
@@ -77,9 +77,6 @@ public class ProductController {
     
     @FXML
     MFXButton deleteProductButton;
-    
-    ConfirmDeleteProductModal confirmDeleteProductModal =
-        new ConfirmDeleteProductModal();
     
     @FXML
     public void initialize() {
@@ -229,14 +226,24 @@ public class ProductController {
         });
         
         deleteProductButton.setOnMouseClicked(e -> {
-            confirmDeleteProductModal.showModal();
-        });
-        
-        confirmDeleteProductModal.deleteButton.setOnMouseClicked(e -> {
-            BaseModel.removeProduct(
-                ProductModel.currentProduct.get().getID()
-            );
-            goBack();
+            PopupService.confirmDialog.setup(
+                "Delete Product",
+                "Are you sure you want to delete this product?",
+                "Delete",
+                true,
+                () -> {
+                    BaseModel.removeProduct(
+                        ProductModel.currentProduct.get().getID()
+                    );
+                    goBack();
+                    
+                    PopupService.messageDialog.setup(
+                        "Delete Product",
+                        "Product has been deleted.",
+                        "Got it!"
+                    ).show();
+                }
+            ).show();
         });
     }
     

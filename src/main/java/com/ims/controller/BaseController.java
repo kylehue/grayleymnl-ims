@@ -185,7 +185,7 @@ public class BaseController {
         this.initializeProductLazyLoad();
         
         addProductButton.setOnMouseClicked((e) -> {
-            addProductModal.showModal();
+            addProductModal.show();
         });
         
         addProductModal.addButton.setOnMouseClicked((e) -> {
@@ -333,8 +333,6 @@ public class BaseController {
     
     private CategoryAddModal addCategoryModal = new CategoryAddModal();
     
-    private CategoryDeleteModal deleteCategoryModal = new CategoryDeleteModal();
-    
     private void initializeCategoryPage() {
         BaseModel.categoryMap.addListener(
             (MapChangeListener<Integer, CategoryObject>) change -> {
@@ -356,7 +354,7 @@ public class BaseController {
         LayoutUtils.applyVirtualScrolling(categoriesScrollPane, categoriesFlowPane);
         this.initializeCategoryLazyLoad();
         addCategoryButton.setOnMouseClicked((e) -> {
-            addCategoryModal.showModal();
+            addCategoryModal.show();
         });
         
         addCategoryModal.addButton.setOnMouseClicked((e) -> {
@@ -377,6 +375,12 @@ public class BaseController {
                     category.getCategoryName()
                 );
             }
+            
+            PopupService.messageDialog.setup(
+                "Update Categories",
+                "All categories has been successfully updated.",
+                "Got it!"
+            ).show();
         });
     }
     
@@ -416,24 +420,6 @@ public class BaseController {
                 this.getSortedCategories().indexOf(category),
                 category
             );
-            
-            category.deleteButton.setOnMouseClicked((e) -> {
-                deleteCategoryModal.setCategoryName(
-                    BaseModel.categoryMap.get(id).getName()
-                );
-                deleteCategoryModal.deleteButton.setOnMouseClicked((ev) -> {
-                    BaseModel.removeCategory(id);
-                    deleteCategoryModal.hide();
-                });
-                deleteCategoryModal.showModal();
-            });
-            
-            category.saveButton.setOnMouseClicked((e) -> {
-                if (!category.nameTextFieldValidator.isValid()) {
-                    return;
-                }
-                BaseModel.updateCategory(id, category.getCategoryName());
-            });
             
             addCategoryTag(category.getCategoryName(), false);
         });

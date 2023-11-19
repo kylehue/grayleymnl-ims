@@ -1,6 +1,7 @@
 package com.ims.components;
 
 import com.ims.Config;
+import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
@@ -69,6 +70,35 @@ public class Category extends GridPane {
         LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
         
         Transition.fadeUp(this, 150);
+        
+        int id = this.categoryObject.getID();
+        
+        deleteButton.setOnMouseClicked((e) -> {
+            PopupService.confirmDialog.setup(
+                "Delete Category",
+                "Are you sure you want to delete this category?",
+                "Delete",
+                true,
+                () -> {
+                    BaseModel.removeCategory(id);
+                    PopupService.confirmDialog.hide();
+                }
+            ).show();
+        });
+        
+        saveButton.setOnMouseClicked((e) -> {
+            if (!this.nameTextFieldValidator.isValid()) {
+                return;
+            }
+            
+            BaseModel.updateCategory(id, this.getCategoryName());
+            
+            PopupService.messageDialog.setup(
+                "Update Category",
+                "Category has been successfully updated.",
+                "Got it!"
+            ).show();
+        });
     }
     
     public void setCategoryName(String name) {

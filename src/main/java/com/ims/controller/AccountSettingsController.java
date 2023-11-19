@@ -1,8 +1,7 @@
 package com.ims.controller;
 
-import com.ims.components.ConfirmUpdatePasswordModal;
+import com.ims.components.PopupService;
 import com.ims.database.DBRoles;
-import com.ims.database.DBUsers;
 import com.ims.model.UserSessionModel;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
@@ -61,9 +60,6 @@ public class AccountSettingsController {
     
     @FXML
     MFXButton updatePasswordButton;
-    
-    ConfirmUpdatePasswordModal confirmUpdatePasswordModal =
-        new ConfirmUpdatePasswordModal();
     
     @FXML
     public void initialize() {
@@ -133,30 +129,40 @@ public class AccountSettingsController {
                 return;
             }
             
-            confirmUpdatePasswordModal.showModal();
-        });
-        
-        confirmUpdatePasswordModal.updateButton.setOnMouseClicked(e -> {
-            if (!oldPasswordFieldValidator.isValid() ||
-                !newPasswordFieldValidator.isValid() ||
-                !confirmNewPasswordTextFieldValidator.isValid()) {
-                return;
-            }
-            
-            String password = confirmNewPasswordField.getText();
-            UserSessionModel.updatePassword(
-                Utils.hashPassword(password)
-            );
-            
-            oldPasswordField.setText("");
-            newPasswordField.setText("");
-            confirmNewPasswordField.setText("");
-            
-            oldPasswordFieldValidator.reset();
-            newPasswordFieldValidator.reset();
-            confirmNewPasswordTextFieldValidator.reset();
-            
-            confirmUpdatePasswordModal.hide();
+            PopupService.confirmDialog.setup(
+                "Update Password",
+                "Are you sure you want to update your password?",
+                "Update",
+                false,
+                () -> {
+                    if (!oldPasswordFieldValidator.isValid() ||
+                        !newPasswordFieldValidator.isValid() ||
+                        !confirmNewPasswordTextFieldValidator.isValid()) {
+                        return;
+                    }
+                    
+                    String password = confirmNewPasswordField.getText();
+                    UserSessionModel.updatePassword(
+                        Utils.hashPassword(password)
+                    );
+                    
+                    oldPasswordField.setText("");
+                    newPasswordField.setText("");
+                    confirmNewPasswordField.setText("");
+                    
+                    oldPasswordFieldValidator.reset();
+                    newPasswordFieldValidator.reset();
+                    confirmNewPasswordTextFieldValidator.reset();
+                    
+                    PopupService.confirmDialog.hide();
+                    
+                    PopupService.messageDialog.setup(
+                        "Update Password",
+                        "Your password has been updated.",
+                        "Got it!"
+                    ).show();
+                }
+            ).show();
         });
     }
     
