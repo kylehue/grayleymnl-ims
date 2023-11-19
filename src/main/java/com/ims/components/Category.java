@@ -15,7 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
 public class Category extends GridPane {
-    public final CategoryObject categoryObject;
+    private CategoryObject categoryObject;
     private final ObservableList<String> styleClass = this.getStyleClass();
     public final MFXTextField nameTextField = new MFXTextField();
     public final TextFieldValidator nameTextFieldValidator;
@@ -107,5 +107,14 @@ public class Category extends GridPane {
     
     public String getCategoryName() {
         return this.nameTextField.getText();
+    }
+    
+    public void setCategoryObject(CategoryObject categoryObject) {
+        this.categoryObject = categoryObject;
+        this.setCategoryName(categoryObject.getName());
+    }
+    
+    public CategoryObject getCategoryObject() {
+        return categoryObject;
     }
 }

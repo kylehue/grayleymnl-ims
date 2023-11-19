@@ -165,16 +165,6 @@ public class BaseController {
                     ProductObject productObject = change.getValueAdded();
                     Product oldProduct = products.get(id);
                     oldProduct.setProductObject(productObject);
-                    oldProduct.setName(productObject.getName());
-                    oldProduct.setStocks(
-                        productObject.getCurrentStocks(),
-                        productObject.getExpectedStocks()
-                    );
-                    oldProduct.setCategory(
-                        BaseModel.loadAndGetCategory(productObject.getCategoryID()).getName()
-                    );
-                    oldProduct.setImage(productObject.getImageURL());
-                    oldProduct.setPrice((float) productObject.getPrice());
                 } else if (needsToBeRemoved) {
                     removeProduct(id);
                 }
@@ -291,8 +281,8 @@ public class BaseController {
         ArrayList<Product> sortedProducts = new ArrayList<>(
             this.products.values().stream().sorted(
                 (a, b) -> {
-                    return b.productObject.getLastModified().compareTo(
-                        a.productObject.getLastModified()
+                    return b.getProductObject().getLastModified().compareTo(
+                        a.getProductObject().getLastModified()
                     );
                 }
             ).toList()
@@ -344,7 +334,9 @@ public class BaseController {
                 if (needsToBeAdded) {
                     addCategory(change.getValueAdded());
                 } else if (needsToBeUpdated) {
-                    categories.get(id).setCategoryName(change.getValueAdded().getName());
+                    Category category = categories.get(id);
+                    CategoryObject categoryObject = change.getValueAdded();
+                    category.setCategoryObject(categoryObject);
                 } else if (needsToBeRemoved) {
                     removeCategory(id);
                 }
@@ -371,7 +363,7 @@ public class BaseController {
                 }
                 
                 BaseModel.updateCategory(
-                    category.categoryObject.getID(),
+                    category.getCategoryObject().getID(),
                     category.getCategoryName()
                 );
             }
@@ -432,7 +424,9 @@ public class BaseController {
         if (categoryToRemove != null) {
             Platform.runLater(() -> {
                 categoriesFlowPane.getChildren().remove(categoryToRemove);
-                this.categories.remove(categoryToRemove.categoryObject.getID());
+                this.categories.remove(
+                    categoryToRemove.getCategoryObject().getID()
+                );
             });
         }
     }
@@ -441,8 +435,8 @@ public class BaseController {
         ArrayList<Category> sortedCategories = new ArrayList<>(
             this.categories.values().stream().sorted(
                 (a, b) -> {
-                    return b.categoryObject.getLastModified().compareTo(
-                        a.categoryObject.getLastModified()
+                    return b.getCategoryObject().getLastModified().compareTo(
+                        a.getCategoryObject().getLastModified()
                     );
                 }
             ).toList()

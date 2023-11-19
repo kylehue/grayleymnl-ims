@@ -1,6 +1,7 @@
 package com.ims.components;
 
 import com.ims.database.DBProducts;
+import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
@@ -21,7 +22,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class Product extends GridPane {
-    public ProductObject productObject;
+    private ProductObject productObject;
     private final ObservableList<String> styleClass = this.getStyleClass();
     
     private final GridPane textGridPane = LayoutUtils.createGridPane(4, 1);
@@ -33,7 +34,6 @@ public class Product extends GridPane {
     private final Label priceLabel = new Label();
     
     public Product(ProductObject productObject) {
-        this.productObject = productObject;
         this.styleClass.add("card");
         this.styleClass.add("product-container");
         
@@ -115,6 +115,8 @@ public class Product extends GridPane {
         this.textGridPane.add(categoryLabel, 0, 1);
         this.textGridPane.add(stocksLabel, 0, 2);
         this.textGridPane.add(priceLabel, 0, 3);
+        
+        this.setProductObject(productObject);
     }
     
     /**
@@ -158,5 +160,19 @@ public class Product extends GridPane {
     
     public void setProductObject(ProductObject productObject) {
         this.productObject = productObject;
+        this.setName(productObject.getName());
+        this.setStocks(
+            productObject.getCurrentStocks(),
+            productObject.getExpectedStocks()
+        );
+        this.setCategory(
+            BaseModel.loadAndGetCategory(productObject.getCategoryID()).getName()
+        );
+        this.setImage(productObject.getImageURL());
+        this.setPrice((float) productObject.getPrice());
+    }
+    
+    public ProductObject getProductObject() {
+        return productObject;
     }
 }
