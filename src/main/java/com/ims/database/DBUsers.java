@@ -157,6 +157,41 @@ public class DBUsers {
         return rows;
     }
     
+    /**
+     * Get rows that are in specified range.
+     * @param startIndex The starting row index.
+     * @param length The limit of rows to retrieve.
+     * @return An ArrayList of rows.
+     */
+    public static ArrayList<HashMap<DBUsers.Column, Object>> getInRange(
+        int startIndex,
+        int length
+    ) {
+        ArrayList<HashMap<DBUsers.Column, Object>> rows = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        
+        try {
+            String query = """
+                SELECT * FROM users
+                ORDER BY joined_date DESC, id ASC
+                OFFSET ?
+                LIMIT ?;
+                """;
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, startIndex);
+            preparedStatement.setInt(2, length);
+            resultSet = preparedStatement.executeQuery();
+            rows = extractRowsFromResultSet(resultSet);
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return rows;
+    }
+    
     public static ArrayList<HashMap<DBUsers.Column, Object>> get(
         DBUsers.Column columnLabel,
         Object compareValue

@@ -4,6 +4,7 @@ import com.ims.components.*;
 import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
+import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -61,8 +62,28 @@ public class UserManagerController {
                 if (needsToBeAdded) {
                     addRole(change.getValueAdded());
                 } else if (needsToBeUpdated) {
-                    roles.get(id).setName(
-                        change.getValueAdded().getName()
+                    Role role = roles.get(id);
+                    RoleObject roleObject = change.getValueAdded();
+                    role.setName(
+                        roleObject.getName()
+                    );
+                    role.setAllowAddCategory(
+                        roleObject.isAllowAddCategory()
+                    );
+                    role.setAllowDeleteCategory(
+                        roleObject.isAllowDeleteCategory()
+                    );
+                    role.setAllowEditCategory(
+                        roleObject.isAllowEditCategory()
+                    );
+                    role.setAllowAddProduct(
+                        roleObject.isAllowAddProduct()
+                    );
+                    role.setAllowDeleteProduct(
+                        roleObject.isAllowDeleteProduct()
+                    );
+                    role.setAllowEditProduct(
+                        roleObject.isAllowEditProduct()
                     );
                 } else if (needsToBeRemoved) {
                     removeRole(id);
@@ -135,7 +156,7 @@ public class UserManagerController {
         });
         
         // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial categories.
+        // So here, we can trigger it by loading initial roles.
         UserManagerModel.loadRoles(12);
     }
     
@@ -195,25 +216,93 @@ public class UserManagerController {
     @FXML
     MFXScrollPane usersScrollPane;
     
-    public void initializeUserPage() {
+    HashMap<Integer, User> users = new HashMap<>();
     
+    public void initializeUserPage() {
+        UserManagerModel.userMap.addListener(
+            (MapChangeListener<Integer, UserObject>) change -> {
+                int id = change.getKey();
+                boolean isAddedAlready = users.get(id) != null;
+                boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
+                boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
+                boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
+                if (needsToBeAdded) {
+                    addUser(change.getValueAdded());
+                } else if (needsToBeUpdated) {
+                    User user = users.get(id);
+                    UserObject userObject = change.getValueAdded();
+                    user.setUserObject(userObject);
+                } else if (needsToBeRemoved) {
+                    removeUser(id);
+                }
+            }
+        );
+        
+        LayoutUtils.applyVirtualScrolling(
+            usersScrollPane,
+            usersFlowPane
+        );
+        this.initializeUserLazyLoad();
     }
     
-    private User addUser(
-        String email,
-        String role,
-        String joinedDate,
-        String lastActivityDate
-    ) {
-        User user = new User();
+    public void initializeUserLazyLoad() {
+        // Load users whenever the scrollbar hits the bottom.
+        usersScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+            if (scrollValue.doubleValue() == 1) {
+                UserManagerModel.loadUsers(12);
+            }
+        });
+        
+        // The listener above won't work if there is no scrollbar.
+        // So here, we add components until the scroll pane gets a scrollbar.
+        usersScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+            double contentHeight = usersFlowPane.getBoundsInLocal().getHeight();
+            double viewportHeight = newValue.getHeight();
+            if (contentHeight < viewportHeight) {
+                UserManagerModel.loadUsers(4);
+            }
+        });
+        
+        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+        // So here, we can trigger it by loading initial users.
+        UserManagerModel.loadUsers(12);
+    }
+    
+    private User addUser(UserObject userObject) {
+        User user = new User(userObject);
         Platform.runLater(() -> {
-            user.setEmail(email);
-            user.setRole(role);
-            user.setJoinedDate(joinedDate);
-            user.setLastActivityDate(lastActivityDate);
-            usersFlowPane.getChildren().add(user);
+            this.users.put(userObject.getID(), user);
+            
+            usersFlowPane.getChildren().add(
+                this.getSortedUsers().indexOf(user),
+                user
+            );
         });
         return user;
+    }
+    
+    private void removeUser(int id) {
+        User userToRemove = this.users.get(id);
+        if (userToRemove != null) {
+            Platform.runLater(() -> {
+                usersFlowPane.getChildren().remove(userToRemove);
+                this.users.remove(userToRemove.getUserObject().getID());
+            });
+        }
+    }
+    
+    private ArrayList<User> getSortedUsers() {
+        ArrayList<User> sortedUsers = new ArrayList<>(
+            this.users.values().stream().sorted(
+                (a, b) -> {
+                    return b.getUserObject().getJoinedDate().compareTo(
+                        a.getUserObject().getJoinedDate()
+                    );
+                }
+            ).toList()
+        );
+        
+        return sortedUsers;
     }
     
     //////////////////////////////////////////////////////////////////////

@@ -38,9 +38,13 @@ public abstract class UserSessionModel {
     
     public static HashMap<DBRoles.Column, Object> getCurrentUserRole() {
         if (currentUser.get() == null) return null;
+        return getUserRole(currentUser.get().getID());
+    }
+    
+    public static HashMap<DBRoles.Column, Object> getUserRole(int userID) {
         HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
             DBUsers.Column.ID,
-            currentUser.get().getID()
+            userID
         );
         if (user == null) return null;
         return DBRoles.getOne(

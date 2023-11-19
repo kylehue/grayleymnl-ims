@@ -1,13 +1,18 @@
 package com.ims.model;
 
+import com.ims.database.DBCategories;
 import com.ims.database.DBRoles;
+import com.ims.database.DBUsers;
+import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
+import com.ims.model.objects.UserObject;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +21,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class UserManagerModel {
+    //////////////////////////////////////////////////////////////////////
+    // ---------------------------- ROLES ----------------------------- //
+    //////////////////////////////////////////////////////////////////////
+    
     public static final ObservableMap<Integer, RoleObject>
         roleMap = FXCollections.observableHashMap();
     public static final BooleanProperty
@@ -211,6 +220,44 @@ public abstract class UserManagerModel {
         executor.shutdown();
     }
     
+    public static RoleObject loadAndGetRole(int id) {
+        RoleObject roleObject = roleMap.get(id);
+        if (roleObject != null) {
+            return roleObject;
+        }
+        
+        HashMap<DBRoles.Column, Object> row = DBRoles.getOne(DBRoles.Column.ID, id);
+        if (row != null) {
+            roleObject = new RoleObject(
+                id,
+                (String) row.get(DBRoles.Column.NAME),
+                (boolean) row.get(
+                    DBRoles.Column.ALLOW_ADD_CATEGORY
+                ),
+                (boolean) row.get(
+                    DBRoles.Column.ALLOW_DELETE_CATEGORY
+                ),
+                (boolean) row.get(
+                    DBRoles.Column.ALLOW_EDIT_CATEGORY
+                ),
+                (boolean) row.get(
+                    DBRoles.Column.ALLOW_ADD_PRODUCT
+                ),
+                (boolean) row.get(
+                    DBRoles.Column.ALLOW_DELETE_PRODUCT
+                ),
+                (boolean) row.get(
+                    DBRoles.Column.ALLOW_EDIT_PRODUCT
+                ),
+                (Timestamp) row.get(DBRoles.Column.LAST_MODIFIED)
+            );
+            roleMap.put(id, roleObject);
+            return roleObject;
+        }
+        
+        return null;
+    }
+    
     /**
      * Load more roles from the database.
      *
@@ -275,6 +322,78 @@ public abstract class UserManagerModel {
         
         task.setOnSucceeded(e -> {
             isBusyRole.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    //////////////////////////////////////////////////////////////////////
+    // ---------------------------- USERS ----------------------------- //
+    //////////////////////////////////////////////////////////////////////
+    
+    public static final ObservableMap<Integer, UserObject>
+        userMap = FXCollections.observableHashMap();
+    public static final BooleanProperty
+        isBusyUser = new SimpleBooleanProperty(false);
+    
+    /**
+     * Load more users from the database.
+     *
+     * @param limit The limit of the rows to retrieve.
+     */
+    public static void loadUsers(int limit) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                isBusyUser.set(true);
+                ArrayList<HashMap<DBUsers.Column, Object>> userRows = DBUsers.getInRange(
+                    userMap.size(),
+                    limit
+                );
+                
+                for (HashMap<DBUsers.Column, Object> row : userRows) {
+                    int id = (Integer) row.get(DBUsers.Column.ID);
+                    // Skip if already added (this shouldn't happen but just to be sure)
+                    UserObject user = userMap.get(id);
+                    if (user != null) {
+                        continue;
+                    }
+                    
+                    // Add in list
+                    String email = (String) row.get(DBUsers.Column.EMAIL);
+                    String password = (String) row.get(
+                        DBUsers.Column.PASSWORD
+                    );
+                    Date joinedDate = (Date) row.get(
+                        DBUsers.Column.JOINED_DATE
+                    );
+                    Timestamp lastActivityDate = (Timestamp) row.get(
+                        DBUsers.Column.LAST_ACTIVITY_DATE
+                    );
+                    int roleID = (Integer) row.get(
+                        DBUsers.Column.ROLE_ID
+                    );
+                    userMap.put(id, new UserObject(
+                        id,
+                        email,
+                        password,
+                        joinedDate,
+                        lastActivityDate,
+                        roleID
+                    ));
+                }
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyUser.set(false);
         });
         
         task.setOnFailed(e -> {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
-<?import io.github.palexdev.materialfx.controls.MFXComboBox?>
 <?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import java.lang.String?>
@@ -56,7 +55,7 @@
                 <Insets top="10.0" />
             </GridPane.margin>
             <children>
-                <GridPane fx:id="tabGeneralPane" visible="false">
+                <GridPane fx:id="tabGeneralPane">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -66,17 +65,16 @@
                     <children>
                         <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vvalue="1.0">
                             <content>
-                                <VBox spacing="10.0">
+                                <VBox fx:id="generalTabContentPane" spacing="10.0">
                                     <children>
                                         <MFXTextField fx:id="emailTextField" disable="true" floatingText="Email" maxWidth="300.0" minWidth="100.0" />
-                              <MFXComboBox fx:id="roleComboBox" floatingText="Role" maxWidth="300.0" minWidth="100.0" />
                                     </children>
                                 </VBox>
                             </content>
                         </MFXScrollPane>
                     </children>
                 </GridPane>
-                <GridPane fx:id="tabOthersPane">
+                <GridPane fx:id="tabOthersPane" visible="false">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
