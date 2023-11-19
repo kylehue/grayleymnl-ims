@@ -64,7 +64,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                <children>
-                  <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
+                  <MFXScrollPane fx:id="usersScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
                      <content>
                         <FlowPane fx:id="usersFlowPane" hgap="10.0" vgap="10.0" />
                      </content>
@@ -84,7 +84,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <MFXScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
+                  <MFXScrollPane fx:id="rolesScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
                      <content>
                         <FlowPane fx:id="rolesFlowPane" hgap="10.0" vgap="10.0" />
                      </content>
@@ -103,8 +103,8 @@
                      </rowConstraints>
                      <children>
                         <MFXTextField fx:id="searchRoleTextField" floatingText="Search Role" maxWidth="300.0" minWidth="100.0" />
-                        <MFXButton text="Add Role" GridPane.columnIndex="2" />
-                        <MFXButton fx:id="saveAllButton" styleClass="outline-button" text="Save All" GridPane.columnIndex="1" />
+                        <MFXButton fx:id="addRoleButton" text="Add Role" GridPane.columnIndex="2" />
+                        <MFXButton fx:id="saveAllRolesButton" styleClass="outline-button" text="Save All" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
                </children>

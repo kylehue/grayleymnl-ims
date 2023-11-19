@@ -119,7 +119,6 @@ public class Modal extends Stage {
             -fx-border-color: transparent;
             -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 12, 0, 0, 6);
             """);
-        
     }
     
     private void onMousePressed(MouseEvent event) {
