@@ -111,6 +111,15 @@ public class Modal extends Stage {
                 });
             }
         }
+        
+        container.setStyle("""
+            -fx-background-insets: 20;
+            -fx-padding: 30 45 35 45;
+            -fx-border-width: 0;
+            -fx-border-color: transparent;
+            -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 12, 0, 0, 6);
+            """);
+        
     }
     
     private void onMousePressed(MouseEvent event) {
@@ -121,9 +130,5 @@ public class Modal extends Stage {
     private void onMouseDragged(MouseEvent event) {
         this.setX(event.getScreenX() - xOffset);
         this.setY(event.getScreenY() - yOffset);
-    }
-    
-    public void showModal() {
-        this.show();
     }
 }
