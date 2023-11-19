@@ -2,6 +2,7 @@ package com.ims.model;
 
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
+import com.ims.utils.SceneManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -10,8 +11,9 @@ import java.util.HashMap;
 public abstract class UserSessionModel {
     public static ObjectProperty<User> currentUser = new SimpleObjectProperty<>(null);
     
-    public static void clear() {
+    public static void logout() {
         currentUser.set(null);
+        SceneManager.setScene("login");
     }
     
     public static Integer getCurrentUserID() {
@@ -55,6 +57,11 @@ public abstract class UserSessionModel {
             password,
             null
         );
+    }
+    
+    public static void deleteAccount() {
+        DBUsers.remove(currentUser.get().getID());
+        logout();
     }
     
     public static class User {

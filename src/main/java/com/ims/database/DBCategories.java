@@ -63,8 +63,7 @@ public class DBCategories {
         return row;
     }
     
-    public static HashMap<Column, Object> remove(int id) {
-        HashMap<Column, Object> row = null;
+    public static void remove(int id) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -76,14 +75,11 @@ public class DBCategories {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
-            row = extractRowsFromResultSet(resultSet).get(0);
         } catch (SQLException e) {
             System.out.println(e);
         } finally {
             Database.closeStuff(resultSet, preparedStatement);
         }
-        
-        return row;
     }
     
     private static ArrayList<HashMap<Column, Object>>

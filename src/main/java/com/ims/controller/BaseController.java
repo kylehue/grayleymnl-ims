@@ -515,8 +515,7 @@ public class BaseController {
         });
         
         logoutButton.setOnMouseClicked((e) -> {
-            SceneManager.setScene("login");
-            UserSessionModel.clear();
+            UserSessionModel.logout();
         });
         
         accountSettingsButton.setOnMouseClicked((e) -> {

@@ -77,6 +77,25 @@ public class DBUsers {
         return row;
     }
     
+    public static void remove(int id) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            String query = """
+                DELETE FROM users
+                WHERE id = ?;
+                """;
+            
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+    }
+    
     private static ArrayList<HashMap<Column, Object>>
     extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
         ArrayList<HashMap<Column, Object>> rows = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.components.ConfirmDeleteAccountModal;
 import com.ims.components.PopupService;
 import com.ims.database.DBRoles;
 import com.ims.model.UserSessionModel;
@@ -60,6 +61,9 @@ public class AccountSettingsController {
     
     @FXML
     MFXButton updatePasswordButton;
+    
+    ConfirmDeleteAccountModal confirmDeleteAccountModal =
+        new ConfirmDeleteAccountModal();
     
     @FXML
     public void initialize() {
@@ -162,6 +166,35 @@ public class AccountSettingsController {
                         "Got it!"
                     ).show();
                 }
+            ).show();
+        });
+        
+        deleteAccountButton.setOnMouseClicked(e -> {
+            confirmDeleteAccountModal.show();
+        });
+        
+        confirmDeleteAccountModal.deleteButton.setOnMouseClicked(e -> {
+            if (
+                UserSessionModel.currentUser.get() == null ||
+                    !confirmDeleteAccountModal.emailTextFieldValidator.isValid() ||
+                    !confirmDeleteAccountModal.passwordFieldValidator.isValid()
+            ) {
+                return;
+            }
+            
+            UserSessionModel.deleteAccount();
+            
+            confirmDeleteAccountModal.hide();
+            
+            confirmDeleteAccountModal.emailTextField.setText("");
+            confirmDeleteAccountModal.passwordField.setText("");
+            confirmDeleteAccountModal.emailTextFieldValidator.reset();
+            confirmDeleteAccountModal.passwordFieldValidator.reset();
+            
+            PopupService.messageDialog.setup(
+                "Delete Account",
+                "Account has been deleted.",
+                "Got it!"
             ).show();
         });
     }

@@ -26,10 +26,21 @@ public abstract class Utils {
     }
     
     public static String hashPassword(String plainTextPassword) {
+        if (plainTextPassword == null || plainTextPassword.isEmpty()) {
+            return null;
+        }
         return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
     }
     
     public static boolean checkPassword(String plainTextPassword, String hashedPassword) {
+        if (
+            plainTextPassword == null ||
+                hashedPassword == null ||
+                plainTextPassword.isEmpty() ||
+                hashedPassword.isEmpty()
+        ) {
+            return false;
+        }
         return BCrypt.checkpw(plainTextPassword, hashedPassword);
     }
     
