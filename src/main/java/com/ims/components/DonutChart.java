@@ -2,8 +2,10 @@ package com.ims.components;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.scene.DepthTest;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
+import javafx.scene.effect.Effect;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -19,6 +21,9 @@ public class DonutChart extends PieChart {
         innerCircle.setFill(Color.WHITE);
         innerCircle.setStroke(Color.WHITE);
         innerCircle.setStrokeWidth(3);
+        
+        this.setDepthTest(DepthTest.DISABLE);
+        this.setEffect(null);
     }
     
     @Override

@@ -87,32 +87,34 @@ public class BaseController {
         }
         
         InvalidationListener listener = e -> {
-            int totalProducts = BaseModel.totalProductsCount.get();
-            int lowStockProducts = BaseModel.lowStockProductsCount.get();
-            int outOfStockProducts = BaseModel.outOfStockProductsCount.get();
-            double inStock = (double) (
-                totalProducts -
-                    lowStockProducts -
-                    outOfStockProducts
-            ) / (double) totalProducts * 100;
-            double lowStock = (double) lowStockProducts /
-                (double) totalProducts * 100;
-            double outOfStock = (double) outOfStockProducts /
-                (double) totalProducts * 100;
-            
-            inventoryData.get(0).setPieValue(inStock);
-            inventoryData.get(1).setPieValue(lowStock);
-            inventoryData.get(2).setPieValue(outOfStock);
-            
-            totalProductsLabel.setText(
-                String.valueOf(totalProducts)
-            );
-            lowStocksProductsLabel.setText(
-                String.valueOf(lowStockProducts)
-            );
-            outOfStocksProductsLabel.setText(
-                String.valueOf(outOfStockProducts)
-            );
+            Platform.runLater(() -> {
+                int totalProducts = BaseModel.totalProductsCount.get();
+                int lowStockProducts = BaseModel.lowStockProductsCount.get();
+                int outOfStockProducts = BaseModel.outOfStockProductsCount.get();
+                double inStock = (double) (
+                    totalProducts -
+                        lowStockProducts -
+                        outOfStockProducts
+                ) / (double) totalProducts * 100;
+                double lowStock = (double) lowStockProducts /
+                    (double) totalProducts * 100;
+                double outOfStock = (double) outOfStockProducts /
+                    (double) totalProducts * 100;
+                
+                inventoryData.get(0).setPieValue(inStock);
+                inventoryData.get(1).setPieValue(lowStock);
+                inventoryData.get(2).setPieValue(outOfStock);
+                
+                totalProductsLabel.setText(
+                    String.valueOf(totalProducts)
+                );
+                lowStocksProductsLabel.setText(
+                    String.valueOf(lowStockProducts)
+                );
+                outOfStocksProductsLabel.setText(
+                    String.valueOf(outOfStockProducts)
+                );
+            });
         };
         
         BaseModel.totalProductsCount.addListener(listener);
@@ -228,7 +230,7 @@ public class BaseController {
         // Load products whenever the scrollbar hits the bottom.
         productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
             if (scrollValue.doubleValue() == 1) {
-                BaseModel.loadProducts(9);
+                BaseModel.loadProducts(3);
             }
         });
         
@@ -284,13 +286,13 @@ public class BaseController {
     }
     
     private void removeProduct(int id) {
-        Product productToRemove = this.products.get(id);
-        if (productToRemove != null) {
-            Platform.runLater(() -> {
+        Platform.runLater(() -> {
+            Product productToRemove = this.products.get(id);
+            if (productToRemove != null) {
                 productsFlowPane.getChildren().remove(productToRemove);
                 this.products.remove(id);
-            });
-        }
+            }
+        });
     }
     
     private ArrayList<Product> getSortedProducts() {

@@ -30,13 +30,29 @@ public abstract class BaseModel {
     public static final IntegerProperty outOfStockProductsCount = new SimpleIntegerProperty(0);
     
     public static void updateProductStats() {
-        int totalProducts = DBProducts.getTotalProductsCount();
-        int lowStockProducts = DBProducts.getLowStockProductsCount();
-        int outOfStockProducts = DBProducts.getOutOfStockProductsCount();
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                int totalProducts = DBProducts.getTotalProductsCount();
+                int lowStockProducts = DBProducts.getLowStockProductsCount();
+                int outOfStockProducts = DBProducts.getOutOfStockProductsCount();
+                
+                totalProductsCount.set(totalProducts);
+                lowStockProductsCount.set(lowStockProducts);
+                outOfStockProductsCount.set(outOfStockProducts);
+                
+                return null;
+            }
+        };
         
-        totalProductsCount.set(totalProducts);
-        lowStockProductsCount.set(lowStockProducts);
-        outOfStockProductsCount.set(outOfStockProducts);
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -120,14 +136,13 @@ public abstract class BaseModel {
                 );
                 productMap.put(newID, productObject);
                 
-                BaseModel.updateProductStats();
-                
                 return productObject;
             }
         };
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
+            BaseModel.updateProductStats();
         });
         
         task.setOnFailed(e -> {
@@ -208,14 +223,13 @@ public abstract class BaseModel {
                     ));
                 }
                 
-                BaseModel.updateProductStats();
-                
                 return null;
             }
         };
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
+            BaseModel.updateProductStats();
         });
         
         task.setOnFailed(e -> {
@@ -241,14 +255,13 @@ public abstract class BaseModel {
                 DBProducts.remove(id);
                 productMap.remove(id);
                 
-                BaseModel.updateProductStats();
-                
                 return null;
             }
         };
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
+            BaseModel.updateProductStats();
         });
         
         task.setOnFailed(e -> {

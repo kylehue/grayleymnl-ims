@@ -1,6 +1,7 @@
 package com.ims.controller;
 
 import com.ims.components.CategoryComboBox;
+import com.ims.components.ConfirmDeleteProductModal;
 import com.ims.components.NumberField;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
@@ -73,6 +74,12 @@ public class ProductController {
     
     @FXML
     MFXButton cancelButton;
+    
+    @FXML
+    MFXButton deleteProductButton;
+    
+    ConfirmDeleteProductModal confirmDeleteProductModal =
+        new ConfirmDeleteProductModal();
     
     @FXML
     public void initialize() {
@@ -218,6 +225,17 @@ public class ProductController {
         });
         
         cancelButton.setOnMouseClicked(e -> {
+            goBack();
+        });
+        
+        deleteProductButton.setOnMouseClicked(e -> {
+            confirmDeleteProductModal.showModal();
+        });
+        
+        confirmDeleteProductModal.deleteButton.setOnMouseClicked(e -> {
+            BaseModel.removeProduct(
+                ProductModel.currentProduct.get().getID()
+            );
             goBack();
         });
     }

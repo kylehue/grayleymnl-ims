@@ -68,7 +68,7 @@
                         <String fx:value="text-medium" />
                      </styleClass>
                   </Label>
-                  <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" vvalue="0.51" GridPane.rowIndex="1">
+                  <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
                      <content>
                         <FlowPane fx:id="analyticsFlowPane" hgap="10.0" vgap="10.0">
                            <children>
@@ -102,7 +102,7 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Label styleClass="text-medium" text="Low Stocks Products" />
+                                    <Label styleClass="text-medium" text="Low Stock Products" />
                                     <Label fx:id="lowStocksProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                                        <styleClass>
                                           <String fx:value="h4" />
@@ -123,7 +123,7 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Label styleClass="text-medium" text="Out of Stocks Products" />
+                                    <Label styleClass="text-medium" text="Out of Stock Products" />
                                     <Label fx:id="outOfStocksProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                                        <styleClass>
                                           <String fx:value="h4" />

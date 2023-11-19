@@ -143,7 +143,7 @@
                      <content>
                         <VBox spacing="10.0">
                            <children>
-                              <MFXButton text="Delete Product">
+                              <MFXButton fx:id="deleteProductButton" text="Delete Product">
                                  <styleClass>
                                     <String fx:value="button-danger" />
                                     <String fx:value="outline-button" />
