@@ -30,12 +30,12 @@ public abstract class LoginModel {
             email
         );
         
-        if (users.isEmpty()) {
+        if (users.size() != 1) {
             validProperty.set(false);
             return;
         }
         
-        HashMap<DBUsers.Column, Object> user = users.get(0);
+        HashMap<DBUsers.Column, Object> user = users.getFirst();
         boolean isCorrectPassword = Utils.checkPassword(
             password,
             user.get(DBUsers.Column.PASSWORD).toString()
@@ -44,6 +44,11 @@ public abstract class LoginModel {
         if (isCorrectPassword) {
             SceneManager.setScene("base");
             validProperty.set(true);
+            
+            int id = (int) user.get(DBUsers.Column.ID);
+            UserSessionModel.currentUser.set(
+                new UserSessionModel.User(id, email)
+            );
         } else {
             validProperty.set(false);
         }

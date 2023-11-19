@@ -13,7 +13,8 @@ public class DBUsers {
         EMAIL,
         PASSWORD,
         JOINED_DATE,
-        LAST_ACTIVITY_DATE
+        LAST_ACTIVITY_DATE,
+        ROLE_ID
     }
     
     public static HashMap<Column, Object> add(String email, String password) {
@@ -22,7 +23,9 @@ public class DBUsers {
         ResultSet resultSet = null;
         try {
             String query = """
-                INSERT INTO USERS (%s, %s) VALUES (?, ?) RETURNING *;
+                INSERT INTO users (%s, %s)
+                VALUES (?, ?)
+                RETURNING *;
                 """.formatted(
                 DBUsers.Column.EMAIL,
                 DBUsers.Column.PASSWORD
@@ -89,6 +92,14 @@ public class DBUsers {
                 retrievedLastActivityDate
             );
             
+            int retrievedRoleID = resultSet.getInt(
+                Column.ROLE_ID.toString()
+            );
+            data.put(
+                Column.ROLE_ID,
+                retrievedRoleID
+            );
+            
             rows.add(data);
         }
         
@@ -105,7 +116,8 @@ public class DBUsers {
         
         try {
             String query = """
-                SELECT * FROM USERS WHERE %s = ?;
+                SELECT * FROM users
+                WHERE %s = ?;
                 """.formatted(
                 columnLabel
             );
@@ -120,5 +132,13 @@ public class DBUsers {
         }
         
         return rows;
+    }
+    
+    public static HashMap<DBUsers.Column, Object> getOne(
+        DBUsers.Column columnLabel,
+        Object compareValue
+    ) {
+        ArrayList<HashMap<DBUsers.Column, Object>> rows = get(columnLabel, compareValue);
+        return !rows.isEmpty() ? rows.getFirst() : null;
     }
 }
