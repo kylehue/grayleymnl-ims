@@ -76,6 +76,7 @@ public class ComboBox<K, V> extends StackPane {
             rotateTransition.setFromAngle(180);
             rotateTransition.setToAngle(0);
             rotateTransition.play();
+            toggleDropDownButton.requestFocus();
         });
         
         textField.delegateFocusedProperty().addListener(e -> {
@@ -129,25 +130,31 @@ public class ComboBox<K, V> extends StackPane {
     }
     
     public void addItem(K id, V item) {
-        items.put(id, item);
-        MFXButton button = dropdown.addItem(id, this.stringifier.call(item));
-        button.setOnMouseClicked(e -> {
-            this.setValue(item);
-            if (this.selectEvent != null) {
-                this.selectEvent.call(item);
-            }
-            dropdown.hide();
+        Platform.runLater(() -> {
+            items.put(id, item);
+            MFXButton button = dropdown.addItem(id, this.stringifier.call(item));
+            button.setOnMouseClicked(e -> {
+                this.setValue(item);
+                if (this.selectEvent != null) {
+                    this.selectEvent.call(item);
+                }
+                dropdown.hide();
+            });
         });
     }
     
     public void removeItem(K id) {
-        items.remove(id);
-        dropdown.removeItemByID(id);
+        Platform.runLater(() -> {
+            items.remove(id);
+            dropdown.removeItemByID(id);
+        });
     }
     
     public void updateItem(K id, V item) {
-        items.put(id, item);
-        dropdown.updateItemByID(id, this.stringifier.call(item));
+        Platform.runLater(() -> {
+            items.put(id, item);
+            dropdown.updateItemByID(id, this.stringifier.call(item));
+        });
     }
     
     public void setItems(ObservableMap<K, V> map) {
@@ -168,9 +175,10 @@ public class ComboBox<K, V> extends StackPane {
             }
         );
         
-        // for (K key : map.keySet()) {
-        //     this.addItem(key, map.get(key));
-        // }
+        for (K key : map.keySet()) {
+            if (this.items.get(key) != null) continue;
+            this.addItem(key, map.get(key));
+        }
     }
     
     public MFXScrollPane getDropDownScrollPane() {
