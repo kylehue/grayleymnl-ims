@@ -217,3 +217,14 @@
 .button:armed {
     -fx-cursor: pointer !important;
 }
+
+.chart-legend {
+    -fx-background-color: transparent !important;
+    -fx-padding: 0 !important;
+}
+
+.default-color0.chart-pie { -fx-pie-color: #54ff7c; }
+.default-color1.chart-pie { -fx-pie-color: #ffea60; }
+.default-color2.chart-pie { -fx-pie-color: #ff897e; }
+.default-color3.chart-pie { -fx-pie-color: #bb54ff; }
+.default-color4.chart-pie { -fx-pie-color: #54b2ff; }

@@ -5,7 +5,9 @@ import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
@@ -23,6 +25,19 @@ public abstract class BaseModel {
     // ----------------------- DASHBOARD PAGE ------------------------- //
     //////////////////////////////////////////////////////////////////////
     
+    public static final IntegerProperty totalProductsCount = new SimpleIntegerProperty(0);
+    public static final IntegerProperty lowStockProductsCount = new SimpleIntegerProperty(0);
+    public static final IntegerProperty outOfStockProductsCount = new SimpleIntegerProperty(0);
+    
+    public static void updateProductStats() {
+        int totalProducts = DBProducts.getTotalProductsCount();
+        int lowStockProducts = DBProducts.getLowStockProductsCount();
+        int outOfStockProducts = DBProducts.getOutOfStockProductsCount();
+        
+        totalProductsCount.set(totalProducts);
+        lowStockProductsCount.set(lowStockProducts);
+        outOfStockProductsCount.set(outOfStockProducts);
+    }
     
     //////////////////////////////////////////////////////////////////////
     // ------------------------ PRODUCT PAGE -------------------------- //
@@ -104,6 +119,8 @@ public abstract class BaseModel {
                     newLastModified
                 );
                 productMap.put(newID, productObject);
+                
+                BaseModel.updateProductStats();
                 
                 return productObject;
             }
@@ -191,6 +208,8 @@ public abstract class BaseModel {
                     ));
                 }
                 
+                BaseModel.updateProductStats();
+                
                 return null;
             }
         };
@@ -221,6 +240,8 @@ public abstract class BaseModel {
                 
                 DBProducts.remove(id);
                 productMap.remove(id);
+                
+                BaseModel.updateProductStats();
                 
                 return null;
             }

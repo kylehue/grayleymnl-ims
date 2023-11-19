@@ -10,10 +10,23 @@ import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Side;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -39,8 +52,73 @@ public class BaseController {
     @FXML
     private FlowPane analyticsFlowPane;
     
-    private void initializeDashboardPage() {
+    @FXML
+    private Label totalProductsLabel;
     
+    @FXML
+    private Label lowStocksProductsLabel;
+    
+    @FXML
+    private Label outOfStocksProductsLabel;
+    
+    // The container for the body of inventory card in dashboard
+    @FXML
+    private StackPane inventoryStackPane;
+    
+    private void initializeDashboardPage() {
+        ObservableList<PieChart.Data> inventoryData = FXCollections.observableArrayList(
+            new PieChart.Data("In Stock", 30),
+            new PieChart.Data("Low Stock", 25),
+            new PieChart.Data("Out of Stock", 45)
+        );
+        DonutChart donutChart = new DonutChart(inventoryData);
+        donutChart.setPrefWidth(-1);
+        donutChart.setMinWidth(-1);
+        donutChart.setMaxWidth(-1);
+        donutChart.setLabelsVisible(false);
+        donutChart.setLegendSide(Side.RIGHT);
+        inventoryStackPane.getChildren().add(donutChart);
+        
+        for (PieChart.Data data : inventoryData) {
+            data.getNode().setStyle("""
+                -fx-border-width: 0 !important;
+                -fx-background-insets: -1 !important;
+                """);
+        }
+        
+        InvalidationListener listener = e -> {
+            int totalProducts = BaseModel.totalProductsCount.get();
+            int lowStockProducts = BaseModel.lowStockProductsCount.get();
+            int outOfStockProducts = BaseModel.outOfStockProductsCount.get();
+            double inStock = (double) (
+                totalProducts -
+                    lowStockProducts -
+                    outOfStockProducts
+            ) / (double) totalProducts * 100;
+            double lowStock = (double) lowStockProducts /
+                (double) totalProducts * 100;
+            double outOfStock = (double) outOfStockProducts /
+                (double) totalProducts * 100;
+            
+            inventoryData.get(0).setPieValue(inStock);
+            inventoryData.get(1).setPieValue(lowStock);
+            inventoryData.get(2).setPieValue(outOfStock);
+            
+            totalProductsLabel.setText(
+                String.valueOf(totalProducts)
+            );
+            lowStocksProductsLabel.setText(
+                String.valueOf(lowStockProducts)
+            );
+            outOfStocksProductsLabel.setText(
+                String.valueOf(outOfStockProducts)
+            );
+        };
+        
+        BaseModel.totalProductsCount.addListener(listener);
+        BaseModel.lowStockProductsCount.addListener(listener);
+        BaseModel.outOfStockProductsCount.addListener(listener);
+        BaseModel.updateProductStats();
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -150,7 +228,7 @@ public class BaseController {
         // Load products whenever the scrollbar hits the bottom.
         productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
             if (scrollValue.doubleValue() == 1) {
-                BaseModel.loadProducts(12);
+                BaseModel.loadProducts(9);
             }
         });
         
@@ -160,13 +238,13 @@ public class BaseController {
             double contentHeight = productsFlowPane.getBoundsInLocal().getHeight();
             double viewportHeight = newValue.getHeight();
             if (contentHeight < viewportHeight) {
-                BaseModel.loadProducts(4);
+                BaseModel.loadProducts(3);
             }
         });
         
         // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
         // So here, we can trigger it by loading initial products.
-        BaseModel.loadProducts(12);
+        BaseModel.loadProducts(9);
     }
     
     private TagButton addCategoryTag(String categoryName, boolean isActive) {
@@ -362,6 +440,8 @@ public class BaseController {
                 }
                 BaseModel.updateCategory(id, category.getCategoryName());
             });
+            
+            addCategoryTag(category.getCategoryName(), false);
         });
         
         return category;

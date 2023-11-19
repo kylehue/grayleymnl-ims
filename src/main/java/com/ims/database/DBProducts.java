@@ -1,5 +1,7 @@
 package com.ims.database;
 
+import com.ims.Config;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -271,5 +273,78 @@ public class DBProducts {
         }
         
         return rows;
+    }
+    
+    public static int getTotalProductsCount() {
+        int count = 0;
+        ArrayList<HashMap<Column, Object>> rows = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            String query = """
+                SELECT COUNT(*) AS count FROM products;
+                """;
+            preparedStatement = connection.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            count = resultSet.getInt("count");
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return count;
+    }
+    
+    public static int getOutOfStockProductsCount() {
+        int count = 0;
+        ArrayList<HashMap<Column, Object>> rows = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            String query = """
+                SELECT COUNT(*) AS count FROM products
+                WHERE current_stocks = 0;
+                """;
+            preparedStatement = connection.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            count = resultSet.getInt("count");
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return count;
+    }
+    
+    public static int getLowStockProductsCount() {
+        int count = 0;
+        ArrayList<HashMap<Column, Object>> rows = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            String query = """
+                SELECT COUNT(*) AS count FROM products
+                WHERE expected_stocks > 0
+                AND current_stocks > 0
+                AND (
+                    CAST(current_stocks AS float) /
+                    CAST(expected_stocks AS float)
+                ) < %s;
+                """.formatted(Config.lowStockRate);
+            preparedStatement = connection.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            count = resultSet.getInt("count");
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return count;
     }
 }

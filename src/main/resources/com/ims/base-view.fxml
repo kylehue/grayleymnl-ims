@@ -53,7 +53,7 @@
       </HBox>
       <StackPane GridPane.rowIndex="2">
          <children>
-            <GridPane fx:id="tabDashboardPane" visible="false">
+            <GridPane fx:id="tabDashboardPane">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
@@ -68,11 +68,11 @@
                         <String fx:value="text-medium" />
                      </styleClass>
                   </Label>
-                  <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" vvalue="0.74" GridPane.rowIndex="1">
+                  <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" vvalue="0.51" GridPane.rowIndex="1">
                      <content>
                         <FlowPane fx:id="analyticsFlowPane" hgap="10.0" vgap="10.0">
                            <children>
-                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                              <GridPane prefHeight="200.0" prefWidth="250.0" styleClass="card">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
@@ -85,9 +85,15 @@
                                  </FlowPane.margin>
                                  <children>
                                     <Label styleClass="text-medium" text="Total Products" />
+                                    <Label fx:id="totalProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                       <styleClass>
+                                          <String fx:value="h4" />
+                                          <String fx:value="text-bold" />
+                                       </styleClass>
+                                    </Label>
                                  </children>
                               </GridPane>
-                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                              <GridPane prefHeight="200.0" prefWidth="250.0" styleClass="card">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                  </columnConstraints>
@@ -97,12 +103,18 @@
                                  </rowConstraints>
                                  <children>
                                     <Label styleClass="text-medium" text="Low Stocks Products" />
+                                    <Label fx:id="lowStocksProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                       <styleClass>
+                                          <String fx:value="h4" />
+                                          <String fx:value="text-bold" />
+                                       </styleClass>
+                                    </Label>
                                  </children>
                                  <FlowPane.margin>
                                     <Insets />
                                  </FlowPane.margin>
                               </GridPane>
-                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                              <GridPane prefHeight="200.0" prefWidth="250.0" styleClass="card">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                  </columnConstraints>
@@ -112,12 +124,18 @@
                                  </rowConstraints>
                                  <children>
                                     <Label styleClass="text-medium" text="Out of Stocks Products" />
+                                    <Label fx:id="outOfStocksProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                       <styleClass>
+                                          <String fx:value="h4" />
+                                          <String fx:value="text-bold" />
+                                       </styleClass>
+                                    </Label>
                                  </children>
                                  <FlowPane.margin>
                                     <Insets />
                                  </FlowPane.margin>
                               </GridPane>
-                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                              <GridPane prefHeight="200.0" prefWidth="250.0" styleClass="card">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                  </columnConstraints>
@@ -127,12 +145,27 @@
                                  </rowConstraints>
                                  <children>
                                     <Label styleClass="text-medium" text="Inventory" />
+                                    <GridPane GridPane.rowIndex="1">
+                                      <columnConstraints>
+                                        <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <StackPane fx:id="inventoryStackPane" GridPane.halignment="LEFT" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets left="40.0" right="40.0" />
+                                             </GridPane.margin>
+                                          </StackPane>
+                                       </children>
+                                    </GridPane>
                                  </children>
                                  <FlowPane.margin>
                                     <Insets />
                                  </FlowPane.margin>
                               </GridPane>
-                              <GridPane prefHeight="150.0" prefWidth="250.0" styleClass="card">
+                              <GridPane prefHeight="200.0" prefWidth="250.0" styleClass="card">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                  </columnConstraints>
@@ -156,7 +189,7 @@
                   </MFXScrollPane>
                </children>
             </GridPane>
-            <GridPane fx:id="tabProductsPane">
+            <GridPane fx:id="tabProductsPane" visible="false">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                </columnConstraints>
