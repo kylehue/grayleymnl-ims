@@ -24,6 +24,16 @@ public abstract class UserSessionModel {
         return currentUser.get().getEmail();
     }
     
+    public static String getCurrentUserPassword() {
+        if (currentUser.get() == null) return null;
+        HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+            DBUsers.Column.ID,
+            currentUser.get().getID()
+        );
+        if (user == null) return null;
+        return user.get(DBUsers.Column.PASSWORD).toString();
+    }
+    
     public static HashMap<DBRoles.Column, Object> getCurrentUserRole() {
         if (currentUser.get() == null) return null;
         HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
@@ -34,6 +44,16 @@ public abstract class UserSessionModel {
         return DBRoles.getOne(
             DBRoles.Column.ID,
             user.get(DBUsers.Column.ROLE_ID)
+        );
+    }
+    
+    public static HashMap<DBUsers.Column, Object> updatePassword(
+        String password
+    ) {
+        return DBUsers.update(
+            currentUser.get().getID(),
+            password,
+            null
         );
     }
     

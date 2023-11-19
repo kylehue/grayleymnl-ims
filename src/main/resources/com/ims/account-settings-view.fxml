@@ -57,7 +57,7 @@
                 <Insets top="10.0" />
             </GridPane.margin>
             <children>
-                <GridPane fx:id="tabGeneralPane">
+                <GridPane fx:id="tabGeneralPane" visible="false">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -77,7 +77,7 @@
                         </MFXScrollPane>
                     </children>
                 </GridPane>
-            <GridPane fx:id="tabSecurityPane" visible="false">
+            <GridPane fx:id="tabSecurityPane">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                </columnConstraints>
@@ -89,9 +89,10 @@
                      <content>
                         <VBox spacing="10.0">
                            <children>
-                              <MFXPasswordField floatingText="Password" maxWidth="300.0" minWidth="100.0" />
-                              <MFXPasswordField floatingText="Confirm Password" maxWidth="300.0" minWidth="100.0" />
-                              <MFXButton fx:id="changePasswordButton" maxWidth="300.0" minWidth="100.0" text="Change password" />
+                              <MFXPasswordField fx:id="oldPasswordField" floatingText="Old Password" maxWidth="300.0" minWidth="100.0" />
+                              <MFXPasswordField fx:id="newPasswordField" floatingText="New Password" maxWidth="300.0" minWidth="100.0" />
+                              <MFXPasswordField fx:id="confirmNewPasswordField" floatingText="Confirm New Password" maxWidth="300.0" minWidth="100.0" />
+                              <MFXButton fx:id="updatePasswordButton" maxWidth="300.0" minWidth="100.0" text="Update Password" />
                            </children>
                         </VBox>
                      </content>

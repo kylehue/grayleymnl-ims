@@ -45,6 +45,38 @@ public class DBUsers {
         return row;
     }
     
+    public static HashMap<DBUsers.Column, Object> update(
+        int id,
+        String password,
+        Integer roleID
+    ) {
+        HashMap<DBUsers.Column, Object> row = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            String query = """
+                UPDATE users
+                SET password = COALESCE(?, password),
+                role_id = COALESCE(?, role_id)
+                WHERE id = ?
+                RETURNING *;
+                """;
+            
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setObject(1, password);
+            preparedStatement.setObject(2, roleID);
+            preparedStatement.setInt(3, id);
+            resultSet = preparedStatement.executeQuery();
+            row = extractRowsFromResultSet(resultSet).get(0);
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return row;
+    }
+    
     private static ArrayList<HashMap<Column, Object>>
     extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
         ArrayList<HashMap<Column, Object>> rows = new ArrayList<>();

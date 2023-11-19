@@ -1,13 +1,12 @@
 package com.ims.controller;
 
 import com.ims.components.*;
-import com.ims.database.DBCategories;
-import com.ims.database.DBProducts;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
+import com.ims.model.UserSessionModel;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -16,22 +15,15 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ims.utils.LayoutUtils;
 
@@ -524,15 +516,21 @@ public class BaseController {
         
         ContextMenu ctx = new ContextMenu();
         // TODO: change this based on user's current session
-        ctx.setHeaderText("someemail12@gmail.com");
+        ctx.setHeaderText("");
         MFXButton accountSettingsButton = ctx.addButtonItem("My Account");
         MFXButton managerUsersButton = ctx.addButtonItem("Manage Users");
         MFXButton logoutButton = ctx.addButtonItem("Logout");
         ctx.bindToNode(settingsButton);
         LayoutUtils.addIconToButton(logoutButton, "/icons/logout.svg");
         
+        UserSessionModel.currentUser.addListener(e -> {
+            String email = UserSessionModel.getCurrentUserEmail();
+            ctx.setHeaderText(email != null ? email : "");
+        });
+        
         logoutButton.setOnMouseClicked((e) -> {
             SceneManager.setScene("login");
+            UserSessionModel.clear();
         });
         
         accountSettingsButton.setOnMouseClicked((e) -> {

@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -17,6 +16,7 @@ import javafx.stage.Stage;
 
 public class ContextMenu extends Popup {
     private final VBox container = new VBox();
+    private final Label headerLabel = new Label();
     
     public ContextMenu() {
         this.setWidth(-1);
@@ -29,6 +29,14 @@ public class ContextMenu extends Popup {
         );
         
         this.getContent().addAll(container);
+        headerLabel.getStyleClass().add("text-medium");
+        headerLabel.setStyle("-fx-text-fill: -text-color-fade; -fx-border-width: 0 0 1 0; -fx-border-color:  rgba(125, 125, 125, 0.1);");
+        headerLabel.setWrapText(true);
+        headerLabel.setPrefHeight(50);
+        headerLabel.setMinHeight(Region.USE_PREF_SIZE);
+        headerLabel.setMaxHeight(Region.USE_PREF_SIZE);
+        headerLabel.setPadding(new Insets(0, 20, 0, 20));
+        container.getChildren().add(0, headerLabel);
     }
     
     public void bindToNode(Node node) {
@@ -76,15 +84,6 @@ public class ContextMenu extends Popup {
     }
     
     public void setHeaderText(String text) {
-        Label label = new Label();
-        label.getStyleClass().add("text-medium");
-        label.setStyle("-fx-text-fill: -text-color-fade; -fx-border-width: 0 0 1 0; -fx-border-color:  rgba(125, 125, 125, 0.1);");
-        label.setText(text);
-        label.setWrapText(true);
-        label.setPrefHeight(50);
-        label.setMinHeight(Region.USE_PREF_SIZE);
-        label.setMaxHeight(Region.USE_PREF_SIZE);
-        label.setPadding(new Insets(0, 20, 0, 20));
-        container.getChildren().add(0, label);
+        headerLabel.setText(text);
     }
 }
