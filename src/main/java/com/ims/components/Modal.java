@@ -71,6 +71,8 @@ public class Modal extends Stage {
         contentContainer.setMinWidth(Region.USE_COMPUTED_SIZE);
         contentContainer.setPrefWidth(Region.USE_COMPUTED_SIZE);
         contentContainer.setMaxWidth(Double.MAX_VALUE);
+        contentContainer.setHgap(10);
+        contentContainer.setVgap(10);
         GridPane.setMargin(contentContainer, new Insets(15, 0, 15, 0));
         container.add(contentContainer, 0, 1);
 

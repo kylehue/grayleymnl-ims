@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,5 +68,19 @@ public abstract class Utils {
             last.set(email);
             model.set(email);
         });
+    }
+    
+    public static String generateRandomCode(int codeLength) {
+        final String ALPHANUMERIC_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder randomCode = new StringBuilder();
+        Random random = new Random();
+        
+        for (int i = 0; i < codeLength; i++) {
+            int randomIndex = random.nextInt(ALPHANUMERIC_CHARS.length());
+            char randomChar = ALPHANUMERIC_CHARS.charAt(randomIndex);
+            randomCode.append(randomChar);
+        }
+        
+        return randomCode.toString();
     }
 }

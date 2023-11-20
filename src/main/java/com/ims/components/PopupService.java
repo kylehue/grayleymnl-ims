@@ -71,6 +71,7 @@ public abstract class PopupService {
         public MessageDialog() {
             this.controlContainer.getChildren().add(okButton);
             
+            messageLabel.setWrapText(true);
             this.contentContainer.add(messageLabel, 0, 0);
             this.contentContainer.setMaxWidth(400);
             this.contentContainer.setMaxHeight(400);

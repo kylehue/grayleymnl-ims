@@ -24,8 +24,6 @@ public class ConfirmDeleteAccountModal extends Modal {
         this.controlContainer.getChildren().add(deleteButton);
         
         LayoutUtils.setupGridPane(this.contentContainer, 2, 1);
-        this.contentContainer.setHgap(10);
-        this.contentContainer.setVgap(10);
         this.contentContainer.add(emailTextField, 0, 0);
         this.contentContainer.add(passwordField, 0, 1);
         this.contentContainer.setMaxWidth(400);
