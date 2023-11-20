@@ -340,11 +340,19 @@ public abstract class UserManagerModel {
         isBusyUser = new SimpleBooleanProperty(false);
     
     /**
-     * Disable a user's account.
+     * Update a user.
      *
      * @param id The id of the user to disable.
+     * @param password The new password of the user.
+     * @param roleID The new role ID of the user.
+     * @param isDisabled Should the user be disabled or not?
      */
-    public static void toggleUserIsDisabled(int id, boolean isDisabled) {
+    public static void updateUser(
+        int id,
+        String password,
+        Integer roleID,
+        Boolean isDisabled
+    ) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -352,8 +360,8 @@ public abstract class UserManagerModel {
                 
                 HashMap<DBUsers.Column, Object> user = DBUsers.update(
                     id,
-                    null,
-                    null,
+                    password,
+                    roleID,
                     isDisabled
                 );
                 

@@ -1,8 +1,10 @@
 package com.ims.controller;
 
 import com.ims.components.*;
+import com.ims.model.BaseModel;
 import com.ims.model.UserEditModel;
 import com.ims.model.UserManagerModel;
+import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -60,6 +62,16 @@ public class UserController {
         roleComboBox.setPrefWidth(300);
         generalTabContentPane.getChildren().add(roleComboBox);
         
+        roleComboBox.setOnSelect(roleObject -> {
+            UserObject currentUser = UserEditModel.currentUser.get();
+            UserManagerModel.updateUser(
+                currentUser.getID(),
+                null,
+                roleObject.getID(),
+                null
+            );
+        });
+        
         UserEditModel.currentUser.addListener(
             ($1, $2, currentUser) -> {
                 emailTextField.setText(currentUser.getEmail());
@@ -83,8 +95,10 @@ public class UserController {
                     "Enable",
                     false,
                     () -> {
-                        UserManagerModel.toggleUserIsDisabled(
+                        UserManagerModel.updateUser(
                             UserEditModel.currentUser.get().getID(),
+                            null,
+                            null,
                             false
                         );
                         
@@ -107,8 +121,10 @@ public class UserController {
                     "Disable",
                     true,
                     () -> {
-                        UserManagerModel.toggleUserIsDisabled(
+                        UserManagerModel.updateUser(
                             UserEditModel.currentUser.get().getID(),
+                            null,
+                            null,
                             true
                         );
                         
