@@ -68,18 +68,4 @@ public abstract class Utils {
             model.set(email);
         });
     }
-    
-    public static Properties getEnv() {
-        Properties properties = new Properties();
-        try {
-            InputStream stream = ClassLoader.getSystemResourceAsStream(
-                "env.properties"
-            );
-            properties.load(stream);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return properties;
-    }
 }

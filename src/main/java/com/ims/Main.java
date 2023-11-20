@@ -1,6 +1,7 @@
 package com.ims;
 
 import com.ims.database.Database;
+import com.ims.utils.Env;
 import com.ims.utils.Mail;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -20,6 +21,7 @@ import java.util.Properties;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, URISyntaxException {
+        Env.initialize();
         Database.connect();
         Mail.initialize();
         

@@ -17,7 +17,7 @@ public abstract class Mail {
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
         
-        Properties env = Utils.getEnv();
+        Properties env = Env.get();
         
         session = Session.getInstance(properties, new Authenticator() {
             @Override
@@ -34,7 +34,7 @@ public abstract class Mail {
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(
-                Utils.getEnv().getProperty("mail.email")
+                Env.get().getProperty("mail.email")
             ));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject);
