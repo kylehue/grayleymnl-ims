@@ -5,6 +5,7 @@ target/
 out/
 src/main/resources/META-INF/
 .idea/artifacts/
+src/main/resources/env.properties
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

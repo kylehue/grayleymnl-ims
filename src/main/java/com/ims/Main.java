@@ -1,6 +1,7 @@
 package com.ims;
 
 import com.ims.database.Database;
+import com.ims.utils.Mail;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
@@ -8,13 +9,19 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import com.ims.utils.SceneManager;
 
+import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, URISyntaxException {
         Database.connect();
+        Mail.initialize();
         
         SceneManager.setStage(stage);
         SceneManager.registerScene("login", "login-view.fxml");

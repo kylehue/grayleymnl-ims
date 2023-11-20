@@ -4,9 +4,11 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.property.StringProperty;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,5 +67,19 @@ public abstract class Utils {
             last.set(email);
             model.set(email);
         });
+    }
+    
+    public static Properties getEnv() {
+        Properties properties = new Properties();
+        try {
+            InputStream stream = ClassLoader.getSystemResourceAsStream(
+                "env.properties"
+            );
+            properties.load(stream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return properties;
     }
 }

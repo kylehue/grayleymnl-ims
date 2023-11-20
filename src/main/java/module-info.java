@@ -5,6 +5,7 @@ module com.imsgrayleymnl {
     requires MaterialFX;
     requires java.sql;
     requires jbcrypt;
+    requires java.mail;
     
     opens com.ims to javafx.fxml;
     exports com.ims;
