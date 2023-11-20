@@ -1,13 +1,8 @@
 package com.ims.controller;
 
-import com.ims.components.ComboBox;
-import com.ims.components.Role;
-import com.ims.components.RoleComboBox;
-import com.ims.components.User;
+import com.ims.components.*;
 import com.ims.model.UserEditModel;
 import com.ims.model.UserManagerModel;
-import com.ims.model.objects.RoleObject;
-import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -73,8 +68,74 @@ public class UserController {
                         currentUser.getRoleID()
                     )
                 );
+                
+                updateDisableAccountButton(
+                    currentUser.isDisabled()
+                );
             }
         );
+        
+        disableAccountButton.setOnMouseClicked(e -> {
+            if (UserEditModel.currentUser.get().isDisabled()) {
+                PopupService.confirmDialog.setup(
+                    "Enable Account",
+                    "Are you sure you want to enable this user's account?",
+                    "Enable",
+                    false,
+                    () -> {
+                        UserManagerModel.toggleUserIsDisabled(
+                            UserEditModel.currentUser.get().getID(),
+                            false
+                        );
+                        
+                        PopupService.confirmDialog.hide();
+                        
+                        PopupService.messageDialog.setup(
+                            "Enable Account",
+                            "Account has been enabled.",
+                            "Got it!"
+                        ).show();
+                        
+                        updateDisableAccountButton(false);
+                        UserEditModel.currentUser.get().setDisabled(false);
+                    }
+                ).show();
+            } else {
+                PopupService.confirmDialog.setup(
+                    "Disable Account",
+                    "Are you sure you want to disable this user's account?",
+                    "Disable",
+                    true,
+                    () -> {
+                        UserManagerModel.toggleUserIsDisabled(
+                            UserEditModel.currentUser.get().getID(),
+                            true
+                        );
+                        
+                        PopupService.confirmDialog.hide();
+                        
+                        PopupService.messageDialog.setup(
+                            "Disable Account",
+                            "Account has been disabled.",
+                            "Got it!"
+                        ).show();
+                        
+                        updateDisableAccountButton(true);
+                        UserEditModel.currentUser.get().setDisabled(true);
+                    }
+                ).show();
+            }
+        });
+    }
+    
+    private void updateDisableAccountButton(boolean isDisabled) {
+        if (isDisabled) {
+            disableAccountButton.setText("Enable Account");
+            disableAccountButton.getStyleClass().remove("button-danger");
+        } else {
+            disableAccountButton.setText("Disable Account");
+            disableAccountButton.getStyleClass().add("button-danger");
+        }
     }
     
     @FXML

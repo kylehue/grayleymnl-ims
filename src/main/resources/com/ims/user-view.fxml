@@ -55,7 +55,7 @@
                 <Insets top="10.0" />
             </GridPane.margin>
             <children>
-                <GridPane fx:id="tabGeneralPane">
+                <GridPane fx:id="tabGeneralPane" visible="false">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -74,7 +74,7 @@
                         </MFXScrollPane>
                     </children>
                 </GridPane>
-                <GridPane fx:id="tabOthersPane" visible="false">
+                <GridPane fx:id="tabOthersPane">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -86,12 +86,7 @@
                             <content>
                                 <VBox spacing="10.0">
                                     <children>
-                                        <MFXButton fx:id="disableAccountButton" text="Disable Account">
-                                            <styleClass>
-                                                <String fx:value="button-danger" />
-                                                <String fx:value="outline-button" />
-                                            </styleClass>
-                                        </MFXButton>
+                                        <MFXButton fx:id="disableAccountButton" styleClass="outline-button" text="Disable Account" />
                                     </children>
                                 </VBox>
                             </content>

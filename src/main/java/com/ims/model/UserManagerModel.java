@@ -1,9 +1,7 @@
 package com.ims.model;
 
-import com.ims.database.DBCategories;
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
-import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import javafx.beans.property.BooleanProperty;
@@ -16,7 +14,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -343,6 +340,71 @@ public abstract class UserManagerModel {
         isBusyUser = new SimpleBooleanProperty(false);
     
     /**
+     * Disable a user's account.
+     *
+     * @param id The id of the user to disable.
+     */
+    public static void toggleUserIsDisabled(int id, boolean isDisabled) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                isBusyUser.set(true);
+                
+                HashMap<DBUsers.Column, Object> user = DBUsers.update(
+                    id,
+                    null,
+                    null,
+                    isDisabled
+                );
+                
+                if (!userMap.containsKey(id)) {
+                    return null;
+                }
+                
+                String email = (String) user.get(DBUsers.Column.EMAIL);
+                String password = (String) user.get(
+                    DBUsers.Column.PASSWORD
+                );
+                Date joinedDate = (Date) user.get(
+                    DBUsers.Column.JOINED_DATE
+                );
+                Timestamp lastActivityDate = (Timestamp) user.get(
+                    DBUsers.Column.LAST_ACTIVITY_DATE
+                );
+                int roleID = (Integer) user.get(
+                    DBUsers.Column.ROLE_ID
+                );
+                boolean _isDisabled = (boolean) user.get(
+                    DBUsers.Column.IS_DISABLED
+                );
+                userMap.put(id, new UserObject(
+                    id,
+                    email,
+                    password,
+                    joinedDate,
+                    lastActivityDate,
+                    roleID,
+                    _isDisabled
+                ));
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyUser.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    /**
      * Load more users from the database.
      *
      * @param limit The limit of the rows to retrieve.
@@ -379,13 +441,17 @@ public abstract class UserManagerModel {
                     int roleID = (Integer) row.get(
                         DBUsers.Column.ROLE_ID
                     );
+                    boolean isDisabled = (boolean) row.get(
+                        DBUsers.Column.IS_DISABLED
+                    );
                     userMap.put(id, new UserObject(
                         id,
                         email,
                         password,
                         joinedDate,
                         lastActivityDate,
-                        roleID
+                        roleID,
+                        isDisabled
                     ));
                 }
                 return null;

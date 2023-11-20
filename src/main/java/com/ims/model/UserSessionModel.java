@@ -59,6 +59,7 @@ public abstract class UserSessionModel {
         return DBUsers.update(
             currentUser.get().getID(),
             password,
+            null,
             null
         );
     }

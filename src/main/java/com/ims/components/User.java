@@ -109,5 +109,11 @@ public class User extends GridPane {
         this.setLastActivityDate(
             userObject.getLastActivityDate()
         );
+        
+        if (userObject.isDisabled()) {
+            this.styleClass.add("user-container-disabled");
+        } else {
+            this.styleClass.remove("user-container-disabled");
+        }
     }
 }

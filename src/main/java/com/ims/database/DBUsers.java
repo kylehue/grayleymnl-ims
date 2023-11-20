@@ -14,7 +14,8 @@ public class DBUsers {
         PASSWORD,
         JOINED_DATE,
         LAST_ACTIVITY_DATE,
-        ROLE_ID
+        ROLE_ID,
+        IS_DISABLED
     }
     
     public static HashMap<Column, Object> add(String email, String password) {
@@ -48,7 +49,8 @@ public class DBUsers {
     public static HashMap<DBUsers.Column, Object> update(
         int id,
         String password,
-        Integer roleID
+        Integer roleID,
+        Boolean isDisabled
     ) {
         HashMap<DBUsers.Column, Object> row = null;
         PreparedStatement preparedStatement = null;
@@ -57,7 +59,8 @@ public class DBUsers {
             String query = """
                 UPDATE users
                 SET password = COALESCE(?, password),
-                role_id = COALESCE(?, role_id)
+                role_id = COALESCE(?, role_id),
+                is_disabled = COALESCE(?, is_disabled)
                 WHERE id = ?
                 RETURNING *;
                 """;
@@ -65,7 +68,8 @@ public class DBUsers {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, password);
             preparedStatement.setObject(2, roleID);
-            preparedStatement.setInt(3, id);
+            preparedStatement.setObject(3, isDisabled);
+            preparedStatement.setInt(4, id);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
         } catch (SQLException e) {
@@ -149,6 +153,14 @@ public class DBUsers {
             data.put(
                 Column.ROLE_ID,
                 retrievedRoleID
+            );
+            
+            boolean retrievedIsDisabled = resultSet.getBoolean(
+                Column.IS_DISABLED.toString()
+            );
+            data.put(
+                Column.IS_DISABLED,
+                retrievedIsDisabled
             );
             
             rows.add(data);
