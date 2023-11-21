@@ -52,7 +52,7 @@ public class UserManagerController {
         UserManagerModel.roleMap.addListener(
             (MapChangeListener<Integer, RoleObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = roles.get(id) != null;
+                boolean isAddedAlready = roles.containsKey(id);
                 boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
@@ -118,10 +118,11 @@ public class UserManagerController {
     private Role addRole(RoleObject roleObject) {
         Role role = new Role(roleObject);
         Platform.runLater(() -> {
+            if (this.roles.containsKey(roleObject.getID())) return;
             this.roles.put(roleObject.getID(), role);
-            
+            int index = this.getSortedRoles().indexOf(role);
             rolesFlowPane.getChildren().add(
-                this.getSortedRoles().indexOf(role),
+                index,
                 role
             );
         });
@@ -177,7 +178,7 @@ public class UserManagerController {
         UserManagerModel.userMap.addListener(
             (MapChangeListener<Integer, UserObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = users.get(id) != null;
+                boolean isAddedAlready = users.containsKey(id);
                 boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
@@ -229,10 +230,11 @@ public class UserManagerController {
     private User addUser(UserObject userObject) {
         User user = new User(userObject);
         Platform.runLater(() -> {
+            if (this.users.containsKey(userObject.getID())) return;
             this.users.put(userObject.getID(), user);
-            
+            int index = this.getSortedUsers().indexOf(user);
             usersFlowPane.getChildren().add(
-                this.getSortedUsers().indexOf(user),
+                index,
                 user
             );
         });

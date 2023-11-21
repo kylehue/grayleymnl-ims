@@ -155,7 +155,7 @@ public class BaseController {
         BaseModel.productMap.addListener(
             (MapChangeListener<Integer, ProductObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = products.get(id) != null;
+                boolean isAddedAlready = products.containsKey(id);
                 boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
@@ -247,9 +247,12 @@ public class BaseController {
     
     private TagButton addCategoryTag(String categoryName, boolean isActive) {
         TagButton categoryButton = new TagButton();
-        categoryButton.setText(categoryName);
-        categoryButton.setActive(isActive);
-        productsCategoriesFlowPane.getChildren().add(categoryButton);
+        
+        Platform.runLater(() -> {
+            categoryButton.setText(categoryName);
+            categoryButton.setActive(isActive);
+            productsCategoriesFlowPane.getChildren().add(categoryButton);
+        });
         
         return categoryButton;
     }
@@ -259,9 +262,11 @@ public class BaseController {
     ) {
         Product product = new Product(productObject);
         Platform.runLater(() -> {
+            if (this.products.containsKey(productObject.getID())) return;
             this.products.put(productObject.getID(), product);
+            int index = this.getSortedProducts().indexOf(product);
             productsFlowPane.getChildren().add(
-                this.getSortedProducts().indexOf(product),
+                index,
                 product
             );
             
@@ -337,7 +342,7 @@ public class BaseController {
         BaseModel.categoryMap.addListener(
             (MapChangeListener<Integer, CategoryObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = categories.get(id) != null;
+                boolean isAddedAlready = categories.containsKey(id);
                 boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
@@ -410,10 +415,11 @@ public class BaseController {
         Category category = new Category(categoryObject);
         int id = categoryObject.getID();
         Platform.runLater(() -> {
+            if (this.categories.containsKey(categoryObject.getID())) return;
             this.categories.put(id, category);
-            
+            int index = this.getSortedCategories().indexOf(category);
             categoriesFlowPane.getChildren().add(
-                this.getSortedCategories().indexOf(category),
+                index,
                 category
             );
             

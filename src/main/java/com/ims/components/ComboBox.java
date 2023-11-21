@@ -144,8 +144,8 @@ public class ComboBox<K, V> extends StackPane {
     }
     
     public void addItem(K id, V item) {
-        if (items.containsKey(id)) return;
         Platform.runLater(() -> {
+            if (items.containsKey(id)) return;
             items.put(id, item);
             MFXButton button = dropdown.addItem(id, this.stringifier.call(item));
             button.setOnMouseClicked(e -> {
