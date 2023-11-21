@@ -256,6 +256,11 @@ public abstract class BaseModel {
      * @param id The id of the category to remove.
      */
     public static void removeProduct(int id) {
+        if (!UserSessionModel.currentUserIsAllowDeleteProduct()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
+        
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -372,6 +377,10 @@ public abstract class BaseModel {
      * @param name The name of the category to add.
      */
     public static void addCategory(String name) {
+        if (!UserSessionModel.currentUserIsAllowAddCategory()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
         if (name.isEmpty()) return;
         
         Task<Void> task = new Task<>() {
@@ -412,6 +421,10 @@ public abstract class BaseModel {
      * @param name The name of the category to update.
      */
     public static void updateCategory(int id, String name) {
+        if (!UserSessionModel.currentUserIsAllowEditCategory()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
         if (name.isEmpty()) return;
         boolean isUnmodified = name.equals(
             Objects.requireNonNull(categoryMap.get(id)).getName()
@@ -461,6 +474,10 @@ public abstract class BaseModel {
      * @param id The id of the category to remove.
      */
     public static void removeCategory(int id) {
+        if (!UserSessionModel.currentUserIsAllowDeleteCategory()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {

@@ -2,6 +2,7 @@ package com.ims.components;
 
 import com.ims.Config;
 import com.ims.model.BaseModel;
+import com.ims.model.UserSessionModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
@@ -21,7 +22,6 @@ public class Category extends GridPane {
     public final MFXTextField nameTextField = new MFXTextField();
     public final TextFieldValidator nameTextFieldValidator;
     public final MFXButton deleteButton = new MFXButton();
-    public final MFXButton saveButton = new MFXButton();
     
     public Category(CategoryObject categoryObject) {
         this.setCategoryObject(categoryObject);
@@ -64,12 +64,6 @@ public class Category extends GridPane {
         deleteButton.setText("");
         LayoutUtils.addIconToButton(deleteButton, "/icons/delete.svg");
         
-        // Setup save button
-        controlContainer.getChildren().add(saveButton);
-        saveButton.getStyleClass().addAll("icon-button");
-        saveButton.setText("");
-        LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
-        
         Transition.fadeUp(this, 150);
         
         int id = this.categoryObject.getID();
@@ -87,23 +81,40 @@ public class Category extends GridPane {
             ).show();
         });
         
-        saveButton.setOnMouseClicked((e) -> {
+        nameTextField.delegateFocusedProperty().addListener((e) -> {
+            if (nameTextField.delegateIsFocused()) return;
             if (!this.nameTextFieldValidator.isValid()) {
                 return;
             }
-            
+
             BaseModel.updateCategory(id, this.getCategoryName());
             
-            PopupService.messageDialog.setup(
-                "Update Category",
-                "Category has been successfully updated.",
-                "Got it!"
-            ).show();
+            // PopupService.messageDialog.setup(
+            //     "Update Category",
+            //     "Category has been successfully updated.",
+            //     "Got it!"
+            // ).show();
         });
         
         SceneManager.onChangeScene(($1, $2) -> {
             this.setCategoryObject(this.categoryObject);
         });
+        
+        updateEditPermissions(UserSessionModel.currentUserIsAllowEditCategory());
+        updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteCategory());
+        UserSessionModel.currentUser.addListener(e -> {
+            updateEditPermissions(UserSessionModel.currentUserIsAllowEditCategory());
+            updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteCategory());
+        });
+    }
+    
+    private void updateEditPermissions(boolean isAllowed) {
+        nameTextField.setDisable(!isAllowed);
+    }
+    
+    private void updateDeletePermissions(boolean isAllowed) {
+        deleteButton.setVisible(isAllowed);
+        deleteButton.setManaged(isAllowed);
     }
     
     public void setCategoryName(String name) {

@@ -53,7 +53,7 @@
       </HBox>
       <StackPane GridPane.rowIndex="2">
          <children>
-            <GridPane fx:id="tabDashboardPane">
+            <GridPane fx:id="tabDashboardPane" visible="false">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
@@ -244,7 +244,7 @@
                   </GridPane>
                </children>
             </GridPane>
-            <GridPane fx:id="tabCategoriesPane" visible="false">
+            <GridPane fx:id="tabCategoriesPane">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
@@ -276,7 +276,6 @@
                      <children>
                         <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.columnIndex="1">
                            <children>
-                              <MFXButton fx:id="saveAllCategoriesButton" styleClass="outline-button" text="Save All" />
                               <MFXButton fx:id="addCategoryButton" text="Add Category" />
                            </children>
                         </HBox>

@@ -326,10 +326,6 @@ public class BaseController {
     @FXML
     private FlowPane categoriesFlowPane;
     
-    // The button used to save all categories
-    @FXML
-    private MFXButton saveAllCategoriesButton;
-    
     // The button used to add a category
     @FXML
     private MFXButton addCategoryButton;
@@ -371,23 +367,14 @@ public class BaseController {
             BaseModel.addCategory(name);
         });
         
-        saveAllCategoriesButton.setOnMouseClicked((e) -> {
-            for (Category category : this.categories.values()) {
-                if (!category.nameTextFieldValidator.isValid()) {
-                    continue;
-                }
-                
-                BaseModel.updateCategory(
-                    category.getCategoryObject().getID(),
-                    category.getCategoryName()
-                );
+        UserSessionModel.currentUser.addListener(e -> {
+            if (UserSessionModel.currentUserIsAllowAddCategory()) {
+                addCategoryButton.setVisible(true);
+                addCategoryButton.setManaged(true);
+            } else {
+                addCategoryButton.setVisible(false);
+                addCategoryButton.setManaged(false);
             }
-            
-            PopupService.messageDialog.setup(
-                "Update Categories",
-                "All categories has been successfully updated.",
-                "Got it!"
-            ).show();
         });
     }
     
@@ -428,7 +415,10 @@ public class BaseController {
                 category
             );
             
-            addCategoryTag(category.getCategoryName(), false);
+            final int CATEGORY_TAG_LIMIT = 12;
+            if (productsCategoriesFlowPane.getChildren().size() < CATEGORY_TAG_LIMIT) {
+                addCategoryTag(category.getCategoryName(), false);
+            }
         });
         
         return category;
