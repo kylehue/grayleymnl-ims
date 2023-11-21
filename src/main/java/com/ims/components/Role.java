@@ -5,6 +5,7 @@ import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.SceneManager;
 import com.ims.utils.TextFieldValidator;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -24,11 +25,11 @@ public class Role extends GridPane {
     private final MFXToggleButton allowDeleteProductToggle = new MFXToggleButton();
     private final MFXToggleButton allowEditProductToggle = new MFXToggleButton();
     private final MFXTextField nameTextField = new MFXTextField();
-    public final RoleObject roleObject;
+    private RoleObject roleObject;
     public final TextFieldValidator nameTextFieldValidator;
     
     public Role(RoleObject roleObject) {
-        this.roleObject = roleObject;
+        this.setRoleObject(roleObject);
         this.styleClass.add("card");
         this.styleClass.add("role-container");
         
@@ -75,14 +76,6 @@ public class Role extends GridPane {
         saveButton.getStyleClass().addAll("icon-button");
         saveButton.setText("");
         LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
-        
-        this.setName(roleObject.getName());
-        this.setAllowAddCategory(roleObject.isAllowAddCategory());
-        this.setAllowDeleteCategory(roleObject.isAllowDeleteCategory());
-        this.setAllowEditCategory(roleObject.isAllowEditCategory());
-        this.setAllowAddProduct(roleObject.isAllowAddProduct());
-        this.setAllowDeleteProduct(roleObject.isAllowDeleteProduct());
-        this.setAllowEditProduct(roleObject.isAllowEditProduct());
         
         nameTextFieldValidator = new TextFieldValidator(
             nameTextField
@@ -139,6 +132,25 @@ public class Role extends GridPane {
                 }
             ).show();
         });
+        
+        SceneManager.onChangeScene(($1, $2) -> {
+            this.setRoleObject(this.roleObject);
+        });
+    }
+    
+    public void setRoleObject(RoleObject roleObject) {
+        this.roleObject = roleObject;
+        this.setName(roleObject.getName());
+        this.setAllowAddCategory(roleObject.isAllowAddCategory());
+        this.setAllowDeleteCategory(roleObject.isAllowDeleteCategory());
+        this.setAllowEditCategory(roleObject.isAllowEditCategory());
+        this.setAllowAddProduct(roleObject.isAllowAddProduct());
+        this.setAllowDeleteProduct(roleObject.isAllowDeleteProduct());
+        this.setAllowEditProduct(roleObject.isAllowEditProduct());
+    }
+    
+    public RoleObject getRoleObject() {
+        return roleObject;
     }
     
     public void setAllowAddCategory(boolean v) {

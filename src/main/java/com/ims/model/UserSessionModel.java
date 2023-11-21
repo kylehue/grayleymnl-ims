@@ -2,6 +2,7 @@ package com.ims.model;
 
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
+import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -9,7 +10,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.util.HashMap;
 
 public abstract class UserSessionModel {
-    public static ObjectProperty<User> currentUser = new SimpleObjectProperty<>(null);
+    public static ObjectProperty<UserObject> currentUser =
+        new SimpleObjectProperty<>(null);
     
     public static void logout() {
         currentUser.set(null);
@@ -41,6 +43,11 @@ public abstract class UserSessionModel {
         return getUserRole(currentUser.get().getID());
     }
     
+    public static boolean currentUserIsOwner() {
+        if (currentUser.get() == null) return false;
+        return currentUser.get().isOwner();
+    }
+    
     public static HashMap<DBRoles.Column, Object> getUserRole(int userID) {
         HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
             DBUsers.Column.ID,
@@ -60,29 +67,17 @@ public abstract class UserSessionModel {
             currentUser.get().getID(),
             password,
             null,
+            null,
             null
         );
     }
     
     public static void deleteAccount() {
+        if (UserSessionModel.currentUserIsOwner()) {
+            return;
+        }
+        
         DBUsers.remove(currentUser.get().getID());
         logout();
-    }
-    
-    public static class User {
-        private int id;
-        private String email;
-        public User(int id, String email) {
-            this.id = id;
-            this.email = email;
-        }
-        
-        public int getID() {
-            return id;
-        }
-        
-        public String getEmail() {
-            return email;
-        }
     }
 }

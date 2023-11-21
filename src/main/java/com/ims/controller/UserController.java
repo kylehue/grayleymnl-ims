@@ -4,6 +4,7 @@ import com.ims.components.*;
 import com.ims.model.BaseModel;
 import com.ims.model.UserEditModel;
 import com.ims.model.UserManagerModel;
+import com.ims.model.UserSessionModel;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
@@ -68,6 +69,7 @@ public class UserController {
                 currentUser.getID(),
                 null,
                 roleObject.getID(),
+                null,
                 null
             );
         });
@@ -99,7 +101,8 @@ public class UserController {
                             UserEditModel.currentUser.get().getID(),
                             null,
                             null,
-                            false
+                            false,
+                            null
                         );
                         
                         PopupService.confirmDialog.hide();
@@ -125,7 +128,8 @@ public class UserController {
                             UserEditModel.currentUser.get().getID(),
                             null,
                             null,
-                            true
+                            true,
+                            null
                         );
                         
                         PopupService.confirmDialog.hide();
@@ -140,6 +144,14 @@ public class UserController {
                         UserEditModel.currentUser.get().setDisabled(true);
                     }
                 ).show();
+            }
+        });
+        
+        UserSessionModel.currentUser.addListener(e -> {
+            if (UserSessionModel.currentUserIsOwner()) {
+                disableAccountButton.setDisable(true);
+            } else {
+                disableAccountButton.setDisable(false);
             }
         });
     }

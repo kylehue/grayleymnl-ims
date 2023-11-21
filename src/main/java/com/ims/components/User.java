@@ -27,6 +27,7 @@ public class User extends GridPane {
     private UserObject userObject;
     
     public User(UserObject userObject) {
+        this.setUserObject(userObject);
         this.styleClass.add("card");
         this.styleClass.add("user-container");
         
@@ -60,8 +61,6 @@ public class User extends GridPane {
         this.add(roleLabel, 0, 1);
         emailLabel.getStyleClass().add("user-email-label");
         this.add(emailLabel, 0, 0);
-        
-        this.setUserObject(userObject);
         
         editButton.setOnMouseClicked(e -> {
             UserEditModel.currentUser.set(this.getUserObject());

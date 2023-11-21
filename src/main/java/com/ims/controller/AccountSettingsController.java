@@ -197,6 +197,14 @@ public class AccountSettingsController {
                 "Got it!"
             ).show();
         });
+        
+        UserSessionModel.currentUser.addListener(e -> {
+            if (UserSessionModel.currentUserIsOwner()) {
+                deleteAccountButton.setDisable(true);
+            } else {
+                deleteAccountButton.setDisable(false);
+            }
+        });
     }
     
     @FXML

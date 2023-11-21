@@ -523,5 +523,15 @@ public class BaseController {
         this.initializeDashboardPage();
         this.initializeProductPage();
         this.initializeCategoryPage();
+        
+        UserSessionModel.currentUser.addListener(e -> {
+            if (UserSessionModel.currentUserIsOwner()) {
+                managerUsersButton.setVisible(true);
+                managerUsersButton.setManaged(true);
+            } else {
+                managerUsersButton.setVisible(false);
+                managerUsersButton.setManaged(false);
+            }
+        });
     }
 }

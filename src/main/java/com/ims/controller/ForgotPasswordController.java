@@ -105,6 +105,7 @@ public class ForgotPasswordController {
                     (int) user.get(DBUsers.Column.ID),
                     Utils.hashPassword(newPassword),
                     null,
+                    null,
                     null
                 );
                 

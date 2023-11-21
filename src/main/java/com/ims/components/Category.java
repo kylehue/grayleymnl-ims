@@ -4,6 +4,7 @@ import com.ims.Config;
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.SceneManager;
 import com.ims.utils.TextFieldValidator;
 import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -23,7 +24,7 @@ public class Category extends GridPane {
     public final MFXButton saveButton = new MFXButton();
     
     public Category(CategoryObject categoryObject) {
-        this.categoryObject = categoryObject;
+        this.setCategoryObject(categoryObject);
         this.setCategoryName(categoryObject.getName());
         this.styleClass.add("card");
         this.styleClass.add("category-container");
@@ -98,6 +99,10 @@ public class Category extends GridPane {
                 "Category has been successfully updated.",
                 "Got it!"
             ).show();
+        });
+        
+        SceneManager.onChangeScene(($1, $2) -> {
+            this.setCategoryObject(this.categoryObject);
         });
     }
     

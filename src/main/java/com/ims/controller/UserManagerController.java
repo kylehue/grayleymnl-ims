@@ -64,27 +64,7 @@ public class UserManagerController {
                 } else if (needsToBeUpdated) {
                     Role role = roles.get(id);
                     RoleObject roleObject = change.getValueAdded();
-                    role.setName(
-                        roleObject.getName()
-                    );
-                    role.setAllowAddCategory(
-                        roleObject.isAllowAddCategory()
-                    );
-                    role.setAllowDeleteCategory(
-                        roleObject.isAllowDeleteCategory()
-                    );
-                    role.setAllowEditCategory(
-                        roleObject.isAllowEditCategory()
-                    );
-                    role.setAllowAddProduct(
-                        roleObject.isAllowAddProduct()
-                    );
-                    role.setAllowDeleteProduct(
-                        roleObject.isAllowDeleteProduct()
-                    );
-                    role.setAllowEditProduct(
-                        roleObject.isAllowEditProduct()
-                    );
+                    role.setRoleObject(roleObject);
                 } else if (needsToBeRemoved) {
                     removeRole(id);
                 }
@@ -118,14 +98,14 @@ public class UserManagerController {
                 }
                 
                 UserManagerModel.updateRole(
-                    role.roleObject.getID(),
+                    role.getRoleObject().getID(),
                     role.getName(),
-                    role.roleObject.isAllowAddCategory(),
-                    role.roleObject.isAllowDeleteCategory(),
-                    role.roleObject.isAllowEditCategory(),
-                    role.roleObject.isAllowAddProduct(),
-                    role.roleObject.isAllowDeleteProduct(),
-                    role.roleObject.isAllowEditProduct()
+                    role.getRoleObject().isAllowAddCategory(),
+                    role.getRoleObject().isAllowDeleteCategory(),
+                    role.getRoleObject().isAllowEditCategory(),
+                    role.getRoleObject().isAllowAddProduct(),
+                    role.getRoleObject().isAllowDeleteProduct(),
+                    role.getRoleObject().isAllowEditProduct()
                 );
             }
             
@@ -178,7 +158,7 @@ public class UserManagerController {
         if (roleToRemove != null) {
             Platform.runLater(() -> {
                 rolesFlowPane.getChildren().remove(roleToRemove);
-                this.roles.remove(roleToRemove.roleObject.getID());
+                this.roles.remove(roleToRemove.getRoleObject().getID());
             });
         }
     }
@@ -187,8 +167,8 @@ public class UserManagerController {
         ArrayList<Role> sortedRoles = new ArrayList<>(
             this.roles.values().stream().sorted(
                 (a, b) -> {
-                    return b.roleObject.getLastModified().compareTo(
-                        a.roleObject.getLastModified()
+                    return b.getRoleObject().getLastModified().compareTo(
+                        a.getRoleObject().getLastModified()
                     );
                 }
             ).toList()

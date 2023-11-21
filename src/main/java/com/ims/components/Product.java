@@ -34,6 +34,7 @@ public class Product extends GridPane {
     private final Label priceLabel = new Label();
     
     public Product(ProductObject productObject) {
+        this.setProductObject(productObject);
         this.styleClass.add("card");
         this.styleClass.add("product-container");
         
@@ -115,8 +116,6 @@ public class Product extends GridPane {
         this.textGridPane.add(categoryLabel, 0, 1);
         this.textGridPane.add(stocksLabel, 0, 2);
         this.textGridPane.add(priceLabel, 0, 3);
-        
-        this.setProductObject(productObject);
     }
     
     /**

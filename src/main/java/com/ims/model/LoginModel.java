@@ -1,6 +1,7 @@
 package com.ims.model;
 
 import com.ims.database.DBUsers;
+import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Utils;
 import javafx.beans.property.BooleanProperty;
@@ -8,6 +9,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -46,11 +49,44 @@ public abstract class LoginModel {
             validProperty.set(true);
             
             int id = (int) user.get(DBUsers.Column.ID);
+            
             UserSessionModel.currentUser.set(
-                new UserSessionModel.User(id, email)
+                getUser(id)
             );
         } else {
             validProperty.set(false);
         }
+    }
+    
+    public static UserObject getUser(int id) {
+        HashMap<DBUsers.Column, Object> row = DBUsers.getOne(DBUsers.Column.ID, id);
+        if (row != null) {
+            UserObject userObject = new UserObject(
+                id,
+                (String) row.get(DBUsers.Column.EMAIL),
+                (String) row.get(
+                    DBUsers.Column.PASSWORD
+                ),
+                (Date) row.get(
+                    DBUsers.Column.JOINED_DATE
+                ),
+                (Timestamp) row.get(
+                    DBUsers.Column.LAST_ACTIVITY_DATE
+                ),
+                (Integer) row.get(
+                    DBUsers.Column.ROLE_ID
+                ),
+                (boolean) row.get(
+                    DBUsers.Column.IS_DISABLED
+                ),
+                (boolean) row.get(
+                    DBUsers.Column.IS_OWNER
+                )
+            );
+            
+            return userObject;
+        }
+        
+        return null;
     }
 }

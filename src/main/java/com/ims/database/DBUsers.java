@@ -15,7 +15,8 @@ public class DBUsers {
         JOINED_DATE,
         LAST_ACTIVITY_DATE,
         ROLE_ID,
-        IS_DISABLED
+        IS_DISABLED,
+        IS_OWNER
     }
     
     public static HashMap<Column, Object> add(String email, String password) {
@@ -50,7 +51,8 @@ public class DBUsers {
         int id,
         String password,
         Integer roleID,
-        Boolean isDisabled
+        Boolean isDisabled,
+        Boolean isOwner
     ) {
         HashMap<DBUsers.Column, Object> row = null;
         PreparedStatement preparedStatement = null;
@@ -60,7 +62,8 @@ public class DBUsers {
                 UPDATE users
                 SET password = COALESCE(?, password),
                 role_id = COALESCE(?, role_id),
-                is_disabled = COALESCE(?, is_disabled)
+                is_disabled = COALESCE(?, is_disabled),
+                is_owner = COALESCE(?, is_owner)
                 WHERE id = ?
                 RETURNING *;
                 """;
@@ -69,7 +72,8 @@ public class DBUsers {
             preparedStatement.setObject(1, password);
             preparedStatement.setObject(2, roleID);
             preparedStatement.setObject(3, isDisabled);
-            preparedStatement.setInt(4, id);
+            preparedStatement.setObject(4, isOwner);
+            preparedStatement.setInt(5, id);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
         } catch (SQLException e) {
@@ -87,7 +91,8 @@ public class DBUsers {
         try {
             String query = """
                 DELETE FROM users
-                WHERE id = ?;
+                WHERE id = ?
+                AND is_owner=false;
                 """;
             
             preparedStatement = connection.prepareStatement(query);
@@ -161,6 +166,14 @@ public class DBUsers {
             data.put(
                 Column.IS_DISABLED,
                 retrievedIsDisabled
+            );
+            
+            boolean retrievedIsOwner = resultSet.getBoolean(
+                Column.IS_OWNER.toString()
+            );
+            data.put(
+                Column.IS_OWNER,
+                retrievedIsOwner
             );
             
             rows.add(data);

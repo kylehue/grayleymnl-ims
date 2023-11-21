@@ -12,6 +12,7 @@ public class UserObject {
     private Timestamp lastActivityDate;
     private int roleID;
     private boolean isDisabled;
+    private boolean isOwner;
     
     public UserObject(
         int id,
@@ -20,7 +21,8 @@ public class UserObject {
         Date joinedDate,
         Timestamp lastActivityDate,
         int roleID,
-        boolean isDisabled
+        boolean isDisabled,
+        boolean isOwner
     ) {
         this.id = id;
         this.email = email;
@@ -29,6 +31,7 @@ public class UserObject {
         this.lastActivityDate = lastActivityDate;
         this.roleID = roleID;
         this.isDisabled = isDisabled;
+        this.isOwner = isOwner;
     }
     
     public int getID() {
@@ -61,5 +64,9 @@ public class UserObject {
     
     public void setDisabled(boolean disabled) {
         isDisabled = disabled;
+    }
+    
+    public boolean isOwner() {
+        return isOwner;
     }
 }

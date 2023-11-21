@@ -33,6 +33,10 @@ public abstract class UserManagerModel {
      * @param name The name of the role to add.
      */
     public static void addRole(String name) {
+        if (!UserSessionModel.currentUserIsOwner()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
         if (name.isEmpty()) return;
         
         Task<Void> task = new Task<>() {
@@ -110,6 +114,10 @@ public abstract class UserManagerModel {
         Boolean allowDeleteProduct,
         Boolean allowEditProduct
     ) {
+        if (!UserSessionModel.currentUserIsOwner()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
         if (name.isEmpty()) return;
         
         Task<Void> task = new Task<>() {
@@ -192,6 +200,11 @@ public abstract class UserManagerModel {
      * @param id The id of the role to remove.
      */
     public static void removeRole(int id) {
+        if (!UserSessionModel.currentUserIsOwner()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
+        
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -342,17 +355,31 @@ public abstract class UserManagerModel {
     /**
      * Update a user.
      *
-     * @param id The id of the user to disable.
-     * @param password The new password of the user.
-     * @param roleID The new role ID of the user.
+     * @param id         The id of the user to disable.
+     * @param password   The new password of the user.
+     * @param roleID     The new role ID of the user.
      * @param isDisabled Should the user be disabled or not?
      */
     public static void updateUser(
         int id,
         String password,
         Integer roleID,
-        Boolean isDisabled
+        Boolean isDisabled,
+        Boolean isOwner
     ) {
+        if (!UserSessionModel.currentUserIsOwner()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
+        if (
+            isDisabled &&
+                id == UserSessionModel.getCurrentUserID() &&
+                UserSessionModel.currentUserIsOwner()
+        ) {
+            System.out.println("You can't disable a user who is an owner.");
+            return;
+        }
+        
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -362,7 +389,8 @@ public abstract class UserManagerModel {
                     id,
                     password,
                     roleID,
-                    isDisabled
+                    isDisabled,
+                    isOwner
                 );
                 
                 if (!userMap.containsKey(id)) {
@@ -385,6 +413,9 @@ public abstract class UserManagerModel {
                 boolean _isDisabled = (boolean) user.get(
                     DBUsers.Column.IS_DISABLED
                 );
+                boolean _isOwner = (boolean) user.get(
+                    DBUsers.Column.IS_OWNER
+                );
                 userMap.put(id, new UserObject(
                     id,
                     email,
@@ -392,7 +423,8 @@ public abstract class UserManagerModel {
                     joinedDate,
                     lastActivityDate,
                     roleID,
-                    _isDisabled
+                    _isDisabled,
+                    _isOwner
                 ));
                 
                 return null;
@@ -452,6 +484,9 @@ public abstract class UserManagerModel {
                     boolean isDisabled = (boolean) row.get(
                         DBUsers.Column.IS_DISABLED
                     );
+                    boolean isOwner = (boolean) row.get(
+                        DBUsers.Column.IS_OWNER
+                    );
                     userMap.put(id, new UserObject(
                         id,
                         email,
@@ -459,7 +494,8 @@ public abstract class UserManagerModel {
                         joinedDate,
                         lastActivityDate,
                         roleID,
-                        isDisabled
+                        isDisabled,
+                        isOwner
                     ));
                 }
                 return null;
