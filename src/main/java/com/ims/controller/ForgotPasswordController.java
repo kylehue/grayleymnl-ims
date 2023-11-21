@@ -5,11 +5,13 @@ import com.ims.components.ConfirmationCodeModal;
 import com.ims.components.PopupService;
 import com.ims.database.DBUsers;
 import com.ims.model.LoginModel;
+import com.ims.model.RegisterModel;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.ImageView;
@@ -17,6 +19,8 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ForgotPasswordController {
     @FXML
@@ -53,7 +57,7 @@ public class ForgotPasswordController {
             "This email address doesn't exist.",
             () -> {
                 String email = emailTextField.getText();
-                return !DBUsers.get(DBUsers.Column.EMAIL, email).isEmpty();
+                return RegisterModel.emailExists(email);
             },
             continueButton.armedProperty()
         );
@@ -92,30 +96,46 @@ public class ForgotPasswordController {
                 
                 confirmationCodeModal.hide();
                 
-                HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
-                    DBUsers.Column.EMAIL,
-                    email
-                );
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() {
+                        HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+                            DBUsers.Column.EMAIL,
+                            email
+                        );
+                        
+                        assert user != null;
+                        
+                        // Change user's password
+                        String newPassword = Utils.generateRandomCode(12);
+                        DBUsers.update(
+                            (int) user.get(DBUsers.Column.ID),
+                            Utils.hashPassword(newPassword),
+                            null,
+                            null,
+                            null
+                        );
+                        
+                        sendNewPassword(email, newPassword);
+                        return null;
+                    }
+                };
                 
-                assert user != null;
+                task.setOnSucceeded(event -> {
+                    PopupService.messageDialog.setup(
+                        "Account Recovery",
+                        "Your account has been successfully recovered. Your temporary password has been sent to your email. Please use it to log in and update your password.",
+                        "Got it!"
+                    ).show();
+                });
                 
-                // Change user's password
-                String newPassword = Utils.generateRandomCode(12);
-                DBUsers.update(
-                    (int) user.get(DBUsers.Column.ID),
-                    Utils.hashPassword(newPassword),
-                    null,
-                    null,
-                    null
-                );
+                task.setOnFailed(err -> {
+                    System.out.println(err);
+                });
                 
-                sendNewPassword(email, newPassword);
-                
-                PopupService.messageDialog.setup(
-                    "Account Recovery",
-                    "Your account has been successfully recovered. Your temporary password has been sent to your email. Please use it to log in and update your password.",
-                    "Got it!"
-                ).show();
+                ExecutorService executor = Executors.newSingleThreadExecutor();
+                executor.submit(task);
+                executor.shutdown();
             });
         });
     }

@@ -2,7 +2,6 @@ package com.ims.controller;
 
 import com.ims.Config;
 import com.ims.canvas.network.Network;
-import com.ims.database.DBUsers;
 import com.ims.model.RegisterModel;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -48,9 +47,7 @@ public class RegisterController {
             "This email address already exists.",
             () -> {
                 String email = emailTextField.getText();
-                // TODO: why is this getting triggered twice?
-                // TODO: add delay before checking in database
-                return DBUsers.get(DBUsers.Column.EMAIL, email).isEmpty();
+                return !RegisterModel.emailExists(email);
             },
             registerButton.armedProperty()
         );

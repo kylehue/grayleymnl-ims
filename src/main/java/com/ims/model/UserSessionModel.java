@@ -6,8 +6,11 @@ import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
 
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class UserSessionModel {
     public static ObjectProperty<UserObject> currentUser =
@@ -30,12 +33,34 @@ public abstract class UserSessionModel {
     
     public static String getCurrentUserPassword() {
         if (currentUser.get() == null) return null;
-        HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
-            DBUsers.Column.ID,
-            currentUser.get().getID()
-        );
-        if (user == null) return null;
-        return user.get(DBUsers.Column.PASSWORD).toString();
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+                    DBUsers.Column.ID,
+                    currentUser.get().getID()
+                );
+                if (user == null) return null;
+                return user.get(DBUsers.Column.PASSWORD).toString();
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        
+        String password = null;
+        try {
+            password = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return password;
     }
     
     public static HashMap<DBRoles.Column, Object> getCurrentUserRole() {
@@ -97,27 +122,72 @@ public abstract class UserSessionModel {
     }
     
     public static HashMap<DBRoles.Column, Object> getUserRole(int userID) {
-        HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
-            DBUsers.Column.ID,
-            userID
-        );
-        if (user == null) return null;
-        return DBRoles.getOne(
-            DBRoles.Column.ID,
-            user.get(DBUsers.Column.ROLE_ID)
-        );
+        Task<HashMap<DBRoles.Column, Object>> task = new Task<>() {
+            @Override
+            protected HashMap<DBRoles.Column, Object> call() throws Exception {
+                HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+                    DBUsers.Column.ID,
+                    userID
+                );
+                if (user == null) return null;
+                
+                return DBRoles.getOne(
+                    DBRoles.Column.ID,
+                    user.get(DBUsers.Column.ROLE_ID)
+                );
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        
+        HashMap<DBRoles.Column, Object> role = null;
+        try {
+            role = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return role;
     }
     
     public static HashMap<DBUsers.Column, Object> updatePassword(
         String password
     ) {
-        return DBUsers.update(
-            currentUser.get().getID(),
-            password,
-            null,
-            null,
-            null
-        );
+        Task<HashMap<DBUsers.Column, Object>> task = new Task<>() {
+            @Override
+            protected HashMap<DBUsers.Column, Object> call() throws Exception {
+                return DBUsers.update(
+                    currentUser.get().getID(),
+                    password,
+                    null,
+                    null,
+                    null
+                );
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        
+        HashMap<DBUsers.Column, Object> user = null;
+        try {
+            user = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return user;
     }
     
     public static void deleteAccount() {
@@ -125,7 +195,24 @@ public abstract class UserSessionModel {
             return;
         }
         
-        DBUsers.remove(currentUser.get().getID());
-        logout();
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                DBUsers.remove(currentUser.get().getID());
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            logout();
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
     }
 }
