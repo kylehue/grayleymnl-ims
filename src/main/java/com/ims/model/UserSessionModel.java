@@ -48,6 +48,54 @@ public abstract class UserSessionModel {
         return currentUser.get().isOwner();
     }
     
+    public static boolean currentUserIsAllowAddCategory() {
+        if (currentUser.get() == null) return false;
+        if (currentUserIsOwner()) return true;
+        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        if (role == null) return false;
+        return role.get(DBRoles.Column.ALLOW_ADD_CATEGORY).equals(true);
+    }
+    
+    public static boolean currentUserIsAllowDeleteCategory() {
+        if (currentUser.get() == null) return false;
+        if (currentUserIsOwner()) return true;
+        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        if (role == null) return false;
+        return role.get(DBRoles.Column.ALLOW_DELETE_CATEGORY).equals(true);
+    }
+    
+    public static boolean currentUserIsAllowEditCategory() {
+        if (currentUser.get() == null) return false;
+        if (currentUserIsOwner()) return true;
+        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        if (role == null) return false;
+        return role.get(DBRoles.Column.ALLOW_EDIT_CATEGORY).equals(true);
+    }
+    
+    public static boolean currentUserIsAllowAddProduct() {
+        if (currentUser.get() == null) return false;
+        if (currentUserIsOwner()) return true;
+        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        if (role == null) return false;
+        return role.get(DBRoles.Column.ALLOW_ADD_PRODUCT).equals(true);
+    }
+    
+    public static boolean currentUserIsAllowDeleteProduct() {
+        if (currentUser.get() == null) return false;
+        if (currentUserIsOwner()) return true;
+        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        if (role == null) return false;
+        return role.get(DBRoles.Column.ALLOW_DELETE_PRODUCT).equals(true);
+    }
+    
+    public static boolean currentUserIsAllowEditProduct() {
+        if (currentUser.get() == null) return false;
+        if (currentUserIsOwner()) return true;
+        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        if (role == null) return false;
+        return role.get(DBRoles.Column.ALLOW_EDIT_PRODUCT).equals(true);
+    }
+    
     public static HashMap<DBRoles.Column, Object> getUserRole(int userID) {
         HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
             DBUsers.Column.ID,

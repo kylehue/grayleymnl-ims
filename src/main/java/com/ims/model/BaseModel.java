@@ -77,6 +77,10 @@ public abstract class BaseModel {
         int categoryID
     ) throws ExecutionException, InterruptedException {
         if (name.isEmpty()) return null;
+        if (!UserSessionModel.currentUserIsAllowAddProduct()) {
+            System.out.println("The user has insufficient permissions.");
+            return null;
+        }
         
         Task<ProductObject> task = new Task<>() {
             @Override
@@ -171,6 +175,11 @@ public abstract class BaseModel {
         Integer currentStocks,
         Integer expectedStocks
     ) {
+        if (!UserSessionModel.currentUserIsAllowEditProduct()) {
+            System.out.println("The user has insufficient permissions.");
+            return;
+        }
+        
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -296,7 +305,7 @@ public abstract class BaseModel {
                     if (product != null) {
                         continue;
                     }
-
+                    
                     // Add in list
                     String name = (String) row.get(
                         DBProducts.Column.NAME

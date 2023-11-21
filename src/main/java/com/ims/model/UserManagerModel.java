@@ -118,7 +118,7 @@ public abstract class UserManagerModel {
             System.out.println("The user has insufficient permissions.");
             return;
         }
-        if (name.isEmpty()) return;
+        if (name != null && name.isEmpty()) return;
         
         Task<Void> task = new Task<>() {
             @Override
@@ -372,6 +372,7 @@ public abstract class UserManagerModel {
             return;
         }
         if (
+            isDisabled != null &&
             isDisabled &&
                 id == UserSessionModel.getCurrentUserID() &&
                 UserSessionModel.currentUserIsOwner()

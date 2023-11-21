@@ -10,6 +10,8 @@ import com.ims.utils.TextFieldValidator;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -70,13 +72,6 @@ public class Role extends GridPane {
         deleteButton.setText("");
         LayoutUtils.addIconToButton(deleteButton, "/icons/delete.svg");
         
-        // Setup save button
-        MFXButton saveButton = new MFXButton();
-        controlContainer.getChildren().add(saveButton);
-        saveButton.getStyleClass().addAll("icon-button");
-        saveButton.setText("");
-        LayoutUtils.addIconToButton(saveButton, "/icons/content-save.svg");
-        
         nameTextFieldValidator = new TextFieldValidator(
             nameTextField
         );
@@ -86,7 +81,7 @@ public class Role extends GridPane {
             "Please enter the role name.",
             () -> !nameTextField.getText().isEmpty(),
             nameTextField.textProperty(),
-            saveButton.armedProperty()
+            nameTextField.delegateFocusedProperty()
         );
         
         nameTextFieldValidator.addConstraint(
@@ -96,11 +91,12 @@ public class Role extends GridPane {
             ),
             () -> nameTextField.getText().length() <= Config.maxRoleNameLength,
             nameTextField.textProperty(),
-            saveButton.armedProperty()
+            nameTextField.delegateFocusedProperty()
         );
         
-        saveButton.setOnMouseClicked(e -> {
+        nameTextField.delegateFocusedProperty().addListener(e -> {
             if (!nameTextFieldValidator.isValid()) return;
+            if (nameTextField.delegateIsFocused()) return;
             
             UserManagerModel.updateRole(
                 roleObject.getID(),
@@ -113,12 +109,32 @@ public class Role extends GridPane {
                 this.allowEditProductToggle.isSelected()
             );
             
-            PopupService.messageDialog.setup(
-                "Update Role",
-                "Role has been successfully updated.",
-                "Got it!"
-            ).show();
+            // PopupService.messageDialog.setup(
+            //     "Update Role",
+            //     "Role has been successfully updated.",
+            //     "Got it!"
+            // ).show();
         });
+        
+        InvalidationListener toggleListener = e -> {
+            UserManagerModel.updateRole(
+                roleObject.getID(),
+                null,
+                this.allowAddCategoryToggle.isSelected(),
+                this.allowDeleteCategoryToggle.isSelected(),
+                this.allowEditCategoryToggle.isSelected(),
+                this.allowAddProductToggle.isSelected(),
+                this.allowDeleteProductToggle.isSelected(),
+                this.allowEditProductToggle.isSelected()
+            );
+        };
+        
+        allowAddCategoryToggle.selectedProperty().addListener(toggleListener);
+        allowDeleteCategoryToggle.selectedProperty().addListener(toggleListener);
+        allowEditCategoryToggle.selectedProperty().addListener(toggleListener);
+        allowAddProductToggle.selectedProperty().addListener(toggleListener);
+        allowDeleteProductToggle.selectedProperty().addListener(toggleListener);
+        allowEditProductToggle.selectedProperty().addListener(toggleListener);
         
         deleteButton.setOnMouseClicked((e) -> {
             PopupService.confirmDialog.setup(
@@ -140,13 +156,15 @@ public class Role extends GridPane {
     
     public void setRoleObject(RoleObject roleObject) {
         this.roleObject = roleObject;
-        this.setName(roleObject.getName());
-        this.setAllowAddCategory(roleObject.isAllowAddCategory());
-        this.setAllowDeleteCategory(roleObject.isAllowDeleteCategory());
-        this.setAllowEditCategory(roleObject.isAllowEditCategory());
-        this.setAllowAddProduct(roleObject.isAllowAddProduct());
-        this.setAllowDeleteProduct(roleObject.isAllowDeleteProduct());
-        this.setAllowEditProduct(roleObject.isAllowEditProduct());
+        Platform.runLater(() -> {
+            this.setName(roleObject.getName());
+            this.setAllowAddCategory(roleObject.isAllowAddCategory());
+            this.setAllowDeleteCategory(roleObject.isAllowDeleteCategory());
+            this.setAllowEditCategory(roleObject.isAllowEditCategory());
+            this.setAllowAddProduct(roleObject.isAllowAddProduct());
+            this.setAllowDeleteProduct(roleObject.isAllowDeleteProduct());
+            this.setAllowEditProduct(roleObject.isAllowEditProduct());
+        });
     }
     
     public RoleObject getRoleObject() {

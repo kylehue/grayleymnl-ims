@@ -3,6 +3,7 @@ package com.ims.components;
 import com.ims.database.DBProducts;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
+import com.ims.model.UserSessionModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import com.ims.utils.LayoutUtils;
@@ -32,6 +33,7 @@ public class Product extends GridPane {
     private final Label categoryLabel = new Label();
     private final Label stocksLabel = new Label();
     private final Label priceLabel = new Label();
+    private final MFXButton editButton = new MFXButton();
     
     public Product(ProductObject productObject) {
         this.setProductObject(productObject);
@@ -65,7 +67,6 @@ public class Product extends GridPane {
         controlGridPane.add(controlFlowPane, 0, 0);
         
         // Setup buttons
-        MFXButton editButton = new MFXButton();
         editButton.setText("");
         LayoutUtils.addIconToButton(editButton, "/icons/pencil.svg");
         editButton.getStyleClass().add("icon-button");
@@ -116,6 +117,16 @@ public class Product extends GridPane {
         this.textGridPane.add(categoryLabel, 0, 1);
         this.textGridPane.add(stocksLabel, 0, 2);
         this.textGridPane.add(priceLabel, 0, 3);
+        
+        updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
+        UserSessionModel.currentUser.addListener(e -> {
+            updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
+        });
+    }
+    
+    private void updateEditPermissions(boolean isAllowed) {
+        editButton.setVisible(isAllowed);
+        editButton.setManaged(isAllowed);
     }
     
     /**

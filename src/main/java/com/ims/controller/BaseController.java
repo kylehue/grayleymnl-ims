@@ -179,6 +179,11 @@ public class BaseController {
         });
         
         addProductModal.addButton.setOnMouseClicked((e) -> {
+            if (!UserSessionModel.currentUserIsAllowAddProduct()) {
+                System.out.println("The user has insufficient permissions.");
+                return;
+            }
+            
             if (
                 !addProductModal.nameTextFieldValidator.isValid() ||
                     !addProductModal.categoryComboBoxValidator.isValid()
@@ -202,6 +207,16 @@ public class BaseController {
             SceneManager.setScene("product");
             
             addProductModal.hide();
+        });
+        
+        UserSessionModel.currentUser.addListener(e -> {
+            if (UserSessionModel.currentUserIsAllowAddProduct()) {
+                addProductButton.setVisible(true);
+                addProductButton.setManaged(true);
+            } else {
+                addProductButton.setVisible(false);
+                addProductButton.setManaged(false);
+            }
         });
     }
     

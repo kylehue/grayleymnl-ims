@@ -59,13 +59,13 @@ public class DBRoles {
         try {
             String query = """
                 UPDATE roles
-                SET name = ?,
-                allow_add_category = ?,
-                allow_delete_category = ?,
-                allow_edit_category = ?,
-                allow_add_product = ?,
-                allow_delete_product = ?,
-                allow_edit_product = ?
+                SET name = COALESCE(?, name),
+                allow_add_category = COALESCE(?, allow_add_category),
+                allow_delete_category = COALESCE(?, allow_delete_category),
+                allow_edit_category = COALESCE(?, allow_edit_category),
+                allow_add_product = COALESCE(?, allow_add_product),
+                allow_delete_product = COALESCE(?, allow_delete_product),
+                allow_edit_product = COALESCE(?, allow_edit_product)
                 WHERE id = ?
                 RETURNING *;
                 """;

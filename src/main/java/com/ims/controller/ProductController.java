@@ -5,6 +5,7 @@ import com.ims.components.NumberField;
 import com.ims.components.PopupService;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
+import com.ims.model.UserSessionModel;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -245,6 +246,15 @@ public class ProductController {
                 }
             ).show();
         });
+        
+        updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
+        UserSessionModel.currentUser.addListener(e -> {
+            updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
+        });
+    }
+    
+    private void updateDeletePermissions(boolean isAllowed) {
+        deleteProductButton.setDisable(!isAllowed);
     }
     
     @FXML

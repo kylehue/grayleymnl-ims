@@ -33,9 +33,6 @@ public class UserManagerController {
     GridPane tabRolesPane;
     
     @FXML
-    MFXButton saveAllRolesButton;
-    
-    @FXML
     MFXButton addRoleButton;
     
     @FXML
@@ -89,31 +86,6 @@ public class UserManagerController {
             );
             
             roleAddModal.hide();
-        });
-        
-        saveAllRolesButton.setOnMouseClicked((e) -> {
-            for (Role role : this.roles.values()) {
-                if (!role.nameTextFieldValidator.isValid()) {
-                    continue;
-                }
-                
-                UserManagerModel.updateRole(
-                    role.getRoleObject().getID(),
-                    role.getName(),
-                    role.getRoleObject().isAllowAddCategory(),
-                    role.getRoleObject().isAllowDeleteCategory(),
-                    role.getRoleObject().isAllowEditCategory(),
-                    role.getRoleObject().isAllowAddProduct(),
-                    role.getRoleObject().isAllowDeleteProduct(),
-                    role.getRoleObject().isAllowEditProduct()
-                );
-            }
-            
-            PopupService.messageDialog.setup(
-                "Update Roles",
-                "All roles has been successfully updated.",
-                "Got it!"
-            ).show();
         });
     }
     
