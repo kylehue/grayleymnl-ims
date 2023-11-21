@@ -1,12 +1,18 @@
 package com.ims.components;
 
-import com.ims.database.DBRoles;
 import com.ims.model.UserEditModel;
+import com.ims.model.UserManagerModel;
+import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
+import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -15,8 +21,6 @@ import javafx.scene.layout.*;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.HashMap;
 
 public class User extends GridPane {
     private final ObservableList<String> styleClass = this.getStyleClass();
@@ -27,7 +31,6 @@ public class User extends GridPane {
     private UserObject userObject;
     
     public User(UserObject userObject) {
-        this.setUserObject(userObject);
         this.styleClass.add("card");
         this.styleClass.add("user-container");
         
@@ -66,19 +69,31 @@ public class User extends GridPane {
             UserEditModel.currentUser.set(this.getUserObject());
             SceneManager.setScene("user");
         });
+        
+        this.setUserObject(userObject);
     }
     
     public void setEmail(String email) {
         emailLabel.setText(email);
     }
     
+    private final ChangeListener<String> roleChangeListener = (e, oldValue, newValue) -> {
+        Platform.runLater(() -> {
+            roleLabel.setText(newValue);
+        });
+    };
+    
+    private RoleObject oldRoleObject = null;
+    
     public void setRole(int roleID) {
-        HashMap<DBRoles.Column, Object> role = DBRoles.getOne(
-            DBRoles.Column.ID,
-            roleID
-        );
-        if (role == null) return;
-        roleLabel.setText(role.get(DBRoles.Column.NAME).toString());
+        RoleObject roleObject = UserManagerModel.loadAndGetRole(roleID);
+        if (roleObject == null) return;
+        roleLabel.setText(roleObject.getName());
+        if (oldRoleObject != null) {
+            oldRoleObject.nameProperty().removeListener(roleChangeListener);
+        }
+        roleObject.nameProperty().addListener(roleChangeListener);
+        oldRoleObject = roleObject;
     }
     
     public void setJoinedDate(Date joinedDate) {

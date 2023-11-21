@@ -4,6 +4,7 @@ import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -81,6 +82,7 @@ public abstract class UserManagerModel {
                     newAllowEditProduct,
                     newLastModified
                 ));
+                
                 return null;
             }
         };
@@ -164,17 +166,20 @@ public abstract class UserManagerModel {
                     Timestamp newLastModified = (Timestamp) newRole.get(
                         DBRoles.Column.LAST_MODIFIED
                     );
-                    roleMap.put(id, new RoleObject(
-                        id,
-                        newName,
-                        newAllowAddCategory,
-                        newAllowDeleteCategory,
-                        newAllowEditCategory,
-                        newAllowAddProduct,
-                        newAllowDeleteProduct,
-                        newAllowEditProduct,
-                        newLastModified
-                    ));
+                    
+                    // remove old object just for the sake of triggering the listeners
+                    roleMap.put(id, null);
+                    
+                    // bring back the old role object
+                    roleObject.setName(newName);
+                    roleObject.setAllowAddCategory(newAllowAddCategory);
+                    roleObject.setAllowDeleteCategory(newAllowDeleteCategory);
+                    roleObject.setAllowEditCategory(newAllowEditCategory);
+                    roleObject.setAllowAddProduct(newAllowAddProduct);
+                    roleObject.setAllowDeleteProduct(newAllowDeleteProduct);
+                    roleObject.setAllowEditProduct(newAllowEditProduct);
+                    roleObject.setLastModified(newLastModified);
+                    roleMap.put(id, roleObject);
                 }
                 
                 return null;
@@ -211,6 +216,7 @@ public abstract class UserManagerModel {
                 isBusyRole.set(true);
                 
                 DBRoles.remove(id);
+                
                 roleMap.remove(id);
                 
                 return null;
@@ -236,36 +242,69 @@ public abstract class UserManagerModel {
             return roleObject;
         }
         
-        HashMap<DBRoles.Column, Object> row = DBRoles.getOne(DBRoles.Column.ID, id);
-        if (row != null) {
-            roleObject = new RoleObject(
-                id,
-                (String) row.get(DBRoles.Column.NAME),
-                (boolean) row.get(
-                    DBRoles.Column.ALLOW_ADD_CATEGORY
-                ),
-                (boolean) row.get(
-                    DBRoles.Column.ALLOW_DELETE_CATEGORY
-                ),
-                (boolean) row.get(
-                    DBRoles.Column.ALLOW_EDIT_CATEGORY
-                ),
-                (boolean) row.get(
-                    DBRoles.Column.ALLOW_ADD_PRODUCT
-                ),
-                (boolean) row.get(
-                    DBRoles.Column.ALLOW_DELETE_PRODUCT
-                ),
-                (boolean) row.get(
-                    DBRoles.Column.ALLOW_EDIT_PRODUCT
-                ),
-                (Timestamp) row.get(DBRoles.Column.LAST_MODIFIED)
-            );
-            roleMap.put(id, roleObject);
-            return roleObject;
+        Task<RoleObject> task = new Task<>() {
+            @Override
+            protected RoleObject call() throws Exception {
+                isBusyRole.set(true);
+                
+                HashMap<DBRoles.Column, Object> row = DBRoles.getOne(
+                    DBRoles.Column.ID,
+                    id
+                );
+                
+                if (row != null) {
+                    RoleObject roleObject = new RoleObject(
+                        id,
+                        (String) row.get(DBRoles.Column.NAME),
+                        (boolean) row.get(
+                            DBRoles.Column.ALLOW_ADD_CATEGORY
+                        ),
+                        (boolean) row.get(
+                            DBRoles.Column.ALLOW_DELETE_CATEGORY
+                        ),
+                        (boolean) row.get(
+                            DBRoles.Column.ALLOW_EDIT_CATEGORY
+                        ),
+                        (boolean) row.get(
+                            DBRoles.Column.ALLOW_ADD_PRODUCT
+                        ),
+                        (boolean) row.get(
+                            DBRoles.Column.ALLOW_DELETE_PRODUCT
+                        ),
+                        (boolean) row.get(
+                            DBRoles.Column.ALLOW_EDIT_PRODUCT
+                        ),
+                        (Timestamp) row.get(DBRoles.Column.LAST_MODIFIED)
+                    );
+                    
+                    roleMap.put(id, roleObject);
+                    
+                    return roleObject;
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyRole.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        
+        try {
+            roleObject = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         
-        return null;
+        return roleObject;
     }
     
     /**
@@ -287,9 +326,6 @@ public abstract class UserManagerModel {
                     int id = (Integer) row.get(DBRoles.Column.ID);
                     // Skip if already added (this shouldn't happen but just to be sure)
                     RoleObject role = roleMap.get(id);
-                    if (role != null) {
-                        continue;
-                    }
                     
                     // Add in list
                     String name = (String) row.get(DBRoles.Column.NAME);
@@ -314,17 +350,31 @@ public abstract class UserManagerModel {
                     Timestamp lastModified = (Timestamp) row.get(
                         DBRoles.Column.LAST_MODIFIED
                     );
-                    roleMap.put(id, new RoleObject(
-                        id,
-                        name,
-                        allowAddCategory,
-                        allowDeleteCategory,
-                        allowEditCategory,
-                        allowAddProduct,
-                        allowDeleteProduct,
-                        allowEditProduct,
-                        lastModified
-                    ));
+                    
+                    if (role == null) {
+                        role = new RoleObject(
+                            id,
+                            name,
+                            allowAddCategory,
+                            allowDeleteCategory,
+                            allowEditCategory,
+                            allowAddProduct,
+                            allowDeleteProduct,
+                            allowEditProduct,
+                            lastModified
+                        );
+                    }
+                    
+                    roleMap.put(id, null);
+                    role.setName(name);
+                    role.setAllowAddProduct(allowAddProduct);
+                    role.setAllowDeleteProduct(allowDeleteProduct);
+                    role.setAllowEditProduct(allowEditProduct);
+                    role.setAllowAddCategory(allowAddCategory);
+                    role.setAllowDeleteCategory(allowDeleteCategory);
+                    role.setAllowEditCategory(allowEditCategory);
+                    role.setLastModified(lastModified);
+                    roleMap.put(id, role);
                 }
                 return null;
             }
@@ -373,7 +423,7 @@ public abstract class UserManagerModel {
         }
         if (
             isDisabled != null &&
-            isDisabled &&
+                isDisabled &&
                 id == UserSessionModel.getCurrentUserID() &&
                 UserSessionModel.currentUserIsOwner()
         ) {
@@ -394,39 +444,36 @@ public abstract class UserManagerModel {
                     isOwner
                 );
                 
-                if (!userMap.containsKey(id)) {
-                    return null;
+                // Update in list if it exists
+                UserObject userObject = userMap.get(id);
+                if (userObject != null) {
+                    String password = (String) user.get(
+                        DBUsers.Column.PASSWORD
+                    );
+                    Timestamp lastActivityDate = (Timestamp) user.get(
+                        DBUsers.Column.LAST_ACTIVITY_DATE
+                    );
+                    int roleID = (Integer) user.get(
+                        DBUsers.Column.ROLE_ID
+                    );
+                    boolean _isDisabled = (boolean) user.get(
+                        DBUsers.Column.IS_DISABLED
+                    );
+                    boolean _isOwner = (boolean) user.get(
+                        DBUsers.Column.IS_OWNER
+                    );
+                    
+                    // remove old object just for the sake of triggering the listeners
+                    userMap.put(id, null);
+                    
+                    // bring back the old user object
+                    userObject.setPassword(password);
+                    userObject.setLastActivityDate(lastActivityDate);
+                    userObject.setRoleID(roleID);
+                    userObject.setDisabled(_isDisabled);
+                    userObject.setOwner(_isOwner);
+                    userMap.put(id, userObject);
                 }
-                
-                String email = (String) user.get(DBUsers.Column.EMAIL);
-                String password = (String) user.get(
-                    DBUsers.Column.PASSWORD
-                );
-                Date joinedDate = (Date) user.get(
-                    DBUsers.Column.JOINED_DATE
-                );
-                Timestamp lastActivityDate = (Timestamp) user.get(
-                    DBUsers.Column.LAST_ACTIVITY_DATE
-                );
-                int roleID = (Integer) user.get(
-                    DBUsers.Column.ROLE_ID
-                );
-                boolean _isDisabled = (boolean) user.get(
-                    DBUsers.Column.IS_DISABLED
-                );
-                boolean _isOwner = (boolean) user.get(
-                    DBUsers.Column.IS_OWNER
-                );
-                userMap.put(id, new UserObject(
-                    id,
-                    email,
-                    password,
-                    joinedDate,
-                    lastActivityDate,
-                    roleID,
-                    _isDisabled,
-                    _isOwner
-                ));
                 
                 return null;
             }
@@ -462,11 +509,7 @@ public abstract class UserManagerModel {
                 
                 for (HashMap<DBUsers.Column, Object> row : userRows) {
                     int id = (Integer) row.get(DBUsers.Column.ID);
-                    // Skip if already added (this shouldn't happen but just to be sure)
                     UserObject user = userMap.get(id);
-                    if (user != null) {
-                        continue;
-                    }
                     
                     // Add in list
                     String email = (String) row.get(DBUsers.Column.EMAIL);
@@ -488,16 +531,27 @@ public abstract class UserManagerModel {
                     boolean isOwner = (boolean) row.get(
                         DBUsers.Column.IS_OWNER
                     );
-                    userMap.put(id, new UserObject(
-                        id,
-                        email,
-                        password,
-                        joinedDate,
-                        lastActivityDate,
-                        roleID,
-                        isDisabled,
-                        isOwner
-                    ));
+                    
+                    if (user == null) {
+                        user = new UserObject(
+                            id,
+                            email,
+                            password,
+                            joinedDate,
+                            lastActivityDate,
+                            roleID,
+                            isDisabled,
+                            isOwner
+                        );
+                    }
+                    
+                    userMap.put(id, null);
+                    user.setPassword(password);
+                    user.setOwner(isOwner);
+                    user.setRoleID(roleID);
+                    user.setDisabled(isDisabled);
+                    user.setLastActivityDate(lastActivityDate);
+                    userMap.put(id, user);
                 }
                 return null;
             }

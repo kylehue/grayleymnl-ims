@@ -1,7 +1,6 @@
 package com.ims.controller;
 
 import com.ims.components.*;
-import com.ims.model.BaseModel;
 import com.ims.model.UserEditModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.UserSessionModel;
@@ -63,7 +62,7 @@ public class UserController {
         roleComboBox.setPrefWidth(300);
         generalTabContentPane.getChildren().add(roleComboBox);
         
-        roleComboBox.setOnSelect(roleObject -> {
+        roleComboBox.addSelectionListener(roleObject -> {
             UserObject currentUser = UserEditModel.currentUser.get();
             UserManagerModel.updateUser(
                 currentUser.getID(),

@@ -36,7 +36,6 @@ public class Product extends GridPane {
     private final MFXButton editButton = new MFXButton();
     
     public Product(ProductObject productObject) {
-        this.setProductObject(productObject);
         this.styleClass.add("card");
         this.styleClass.add("product-container");
         
@@ -122,6 +121,8 @@ public class Product extends GridPane {
         UserSessionModel.currentUser.addListener(e -> {
             updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
         });
+        
+        this.setProductObject(productObject);
     }
     
     private void updateEditPermissions(boolean isAllowed) {

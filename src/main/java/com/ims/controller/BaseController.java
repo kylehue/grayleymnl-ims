@@ -160,9 +160,12 @@ public class BaseController {
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
                 if (needsToBeAdded) {
-                    addProduct(change.getValueAdded());
+                    ProductObject productObject = change.getValueAdded();
+                    if (productObject == null) return;
+                    addProduct(productObject);
                 } else if (needsToBeUpdated) {
                     ProductObject productObject = change.getValueAdded();
+                    if (productObject == null) return;
                     Product oldProduct = products.get(id);
                     oldProduct.setProductObject(productObject);
                 } else if (needsToBeRemoved) {
@@ -194,14 +197,10 @@ public class BaseController {
             String name = addProductModal.nameTextField.getText();
             CategoryObject category = addProductModal.categoryComboBox.getValue();
             
-            ProductObject addedProductObject = null;
-            try {
-                addedProductObject = BaseModel.addProduct(name, category.getID());
-            } catch (ExecutionException ex) {
-                throw new RuntimeException(ex);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
+            ProductObject addedProductObject = BaseModel.addProduct(
+                name,
+                category.getID()
+            );
             
             ProductModel.currentProduct.set(addedProductObject);
             SceneManager.setScene("product");
@@ -343,10 +342,13 @@ public class BaseController {
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
                 if (needsToBeAdded) {
-                    addCategory(change.getValueAdded());
+                    CategoryObject categoryObject = change.getValueAdded();
+                    if (categoryObject == null) return;
+                    addCategory(categoryObject);
                 } else if (needsToBeUpdated) {
                     Category category = categories.get(id);
                     CategoryObject categoryObject = change.getValueAdded();
+                    if (categoryObject == null) return;
                     category.setCategoryObject(categoryObject);
                 } else if (needsToBeRemoved) {
                     removeCategory(id);

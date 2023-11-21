@@ -2,6 +2,9 @@ package com.ims.components;
 
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
+import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
 
 public class RoleComboBox extends ComboBox<Integer, RoleObject> {
     public RoleComboBox() {
@@ -9,6 +12,19 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
         this.setItems(UserManagerModel.roleMap);
         this.setStringifier(RoleObject::getName);
         this.initializeRoleLazyLoad();
+        
+        ChangeListener<String> roleNameListener = (e, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                this.textField.setText(newValue);
+            });
+        };
+        
+        this.addSelectionListener((roleObject, oldRoleObject) -> {
+            if (oldRoleObject != null) {
+                oldRoleObject.nameProperty().removeListener(roleNameListener);
+            }
+            roleObject.nameProperty().addListener(roleNameListener);
+        });
     }
     
     private void initializeRoleLazyLoad() {

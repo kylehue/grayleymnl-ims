@@ -31,7 +31,6 @@ public class Role extends GridPane {
     public final TextFieldValidator nameTextFieldValidator;
     
     public Role(RoleObject roleObject) {
-        this.setRoleObject(roleObject);
         this.styleClass.add("card");
         this.styleClass.add("role-container");
         
@@ -149,9 +148,12 @@ public class Role extends GridPane {
             ).show();
         });
         
-        SceneManager.onChangeScene(($1, $2) -> {
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
+            if (!currentScene.equals("user-manager")) return;
             this.setRoleObject(this.roleObject);
         });
+        
+        this.setRoleObject(roleObject);
     }
     
     public void setRoleObject(RoleObject roleObject) {

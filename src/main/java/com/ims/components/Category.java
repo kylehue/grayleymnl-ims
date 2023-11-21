@@ -24,7 +24,6 @@ public class Category extends GridPane {
     public final MFXButton deleteButton = new MFXButton();
     
     public Category(CategoryObject categoryObject) {
-        this.setCategoryObject(categoryObject);
         this.setCategoryName(categoryObject.getName());
         this.styleClass.add("card");
         this.styleClass.add("category-container");
@@ -66,8 +65,6 @@ public class Category extends GridPane {
         
         Transition.fadeUp(this, 150);
         
-        int id = this.categoryObject.getID();
-        
         deleteButton.setOnMouseClicked((e) -> {
             PopupService.confirmDialog.setup(
                 "Delete Category",
@@ -75,7 +72,7 @@ public class Category extends GridPane {
                 "Delete",
                 true,
                 () -> {
-                    BaseModel.removeCategory(id);
+                    BaseModel.removeCategory(categoryObject.getID());
                     PopupService.confirmDialog.hide();
                 }
             ).show();
@@ -87,7 +84,7 @@ public class Category extends GridPane {
                 return;
             }
 
-            BaseModel.updateCategory(id, this.getCategoryName());
+            BaseModel.updateCategory(categoryObject.getID(), this.getCategoryName());
             
             // PopupService.messageDialog.setup(
             //     "Update Category",
@@ -96,7 +93,8 @@ public class Category extends GridPane {
             // ).show();
         });
         
-        SceneManager.onChangeScene(($1, $2) -> {
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
+            if (!currentScene.equals("base")) return;
             this.setCategoryObject(this.categoryObject);
         });
         
@@ -106,6 +104,8 @@ public class Category extends GridPane {
             updateEditPermissions(UserSessionModel.currentUserIsAllowEditCategory());
             updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteCategory());
         });
+        
+        this.setCategoryObject(categoryObject);
     }
     
     private void updateEditPermissions(boolean isAllowed) {

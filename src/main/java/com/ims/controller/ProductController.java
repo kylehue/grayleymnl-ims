@@ -6,11 +6,14 @@ import com.ims.components.PopupService;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.UserSessionModel;
+import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -163,6 +166,79 @@ public class ProductController {
         productCategoryComboBox.setMaxWidth(300);
         
         ProductModel.currentProduct.addListener(($1, $2, currentProduct) -> {
+            updateContents(currentProduct);
+        });
+        
+        saveAllButton.setOnMouseClicked(e -> {
+            BaseModel.updateProduct(
+                ProductModel.currentProduct.get().getID(),
+                productNameTextField.getText(),
+                Double.parseDouble(productPriceNumberField.textField.getText()),
+                productCategoryComboBox.getValue().getID(),
+                productImageURLTextField.getText(),
+                Integer.parseInt(currentStocksNumberField.textField.getText()),
+                Integer.parseInt(expectedStocksNumberField.textField.getText())
+            );
+            
+            PopupService.messageDialog.setup(
+                "Product Updated",
+                "Product has been successfully updated.",
+                "Got it!"
+            ).show();
+        });
+        
+        backButton.setOnMouseClicked(e -> {
+            goBack();
+        });
+        
+        cancelButton.setOnMouseClicked(e -> {
+            goBack();
+        });
+        
+        deleteProductButton.setOnMouseClicked(e -> {
+            PopupService.confirmDialog.setup(
+                "Delete Product",
+                "Are you sure you want to delete this product?",
+                "Delete",
+                true,
+                () -> {
+                    BaseModel.removeProduct(
+                        ProductModel.currentProduct.get().getID()
+                    );
+                    goBack();
+                    
+                    PopupService.messageDialog.setup(
+                        "Delete Product",
+                        "Product has been deleted.",
+                        "Got it!"
+                    ).show();
+                }
+            ).show();
+        });
+        
+        updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
+        UserSessionModel.currentUser.addListener(e -> {
+            updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
+        });
+        
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
+            if (!currentScene.equals("product")) return;
+            updateContents(ProductModel.currentProduct.get());
+        });
+    }
+    
+    private void updateDeletePermissions(boolean isAllowed) {
+        deleteProductButton.setDisable(!isAllowed);
+    }
+    
+    @FXML
+    public void goBack() {
+        SceneManager.setScene("base");
+        ProductModel.clearState();
+    }
+    
+    private void updateContents(ProductObject currentProduct) {
+        Platform.runLater(() -> {
             String name = currentProduct.getName();
             if (name == null || name.isEmpty()) {
                 productNameTextField.setText("");
@@ -205,61 +281,5 @@ public class ProductController {
                 String.valueOf(expectedStocks)
             );
         });
-        
-        saveAllButton.setOnMouseClicked(e -> {
-            BaseModel.updateProduct(
-                ProductModel.currentProduct.get().getID(),
-                productNameTextField.getText(),
-                Double.parseDouble(productPriceNumberField.textField.getText()),
-                productCategoryComboBox.getValue().getID(),
-                productImageURLTextField.getText(),
-                Integer.parseInt(currentStocksNumberField.textField.getText()),
-                Integer.parseInt(expectedStocksNumberField.textField.getText())
-            );
-        });
-        
-        backButton.setOnMouseClicked(e -> {
-            goBack();
-        });
-        
-        cancelButton.setOnMouseClicked(e -> {
-            goBack();
-        });
-        
-        deleteProductButton.setOnMouseClicked(e -> {
-            PopupService.confirmDialog.setup(
-                "Delete Product",
-                "Are you sure you want to delete this product?",
-                "Delete",
-                true,
-                () -> {
-                    BaseModel.removeProduct(
-                        ProductModel.currentProduct.get().getID()
-                    );
-                    goBack();
-                    
-                    PopupService.messageDialog.setup(
-                        "Delete Product",
-                        "Product has been deleted.",
-                        "Got it!"
-                    ).show();
-                }
-            ).show();
-        });
-        
-        updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
-        UserSessionModel.currentUser.addListener(e -> {
-            updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
-        });
-    }
-    
-    private void updateDeletePermissions(boolean isAllowed) {
-        deleteProductButton.setDisable(!isAllowed);
-    }
-    
-    @FXML
-    public void goBack() {
-        SceneManager.setScene("base");
-        ProductModel.clearState();
     }
 }

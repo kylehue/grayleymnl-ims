@@ -4,6 +4,7 @@ import com.ims.database.DBCategories;
 import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -75,7 +76,7 @@ public abstract class BaseModel {
     public static ProductObject addProduct(
         String name,
         int categoryID
-    ) throws ExecutionException, InterruptedException {
+    ) {
         if (name.isEmpty()) return null;
         if (!UserSessionModel.currentUserIsAllowAddProduct()) {
             System.out.println("The user has insufficient permissions.");
@@ -128,6 +129,7 @@ public abstract class BaseModel {
                 Timestamp newLastModified = (Timestamp) newProduct.get(
                     DBProducts.Column.LAST_MODIFIED
                 );
+                
                 ProductObject productObject = new ProductObject(
                     newID,
                     newName,
@@ -157,7 +159,14 @@ public abstract class BaseModel {
         executor.submit(task);
         executor.shutdown();
         
-        return task.get();
+        ProductObject productObject = null;
+        try {
+            productObject = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return productObject;
     }
     
     /**
@@ -220,16 +229,19 @@ public abstract class BaseModel {
                     Timestamp newLastModified = (Timestamp) newProduct.get(
                         DBProducts.Column.LAST_MODIFIED
                     );
-                    productMap.put(id, new ProductObject(
-                        id,
-                        newName,
-                        newPrice,
-                        newCategoryID,
-                        newImageURL,
-                        newCurrentStocks,
-                        newExpectedStocks,
-                        newLastModified
-                    ));
+                    
+                    // remove old object just for the sake of triggering the listeners
+                    productMap.put(id, null);
+                    
+                    // bring back the old product object
+                    productObject.setName(newName);
+                    productObject.setPrice(newPrice);
+                    productObject.setCategoryID(newCategoryID);
+                    productObject.setImageURL(newImageURL);
+                    productObject.setCurrentStocks(newCurrentStocks);
+                    productObject.setExpectedStocks(newExpectedStocks);
+                    productObject.setLastModified(newLastModified);
+                    productMap.put(id, productObject);
                 }
                 
                 return null;
@@ -267,6 +279,7 @@ public abstract class BaseModel {
                 isBusyProduct.set(true);
                 
                 DBProducts.remove(id);
+                
                 productMap.remove(id);
                 
                 return null;
@@ -307,9 +320,6 @@ public abstract class BaseModel {
                     
                     // Skip if already added (this shouldn't happen but just to be sure)
                     ProductObject product = productMap.get(id);
-                    if (product != null) {
-                        continue;
-                    }
                     
                     // Add in list
                     String name = (String) row.get(
@@ -333,16 +343,29 @@ public abstract class BaseModel {
                     Timestamp lastModified = (Timestamp) row.get(
                         DBProducts.Column.LAST_MODIFIED
                     );
-                    productMap.put(id, new ProductObject(
-                        id,
-                        name,
-                        price,
-                        categoryID,
-                        imageURL,
-                        currentStocks,
-                        expectedStocks,
-                        lastModified
-                    ));
+                    
+                    if (product == null) {
+                        product = new ProductObject(
+                            id,
+                            name,
+                            price,
+                            categoryID,
+                            imageURL,
+                            currentStocks,
+                            expectedStocks,
+                            lastModified
+                        );
+                    }
+                    
+                    productMap.put(id, null);
+                    product.setName(name);
+                    product.setPrice(price);
+                    product.setCategoryID(categoryID);
+                    product.setImageURL(imageURL);
+                    product.setCurrentStocks(currentStocks);
+                    product.setExpectedStocks(expectedStocks);
+                    product.setLastModified(lastModified);
+                    productMap.put(id, product);
                 }
                 return null;
             }
@@ -444,11 +467,14 @@ public abstract class BaseModel {
                 if (categoryObject != null) {
                     String newName = (String) newCategory.get(DBCategories.Column.NAME);
                     Timestamp newLastModified = (Timestamp) newCategory.get(DBCategories.Column.LAST_MODIFIED);
-                    categoryMap.put(id, new CategoryObject(
-                        id,
-                        newName,
-                        newLastModified
-                    ));
+                    
+                    // remove old object just for the sake of triggering the listeners
+                    categoryMap.put(id, null);
+                    
+                    // bring back the old category object
+                    categoryObject.setName(newName);
+                    categoryObject.setLastModified(newLastModified);
+                    categoryMap.put(id, categoryObject);
                 }
                 
                 return null;
@@ -509,18 +535,45 @@ public abstract class BaseModel {
             return categoryObject;
         }
         
-        HashMap<DBCategories.Column, Object> row = DBCategories.getOne(DBCategories.Column.ID, id);
-        if (row != null) {
-            categoryObject = new CategoryObject(
-                id,
-                (String) row.get(DBCategories.Column.NAME),
-                (Timestamp) row.get(DBCategories.Column.LAST_MODIFIED)
-            );
-            categoryMap.put(id, categoryObject);
-            return categoryObject;
+        Task<CategoryObject> task = new Task<>() {
+            @Override
+            protected CategoryObject call() {
+                isBusyCategory.set(true);
+                
+                HashMap<DBCategories.Column, Object> row = DBCategories.getOne(DBCategories.Column.ID, id);
+                if (row != null) {
+                    CategoryObject categoryObject = new CategoryObject(
+                        id,
+                        (String) row.get(DBCategories.Column.NAME),
+                        (Timestamp) row.get(DBCategories.Column.LAST_MODIFIED)
+                    );
+                    categoryMap.put(id, categoryObject);
+                    return categoryObject;
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyCategory.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        
+        try {
+            categoryObject = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         
-        return null;
+        return categoryObject;
     }
     
     /**
@@ -542,18 +595,23 @@ public abstract class BaseModel {
                     int id = (Integer) row.get(DBCategories.Column.ID);
                     // Skip if already added (this shouldn't happen but just to be sure)
                     CategoryObject category = categoryMap.get(id);
-                    if (category != null) {
-                        continue;
-                    }
                     
                     // Add in list
                     String name = (String) row.get(DBCategories.Column.NAME);
                     Timestamp lastModified = (Timestamp) row.get(DBCategories.Column.LAST_MODIFIED);
-                    categoryMap.put(id, new CategoryObject(
-                        id,
-                        name,
-                        lastModified
-                    ));
+                    
+                    if (category == null) {
+                        category = new CategoryObject(
+                            id,
+                            name,
+                            lastModified
+                        );
+                    }
+                    
+                    categoryMap.put(id, null);
+                    category.setName(name);
+                    category.setLastModified(lastModified);
+                    categoryMap.put(id, category);
                 }
                 return null;
             }

@@ -1,18 +1,19 @@
 package com.ims.model.objects;
 
+import javafx.beans.property.*;
+
 import java.sql.Date;
 import java.sql.Timestamp;
 
 public class UserObject {
-    
-    private int id;
-    private String email;
-    private String password;
-    private Date joinedDate;
-    private Timestamp lastActivityDate;
-    private int roleID;
-    private boolean isDisabled;
-    private boolean isOwner;
+    private final int id;
+    private final String email;
+    private final Date joinedDate;
+    private final StringProperty password;
+    private final ObjectProperty<Timestamp> lastActivityDate;
+    private final IntegerProperty roleID;
+    private final BooleanProperty isDisabled;
+    private final BooleanProperty isOwner;
     
     public UserObject(
         int id,
@@ -26,12 +27,12 @@ public class UserObject {
     ) {
         this.id = id;
         this.email = email;
-        this.password = password;
         this.joinedDate = joinedDate;
-        this.lastActivityDate = lastActivityDate;
-        this.roleID = roleID;
-        this.isDisabled = isDisabled;
-        this.isOwner = isOwner;
+        this.password = new SimpleStringProperty(password);
+        this.lastActivityDate = new SimpleObjectProperty<>(lastActivityDate);
+        this.roleID = new SimpleIntegerProperty(roleID);
+        this.isDisabled = new SimpleBooleanProperty(isDisabled);
+        this.isOwner = new SimpleBooleanProperty(isOwner);
     }
     
     public int getID() {
@@ -42,31 +43,67 @@ public class UserObject {
         return email;
     }
     
-    public String getPassword() {
+    public StringProperty passwordProperty() {
         return password;
+    }
+    
+    public String getPassword() {
+        return password.get();
+    }
+    
+    public void setPassword(String password) {
+        this.password.set(password);
     }
     
     public Date getJoinedDate() {
         return joinedDate;
     }
     
-    public Timestamp getLastActivityDate() {
+    public ObjectProperty<Timestamp> lastActivityDateProperty() {
         return lastActivityDate;
     }
     
-    public int getRoleID() {
+    public Timestamp getLastActivityDate() {
+        return lastActivityDate.get();
+    }
+    
+    public void setLastActivityDate(Timestamp lastActivityDate) {
+        this.lastActivityDate.set(lastActivityDate);
+    }
+    
+    public IntegerProperty roleIDProperty() {
         return roleID;
     }
     
-    public boolean isDisabled() {
+    public int getRoleID() {
+        return roleID.get();
+    }
+    
+    public void setRoleID(int roleID) {
+        this.roleID.set(roleID);
+    }
+    
+    public BooleanProperty isDisabledProperty() {
         return isDisabled;
     }
     
+    public boolean isDisabled() {
+        return isDisabled.get();
+    }
+    
     public void setDisabled(boolean disabled) {
-        isDisabled = disabled;
+        isDisabled.set(disabled);
+    }
+    
+    public BooleanProperty isOwnerProperty() {
+        return isOwner;
     }
     
     public boolean isOwner() {
-        return isOwner;
+        return isOwner.get();
+    }
+    
+    public void setOwner(boolean owner) {
+        isOwner.set(owner);
     }
 }

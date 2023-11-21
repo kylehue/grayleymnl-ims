@@ -13,7 +13,6 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.*;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -23,6 +22,7 @@ import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ComboBox<K, V> extends StackPane {
@@ -32,7 +32,8 @@ public class ComboBox<K, V> extends StackPane {
     private final Dropdown<K> dropdown = new Dropdown<>();
     private Stringifier<V> stringifier = Object::toString;
     private V value = null;
-    private SelectEvent<V> selectEvent = null;
+    private final ArrayList<SelectEvent<V>> selectListeners = new ArrayList<>();
+    private final ArrayList<Select2Event<V>> select2Listeners = new ArrayList<>();
     
     public ComboBox() {
         // Set up the TextField
@@ -113,8 +114,16 @@ public class ComboBox<K, V> extends StackPane {
         void call(T item);
     }
     
-    public void setOnSelect(SelectEvent<V> selectEvent) {
-        this.selectEvent = selectEvent;
+    public interface Select2Event<T> {
+        void call(T newItem, T oldItem);
+    }
+    
+    public void addSelectionListener(SelectEvent<V> selectEvent) {
+        this.selectListeners.add(selectEvent);
+    }
+    
+    public void addSelectionListener(Select2Event<V> selectEvent) {
+        this.select2Listeners.add(selectEvent);
     }
     
     public void setValue(V value) {
@@ -122,9 +131,12 @@ public class ComboBox<K, V> extends StackPane {
             this.clearValue();
             return;
         }
+        if (value == this.value) return;
+        V oldValue = this.value;
         this.value = value;
         this.textField.setText(this.stringifier.call(this.value));
         textField.positionCaret(textField.getText().length());
+        this.triggerSelectListeners(value, oldValue);
     }
     
     public V getValue() {
@@ -132,17 +144,26 @@ public class ComboBox<K, V> extends StackPane {
     }
     
     public void addItem(K id, V item) {
+        if (items.containsKey(id)) return;
         Platform.runLater(() -> {
             items.put(id, item);
             MFXButton button = dropdown.addItem(id, this.stringifier.call(item));
             button.setOnMouseClicked(e -> {
+                V oldItem = this.getValue();
                 this.setValue(item);
-                if (this.selectEvent != null) {
-                    this.selectEvent.call(item);
-                }
+                this.triggerSelectListeners(item, oldItem);
                 dropdown.hide();
             });
         });
+    }
+    
+    private void triggerSelectListeners(V item, V oldItem) {
+        for (SelectEvent<V> listener : this.selectListeners) {
+            listener.call(item);
+        }
+        for (Select2Event<V> listener : this.select2Listeners) {
+            listener.call(item, oldItem);
+        }
     }
     
     public void removeItem(K id) {
@@ -168,9 +189,13 @@ public class ComboBox<K, V> extends StackPane {
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
                 if (needsToBeAdded) {
-                    this.addItem(id, change.getValueAdded());
+                    V obj = change.getValueAdded();
+                    if (obj == null) return;
+                    this.addItem(id, obj);
                 } else if (needsToBeUpdated) {
-                    this.updateItem(id, change.getValueAdded());
+                    V obj = change.getValueAdded();
+                    if (obj == null) return;
+                    this.updateItem(id, obj);
                 } else if (needsToBeRemoved) {
                     this.removeItem(id);
                 }

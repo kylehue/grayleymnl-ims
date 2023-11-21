@@ -1,16 +1,18 @@
 package com.ims.model.objects;
 
+import javafx.beans.property.*;
+
 import java.sql.Timestamp;
 
 public class ProductObject {
     private final int id;
-    private final String name;
-    private final double price;
-    private final int categoryID;
-    private final String imageURL;
-    private final int currentStocks;
-    private final int expectedStocks;
-    private final Timestamp lastModified;
+    private final StringProperty name;
+    private final DoubleProperty price;
+    private final IntegerProperty categoryID;
+    private final StringProperty imageURL;
+    private final IntegerProperty currentStocks;
+    private final IntegerProperty expectedStocks;
+    private final ObjectProperty<Timestamp> lastModified;
     
     public ProductObject(
         int id,
@@ -23,44 +25,100 @@ public class ProductObject {
         Timestamp lastModified
     ) {
         this.id = id;
-        this.name = name;
-        this.price = price;
-        this.categoryID = categoryID;
-        this.imageURL = imageURL;
-        this.currentStocks = currentStocks;
-        this.expectedStocks = expectedStocks;
-        this.lastModified = lastModified;
+        this.name = new SimpleStringProperty(name);
+        this.price = new SimpleDoubleProperty(price);
+        this.categoryID = new SimpleIntegerProperty(categoryID);
+        this.imageURL = new SimpleStringProperty(imageURL);
+        this.currentStocks = new SimpleIntegerProperty(currentStocks);
+        this.expectedStocks = new SimpleIntegerProperty(expectedStocks);
+        this.lastModified = new SimpleObjectProperty<>(lastModified);
     }
     
     public int getID() {
         return id;
     }
     
-    public String getName() {
+    public StringProperty nameProperty() {
         return name;
     }
     
-    public int getCategoryID() {
+    public String getName() {
+        return name.get();
+    }
+    
+    public void setName(String name) {
+        this.name.set(name);
+    }
+    
+    public IntegerProperty categoryIDProperty() {
         return categoryID;
     }
     
-    public String getImageURL() {
+    public int getCategoryID() {
+        return categoryID.get();
+    }
+    
+    public void setCategoryID(int categoryID) {
+        this.categoryID.set(categoryID);
+    }
+    
+    public StringProperty imageURLProperty() {
         return imageURL;
     }
     
-    public int getCurrentStocks() {
+    public String getImageURL() {
+        return imageURL.get();
+    }
+    
+    public void setImageURL(String imageURL) {
+        this.imageURL.set(imageURL);
+    }
+    
+    public IntegerProperty currentStocksProperty() {
         return currentStocks;
     }
     
-    public int getExpectedStocks() {
+    public int getCurrentStocks() {
+        return currentStocks.get();
+    }
+    
+    public void setCurrentStocks(int currentStocks) {
+        this.currentStocks.set(currentStocks);
+    }
+    
+    public IntegerProperty expectedStocksProperty() {
         return expectedStocks;
     }
     
-    public Timestamp getLastModified() {
+    public int getExpectedStocks() {
+        return expectedStocks.get();
+    }
+    
+    public void setExpectedStocks(int expectedStocks) {
+        this.expectedStocks.set(expectedStocks);
+    }
+    
+    public ObjectProperty<Timestamp> lastModifiedProperty() {
         return lastModified;
     }
     
-    public double getPrice() {
+    public Timestamp getLastModified() {
+        return lastModified.get();
+    }
+    
+    public void setLastModified(Timestamp lastModified) {
+        this.lastModified.set(lastModified);
+    }
+    
+    public DoubleProperty priceProperty() {
         return price;
+    }
+    
+    public double getPrice() {
+        return price.get();
+    }
+    
+    public void setPrice(double price) {
+        this.price.set(price);
     }
 }

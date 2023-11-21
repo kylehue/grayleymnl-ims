@@ -57,10 +57,13 @@ public class UserManagerController {
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
                 if (needsToBeAdded) {
-                    addRole(change.getValueAdded());
+                    RoleObject roleObject = change.getValueAdded();
+                    if (roleObject == null) return;
+                    addRole(roleObject);
                 } else if (needsToBeUpdated) {
                     Role role = roles.get(id);
                     RoleObject roleObject = change.getValueAdded();
+                    if (roleObject == null) return;
                     role.setRoleObject(roleObject);
                 } else if (needsToBeRemoved) {
                     removeRole(id);
@@ -179,10 +182,13 @@ public class UserManagerController {
                 boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
                 boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
                 if (needsToBeAdded) {
-                    addUser(change.getValueAdded());
+                    UserObject userObject = change.getValueAdded();
+                    if (userObject == null) return;
+                    addUser(userObject);
                 } else if (needsToBeUpdated) {
                     User user = users.get(id);
                     UserObject userObject = change.getValueAdded();
+                    if (userObject == null) return;
                     user.setUserObject(userObject);
                 } else if (needsToBeRemoved) {
                     removeUser(id);
