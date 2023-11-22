@@ -27,4 +27,7 @@ public class TagButton extends MFXButton {
         }
     }
     
+    public boolean isActive() {
+        return isActive;
+    }
 }

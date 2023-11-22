@@ -2,6 +2,7 @@ package com.ims.database;
 
 import com.ims.Config;
 
+import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -277,7 +278,8 @@ public class DBProducts {
     }
     
     public static ArrayList<HashMap<Column, Object>> search(
-        String regexPattern
+        String regexPattern,
+        String... categories
     ) {
         ArrayList<HashMap<Column, Object>> rows = null;
         ResultSet resultSet = null;
@@ -285,16 +287,24 @@ public class DBProducts {
         
         try {
             String query = """
-                SELECT * FROM products
+                SELECT p.*, c.name FROM products p
+                JOIN categories c
+                ON p.category_id = c.id
                 WHERE CONCAT(
-                	name,
-                	(SELECT name FROM categories WHERE id=category_id),
-                	current_stocks,
-                	expected_stocks,
-                	price
+                    p.name,
+                    c.name,
+                    p.current_stocks,
+                    p.expected_stocks,
+                    p.price
                 ) ~* ?
-                ORDER BY last_modified DESC, id;
-                """;
+                %s
+                ORDER BY p.last_modified DESC, p.id;
+                """.formatted(
+                    categories.length == 0 ? "" :
+                        "AND c.name IN (%s)".formatted(
+                            "'" + String.join("', '", categories) + "'"
+                        )
+            );
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();

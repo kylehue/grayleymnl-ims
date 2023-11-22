@@ -224,19 +224,20 @@ public abstract class BaseModel {
         executor.shutdown();
     }
     
-    public static void searchProducts(String searchText) {
+    public static void searchProducts(String searchText, String... categories) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
                 productMap.clear();
-                if (searchText.isEmpty()) {
+                if (searchText.isEmpty() && categories.length == 0) {
                     loadProducts(Config.productLoadLimit);
                     return null;
                 }
                 
                 String searchPattern = Utils.textToSearchPattern(searchText);
                 ArrayList<HashMap<DBProducts.Column, Object>> result = DBProducts.search(
-                    searchPattern
+                    searchPattern,
+                    categories
                 );
                 
                 for (HashMap<DBProducts.Column, Object> row : result) {

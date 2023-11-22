@@ -233,6 +233,7 @@ public class BaseController {
             // Load products whenever the scrollbar hits the bottom.
             productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
                 if (!searchProductTextField.getText().isEmpty()) return;
+                if (!getAllActiveCategoryTags().isEmpty()) return;
                 if (scrollValue.doubleValue() == 1) {
                     BaseModel.loadProducts(Config.productLoadLimit / 3);
                 }
@@ -242,6 +243,7 @@ public class BaseController {
             // So here, we add components until the scroll pane gets a scrollbar.
             productsScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
                 if (!searchProductTextField.getText().isEmpty()) return;
+                if (!getAllActiveCategoryTags().isEmpty()) return;
                 double contentHeight = productsFlowPane.getBoundsInLocal().getHeight();
                 double viewportHeight = newValue.getHeight();
                 if (contentHeight < viewportHeight) {
@@ -255,7 +257,19 @@ public class BaseController {
         });
     }
     
-    private TagButton addCategoryTag(CategoryObject categoryObject, boolean isActive) {
+    ArrayList<CategoryTagButton> categoryTagButtons = new ArrayList<>();
+    
+    private ArrayList<String> getAllActiveCategoryTags() {
+        ArrayList<String> res = new ArrayList<>();
+        for (CategoryTagButton categoryTagButton : categoryTagButtons) {
+            if (!categoryTagButton.isActive()) continue;
+            res.add(categoryTagButton.getCategoryName());
+        }
+        
+        return res;
+    }
+    
+    private void addCategoryTag(CategoryObject categoryObject, boolean isActive) {
         CategoryTagButton categoryButton = new CategoryTagButton(categoryObject);
         
         Platform.runLater(() -> {
@@ -263,10 +277,16 @@ public class BaseController {
             if (productsCategoriesFlowPane.getChildren().size() < CATEGORY_TAG_LIMIT) {
                 categoryButton.setActive(isActive);
                 productsCategoriesFlowPane.getChildren().add(categoryButton);
+                categoryButton.setOnMouseClicked(e -> {
+                    BaseModel.searchProducts(
+                        searchProductTextField.getText(),
+                        getAllActiveCategoryTags().toArray(new String[0])
+                    );
+                });
+                
+                categoryTagButtons.add(categoryButton);
             }
         });
-        
-        return categoryButton;
     }
     
     private void addProduct(
@@ -399,6 +419,7 @@ public class BaseController {
             
             // Load categories whenever the scrollbar hits the bottom.
             categoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+                if (!searchCategoryTextField.getText().isEmpty()) return;
                 if (scrollValue.doubleValue() == 1) {
                     BaseModel.loadCategories(12);
                 }
@@ -407,6 +428,7 @@ public class BaseController {
             // The listener above won't work if there is no scrollbar.
             // So here, we add components until the scroll pane gets a scrollbar.
             categoriesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+                if (!searchCategoryTextField.getText().isEmpty()) return;
                 double contentHeight = categoriesFlowPane.getBoundsInLocal().getHeight();
                 double viewportHeight = newValue.getHeight();
                 if (contentHeight < viewportHeight) {

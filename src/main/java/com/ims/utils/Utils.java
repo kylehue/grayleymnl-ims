@@ -85,6 +85,7 @@ public abstract class Utils {
     }
     
     public static String textToSearchPattern(String text) {
+        if (text.isEmpty()) return "";
         String searchPattern = text;
         searchPattern = text.replaceAll("\\s", "");
         searchPattern = searchPattern.replaceAll("(.)", "$1.*");
