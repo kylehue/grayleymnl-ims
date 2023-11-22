@@ -48,10 +48,14 @@ public class TextFieldValidator {
         });
     }
     
+    public interface ValidityChecker {
+        boolean call();
+    }
+    
     public Constraint addConstraint(
         Severity severity,
         String invalidMessage,
-        Callable<Boolean> validityChecker,
+        ValidityChecker validityChecker,
         Observable... dependencies
     ) {
         Constraint constraint = new Constraint(
@@ -77,6 +81,12 @@ public class TextFieldValidator {
         return constraint;
     }
     
+    public void validate() {
+        for (Constraint constraint : constraints) {
+            constraint.validate();
+        }
+    }
+    
     private void resetConstraints() {
         for (Constraint constraint : constraints) {
             constraint.validProperty.set(true);
@@ -89,6 +99,7 @@ public class TextFieldValidator {
     }
     
     public boolean isValid() {
+        this.validate();
         return this.validProperty.get() && this.getInvalidConstraint() == null;
     }
     
@@ -176,24 +187,27 @@ public class TextFieldValidator {
         public final BooleanProperty validProperty = new SimpleBooleanProperty(true);
         private final TextFieldValidator.Severity severity;
         private final String invalidMessage;
+        private final ValidityChecker validityChecker;
         
         public Constraint(
             TextFieldValidator.Severity severity,
             String invalidMessage,
-            Callable<Boolean> validityChecker,
+            ValidityChecker validityChecker,
             Observable... dependencies
         ) {
             this.severity = severity;
             this.invalidMessage = invalidMessage;
+            this.validityChecker = validityChecker;
             for (Observable dep : dependencies) {
                 dep.addListener((e) -> {
-                    try {
-                        this.validProperty.set(validityChecker.call());
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    this.validate();
                 });
             }
+        }
+        
+        public boolean validate() {
+            this.validProperty.set(validityChecker.call());
+            return this.validProperty.get();
         }
         
         public String getInvalidMessage() {
