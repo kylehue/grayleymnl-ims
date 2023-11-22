@@ -167,10 +167,6 @@ public abstract class UserManagerModel {
                         DBRoles.Column.LAST_MODIFIED
                     );
                     
-                    // remove old object just for the sake of triggering the listeners
-                    roleMap.put(id, null);
-                    
-                    // bring back the old role object
                     roleObject.setName(newName);
                     roleObject.setAllowAddCategory(newAllowAddCategory);
                     roleObject.setAllowDeleteCategory(newAllowDeleteCategory);
@@ -179,7 +175,6 @@ public abstract class UserManagerModel {
                     roleObject.setAllowDeleteProduct(newAllowDeleteProduct);
                     roleObject.setAllowEditProduct(newAllowEditProduct);
                     roleObject.setLastModified(newLastModified);
-                    roleMap.put(id, roleObject);
                 }
                 
                 return null;
@@ -363,18 +358,17 @@ public abstract class UserManagerModel {
                             allowEditProduct,
                             lastModified
                         );
+                        roleMap.put(id, role);
+                    } else {
+                        role.setName(name);
+                        role.setAllowAddProduct(allowAddProduct);
+                        role.setAllowDeleteProduct(allowDeleteProduct);
+                        role.setAllowEditProduct(allowEditProduct);
+                        role.setAllowAddCategory(allowAddCategory);
+                        role.setAllowDeleteCategory(allowDeleteCategory);
+                        role.setAllowEditCategory(allowEditCategory);
+                        role.setLastModified(lastModified);
                     }
-                    
-                    roleMap.put(id, null);
-                    role.setName(name);
-                    role.setAllowAddProduct(allowAddProduct);
-                    role.setAllowDeleteProduct(allowDeleteProduct);
-                    role.setAllowEditProduct(allowEditProduct);
-                    role.setAllowAddCategory(allowAddCategory);
-                    role.setAllowDeleteCategory(allowDeleteCategory);
-                    role.setAllowEditCategory(allowEditCategory);
-                    role.setLastModified(lastModified);
-                    roleMap.put(id, role);
                 }
                 return null;
             }
@@ -463,16 +457,11 @@ public abstract class UserManagerModel {
                         DBUsers.Column.IS_OWNER
                     );
                     
-                    // remove old object just for the sake of triggering the listeners
-                    userMap.put(id, null);
-                    
-                    // bring back the old user object
                     userObject.setPassword(password);
                     userObject.setLastActivityDate(lastActivityDate);
                     userObject.setRoleID(roleID);
                     userObject.setDisabled(_isDisabled);
                     userObject.setOwner(_isOwner);
-                    userMap.put(id, userObject);
                 }
                 
                 return null;
@@ -543,15 +532,14 @@ public abstract class UserManagerModel {
                             isDisabled,
                             isOwner
                         );
+                        userMap.put(id, user);
+                    } else {
+                        user.setPassword(password);
+                        user.setOwner(isOwner);
+                        user.setRoleID(roleID);
+                        user.setDisabled(isDisabled);
+                        user.setLastActivityDate(lastActivityDate);
                     }
-                    
-                    userMap.put(id, null);
-                    user.setPassword(password);
-                    user.setOwner(isOwner);
-                    user.setRoleID(roleID);
-                    user.setDisabled(isDisabled);
-                    user.setLastActivityDate(lastActivityDate);
-                    userMap.put(id, user);
                 }
                 return null;
             }

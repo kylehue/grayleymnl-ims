@@ -9,6 +9,7 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
+import javafx.beans.property.Property;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.*;
@@ -29,7 +30,7 @@ public class ComboBox<K, V> extends StackPane {
     public final MFXTextField textField = new MFXTextField();
     private final MFXButton toggleDropDownButton = new MFXButton("");
     private final HashMap<K, V> items = new HashMap<>();
-    private final Dropdown<K> dropdown = new Dropdown<>();
+    protected final Dropdown<K> dropdown = new Dropdown<>();
     private Stringifier<V> stringifier = Object::toString;
     private V value = null;
     private final ArrayList<SelectEvent<V>> selectListeners = new ArrayList<>();
@@ -143,17 +144,32 @@ public class ComboBox<K, V> extends StackPane {
         return value;
     }
     
+    private MFXButton _addItem(K id, V item) {
+        items.put(id, item);
+        MFXButton button = dropdown.addItem(id, this.stringifier.call(item));
+        button.setOnMouseClicked(e -> {
+            V oldItem = this.getValue();
+            this.setValue(item);
+            this.triggerSelectListeners(item, oldItem);
+            dropdown.hide();
+        });
+        return button;
+    }
+    
     public void addItem(K id, V item) {
         Platform.runLater(() -> {
             if (items.containsKey(id)) return;
-            items.put(id, item);
-            MFXButton button = dropdown.addItem(id, this.stringifier.call(item));
-            button.setOnMouseClicked(e -> {
-                V oldItem = this.getValue();
-                this.setValue(item);
-                this.triggerSelectListeners(item, oldItem);
-                dropdown.hide();
-            });
+            this._addItem(id, item);
+        });
+    }
+    
+    public void addItem(K id, V item, Property<String> textProperty) {
+        Platform.runLater(() -> {
+            if (items.containsKey(id)) return;
+            MFXButton button = this._addItem(id, item);
+            if (textProperty != null) {
+                button.textProperty().bind(textProperty);
+            }
         });
     }
     
@@ -180,23 +196,21 @@ public class ComboBox<K, V> extends StackPane {
         });
     }
     
-    public void setItems(ObservableMap<K, V> map) {
+    public void _setItems(
+        ObservableMap<K, V> map,
+        TextPropertyGetter<V> textPropertyGetter
+    ) {
         map.addListener(
             (MapChangeListener<K, V>) change -> {
                 K id = change.getKey();
-                boolean isAddedAlready = items.get(id) != null;
-                boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
-                boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
-                boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
-                if (needsToBeAdded) {
+                if (change.wasAdded()) {
                     V obj = change.getValueAdded();
-                    if (obj == null) return;
-                    this.addItem(id, obj);
-                } else if (needsToBeUpdated) {
-                    V obj = change.getValueAdded();
-                    if (obj == null) return;
-                    this.updateItem(id, obj);
-                } else if (needsToBeRemoved) {
+                    if (textPropertyGetter == null) {
+                        this.addItem(id, obj);
+                    } else {
+                        this.addItem(id, obj, textPropertyGetter.call(obj));
+                    }
+                } else if (change.wasRemoved()) {
                     this.removeItem(id);
                 }
             }
@@ -204,8 +218,28 @@ public class ComboBox<K, V> extends StackPane {
         
         for (K key : map.keySet()) {
             if (this.items.get(key) != null) continue;
-            this.addItem(key, map.get(key));
+            V obj = map.get(key);
+            if (textPropertyGetter == null) {
+                this.addItem(key, obj);
+            } else {
+                this.addItem(key, obj, textPropertyGetter.call(obj));
+            }
         }
+    }
+    
+    public void setItems(ObservableMap<K, V> map) {
+        this._setItems(map, null);
+    }
+    
+    public interface TextPropertyGetter<V> {
+        Property<String> call(V obj);
+    }
+    
+    public void setItems(
+        ObservableMap<K, V> map,
+        TextPropertyGetter<V> textPropertyGetter
+    ) {
+        this._setItems(map, textPropertyGetter);
     }
     
     public MFXScrollPane getDropDownScrollPane() {
@@ -216,7 +250,7 @@ public class ComboBox<K, V> extends StackPane {
         return this.dropdown.getContainer();
     }
     
-    private static class Dropdown<K> extends Popup {
+    protected static class Dropdown<K> extends Popup {
         private final VBox container = new VBox();
         private final MFXScrollPane scrollPane = new MFXScrollPane();
         private final HashMap<K, MFXButton> itemMap = new HashMap<>();

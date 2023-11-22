@@ -9,7 +9,7 @@ import javafx.beans.value.ChangeListener;
 public class RoleComboBox extends ComboBox<Integer, RoleObject> {
     public RoleComboBox() {
         this.textField.setFloatingText("Role");
-        this.setItems(UserManagerModel.roleMap);
+        this.setItems(UserManagerModel.roleMap, RoleObject::nameProperty);
         this.setStringifier(RoleObject::getName);
         this.initializeRoleLazyLoad();
         
@@ -28,6 +28,14 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
     }
     
     private void initializeRoleLazyLoad() {
+        // First of all, we have to add the roles in the model
+        for (int id : UserManagerModel.roleMap.keySet()) {
+            RoleObject roleObject = UserManagerModel.roleMap.get(id);
+            Platform.runLater(() -> {
+                this.addItem(id, roleObject);
+            });
+        }
+        
         // Load roles whenever the scrollbar hits the bottom.
         this.getDropDownScrollPane().vvalueProperty().addListener(
             ($1, $2, scrollValue) -> {

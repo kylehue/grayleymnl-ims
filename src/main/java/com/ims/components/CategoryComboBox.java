@@ -2,17 +2,40 @@ package com.ims.components;
 
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
-import com.ims.utils.LayoutUtils;
+import com.ims.model.objects.RoleObject;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 
 public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
     public CategoryComboBox() {
         this.textField.setFloatingText("Category");
-        this.setItems(BaseModel.categoryMap);
+        this.setItems(BaseModel.categoryMap, CategoryObject::nameProperty);
         this.setStringifier(CategoryObject::getName);
-        this.initilizeCategoryLazyLoad();
+        this.initializeCategoryLazyLoad();
+        
+        ChangeListener<String> categoryNameListener = (e, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                this.textField.setText(newValue);
+            });
+        };
+        
+        this.addSelectionListener((categoryObject, oldCategoryObject) -> {
+            if (oldCategoryObject != null) {
+                oldCategoryObject.nameProperty().removeListener(categoryNameListener);
+            }
+            categoryObject.nameProperty().addListener(categoryNameListener);
+        });
     }
     
-    private void initilizeCategoryLazyLoad() {
+    private void initializeCategoryLazyLoad() {
+        // First of all, we have to add the categories in the model
+        for (int id : BaseModel.categoryMap.keySet()) {
+            CategoryObject categoryObject = BaseModel.categoryMap.get(id);
+            Platform.runLater(() -> {
+                this.addItem(id, categoryObject);
+            });
+        }
+        
         // Load categories whenever the scrollbar hits the bottom.
         this.getDropDownScrollPane().vvalueProperty().addListener(
             ($1, $2, scrollValue) -> {

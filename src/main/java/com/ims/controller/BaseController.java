@@ -23,7 +23,6 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Pair;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 import com.ims.utils.LayoutUtils;
 
@@ -155,20 +154,10 @@ public class BaseController {
         BaseModel.productMap.addListener(
             (MapChangeListener<Integer, ProductObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = products.containsKey(id);
-                boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
-                boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
-                boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
-                if (needsToBeAdded) {
+                if (change.wasAdded()) {
                     ProductObject productObject = change.getValueAdded();
-                    if (productObject == null) return;
                     addProduct(productObject);
-                } else if (needsToBeUpdated) {
-                    ProductObject productObject = change.getValueAdded();
-                    if (productObject == null) return;
-                    Product oldProduct = products.get(id);
-                    oldProduct.setProductObject(productObject);
-                } else if (needsToBeRemoved) {
+                } else if (change.wasRemoved()) {
                     removeProduct(id);
                 }
             }
@@ -223,6 +212,15 @@ public class BaseController {
      * Autoload products whenever needed.
      */
     private void initializeProductLazyLoad() {
+        // First of all, we have to add the products in the model
+        for (int id : BaseModel.productMap.keySet()) {
+            ProductObject productObject = BaseModel.productMap.get(id);
+            if (productObject == null) return;
+            Platform.runLater(() -> {
+                addProduct(productObject);
+            });
+        }
+        
         // Load products whenever the scrollbar hits the bottom.
         productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
             if (scrollValue.doubleValue() == 1) {
@@ -245,24 +243,26 @@ public class BaseController {
         BaseModel.loadProducts(9);
     }
     
-    private TagButton addCategoryTag(String categoryName, boolean isActive) {
-        TagButton categoryButton = new TagButton();
+    private TagButton addCategoryTag(CategoryObject categoryObject, boolean isActive) {
+        CategoryTagButton categoryButton = new CategoryTagButton(categoryObject);
         
         Platform.runLater(() -> {
-            categoryButton.setText(categoryName);
-            categoryButton.setActive(isActive);
-            productsCategoriesFlowPane.getChildren().add(categoryButton);
+            final int CATEGORY_TAG_LIMIT = 12;
+            if (productsCategoriesFlowPane.getChildren().size() < CATEGORY_TAG_LIMIT) {
+                categoryButton.setActive(isActive);
+                productsCategoriesFlowPane.getChildren().add(categoryButton);
+            }
         });
         
         return categoryButton;
     }
     
-    private Product addProduct(
+    private void addProduct(
         ProductObject productObject
     ) {
-        Product product = new Product(productObject);
         Platform.runLater(() -> {
             if (this.products.containsKey(productObject.getID())) return;
+            Product product = new Product(productObject);
             this.products.put(productObject.getID(), product);
             int index = this.getSortedProducts().indexOf(product);
             productsFlowPane.getChildren().add(
@@ -271,11 +271,7 @@ public class BaseController {
             );
             
             product.setName(productObject.getName());
-            product.setCategory(
-                BaseModel.loadAndGetCategory(
-                    productObject.getCategoryID()
-                ).getName()
-            );
+            product.setCategory(productObject.getCategoryID());
             product.setStocks(
                 productObject.getCurrentStocks(),
                 productObject.getExpectedStocks()
@@ -283,7 +279,6 @@ public class BaseController {
             product.setPrice((float) productObject.getPrice());
             product.setImage(productObject.getImageURL());
         });
-        return product;
     }
     
     private void removeProduct(int id) {
@@ -342,20 +337,10 @@ public class BaseController {
         BaseModel.categoryMap.addListener(
             (MapChangeListener<Integer, CategoryObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = categories.containsKey(id);
-                boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
-                boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
-                boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
-                if (needsToBeAdded) {
+                if (change.wasAdded()) {
                     CategoryObject categoryObject = change.getValueAdded();
-                    if (categoryObject == null) return;
                     addCategory(categoryObject);
-                } else if (needsToBeUpdated) {
-                    Category category = categories.get(id);
-                    CategoryObject categoryObject = change.getValueAdded();
-                    if (categoryObject == null) return;
-                    category.setCategoryObject(categoryObject);
-                } else if (needsToBeRemoved) {
+                } else if (change.wasRemoved()) {
                     removeCategory(id);
                 }
             }
@@ -389,6 +374,15 @@ public class BaseController {
      * Autoload categories whenever needed.
      */
     private void initializeCategoryLazyLoad() {
+        // First of all, we have to add the categories in the model
+        for (int id : BaseModel.categoryMap.keySet()) {
+            CategoryObject categoryObject = BaseModel.categoryMap.get(id);
+            if (categoryObject == null) return;
+            Platform.runLater(() -> {
+                addCategory(categoryObject);
+            });
+        }
+        
         // Load categories whenever the scrollbar hits the bottom.
         categoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
             if (scrollValue.doubleValue() == 1) {
@@ -411,11 +405,11 @@ public class BaseController {
         BaseModel.loadCategories(12);
     }
     
-    private Category addCategory(CategoryObject categoryObject) {
-        Category category = new Category(categoryObject);
-        int id = categoryObject.getID();
+    private void addCategory(CategoryObject categoryObject) {
         Platform.runLater(() -> {
-            if (this.categories.containsKey(categoryObject.getID())) return;
+            int id = categoryObject.getID();
+            if (this.categories.containsKey(id)) return;
+            Category category = new Category(categoryObject);
             this.categories.put(id, category);
             int index = this.getSortedCategories().indexOf(category);
             categoriesFlowPane.getChildren().add(
@@ -423,13 +417,9 @@ public class BaseController {
                 category
             );
             
-            final int CATEGORY_TAG_LIMIT = 12;
-            if (productsCategoriesFlowPane.getChildren().size() < CATEGORY_TAG_LIMIT) {
-                addCategoryTag(category.getCategoryName(), false);
-            }
+            addCategoryTag(categoryObject, false);
         });
         
-        return category;
     }
     
     private void removeCategory(int id) {

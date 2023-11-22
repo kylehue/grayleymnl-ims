@@ -10,6 +10,7 @@ import com.ims.utils.TextFieldValidator;
 import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -83,7 +84,7 @@ public class Category extends GridPane {
             if (!this.nameTextFieldValidator.isValid()) {
                 return;
             }
-
+            
             BaseModel.updateCategory(categoryObject.getID(), this.getCategoryName());
             
             // PopupService.messageDialog.setup(

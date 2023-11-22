@@ -1,7 +1,6 @@
 package com.ims.controller;
 
 import com.ims.components.*;
-import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
@@ -52,20 +51,10 @@ public class UserManagerController {
         UserManagerModel.roleMap.addListener(
             (MapChangeListener<Integer, RoleObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = roles.containsKey(id);
-                boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
-                boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
-                boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
-                if (needsToBeAdded) {
+                if (change.wasAdded()) {
                     RoleObject roleObject = change.getValueAdded();
-                    if (roleObject == null) return;
                     addRole(roleObject);
-                } else if (needsToBeUpdated) {
-                    Role role = roles.get(id);
-                    RoleObject roleObject = change.getValueAdded();
-                    if (roleObject == null) return;
-                    role.setRoleObject(roleObject);
-                } else if (needsToBeRemoved) {
+                } else if (change.wasRemoved()) {
                     removeRole(id);
                 }
             }
@@ -93,6 +82,15 @@ public class UserManagerController {
     }
     
     public void initializeRoleLazyLoad() {
+        // First of all, we have to add the roles in the model
+        for (int id : UserManagerModel.roleMap.keySet()) {
+            RoleObject roleObject = UserManagerModel.roleMap.get(id);
+            if (roleObject == null) return;
+            Platform.runLater(() -> {
+                addRole(roleObject);
+            });
+        }
+        
         // Load roles whenever the scrollbar hits the bottom.
         rolesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
             if (scrollValue.doubleValue() == 1) {
@@ -115,10 +113,10 @@ public class UserManagerController {
         UserManagerModel.loadRoles(12);
     }
     
-    private Role addRole(RoleObject roleObject) {
-        Role role = new Role(roleObject);
+    private void addRole(RoleObject roleObject) {
         Platform.runLater(() -> {
             if (this.roles.containsKey(roleObject.getID())) return;
+            Role role = new Role(roleObject);
             this.roles.put(roleObject.getID(), role);
             int index = this.getSortedRoles().indexOf(role);
             rolesFlowPane.getChildren().add(
@@ -126,7 +124,6 @@ public class UserManagerController {
                 role
             );
         });
-        return role;
     }
     
     private void removeRole(int id) {
@@ -178,20 +175,10 @@ public class UserManagerController {
         UserManagerModel.userMap.addListener(
             (MapChangeListener<Integer, UserObject>) change -> {
                 int id = change.getKey();
-                boolean isAddedAlready = users.containsKey(id);
-                boolean needsToBeAdded = change.wasAdded() && !isAddedAlready;
-                boolean needsToBeUpdated = change.wasAdded() && isAddedAlready;
-                boolean needsToBeRemoved = change.wasRemoved() && isAddedAlready;
-                if (needsToBeAdded) {
+                if (change.wasAdded()) {
                     UserObject userObject = change.getValueAdded();
-                    if (userObject == null) return;
                     addUser(userObject);
-                } else if (needsToBeUpdated) {
-                    User user = users.get(id);
-                    UserObject userObject = change.getValueAdded();
-                    if (userObject == null) return;
-                    user.setUserObject(userObject);
-                } else if (needsToBeRemoved) {
+                } else if (change.wasRemoved()) {
                     removeUser(id);
                 }
             }
@@ -205,6 +192,15 @@ public class UserManagerController {
     }
     
     public void initializeUserLazyLoad() {
+        // First of all, we have to add the users in the model
+        for (int id : UserManagerModel.userMap.keySet()) {
+            UserObject userObject = UserManagerModel.userMap.get(id);
+            if (userObject == null) return;
+            Platform.runLater(() -> {
+                addUser(userObject);
+            });
+        }
+        
         // Load users whenever the scrollbar hits the bottom.
         usersScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
             if (scrollValue.doubleValue() == 1) {
@@ -227,10 +223,10 @@ public class UserManagerController {
         UserManagerModel.loadUsers(12);
     }
     
-    private User addUser(UserObject userObject) {
-        User user = new User(userObject);
+    private void addUser(UserObject userObject) {
         Platform.runLater(() -> {
             if (this.users.containsKey(userObject.getID())) return;
+            User user = new User(userObject);
             this.users.put(userObject.getID(), user);
             int index = this.getSortedUsers().indexOf(user);
             usersFlowPane.getChildren().add(
@@ -238,7 +234,6 @@ public class UserManagerController {
                 user
             );
         });
-        return user;
     }
     
     private void removeUser(int id) {

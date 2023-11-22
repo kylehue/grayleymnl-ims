@@ -230,10 +230,6 @@ public abstract class BaseModel {
                         DBProducts.Column.LAST_MODIFIED
                     );
                     
-                    // remove old object just for the sake of triggering the listeners
-                    productMap.put(id, null);
-                    
-                    // bring back the old product object
                     productObject.setName(newName);
                     productObject.setPrice(newPrice);
                     productObject.setCategoryID(newCategoryID);
@@ -241,7 +237,6 @@ public abstract class BaseModel {
                     productObject.setCurrentStocks(newCurrentStocks);
                     productObject.setExpectedStocks(newExpectedStocks);
                     productObject.setLastModified(newLastModified);
-                    productMap.put(id, productObject);
                 }
                 
                 return null;
@@ -355,17 +350,16 @@ public abstract class BaseModel {
                             expectedStocks,
                             lastModified
                         );
+                        productMap.put(id, product);
+                    } else {
+                        product.setName(name);
+                        product.setPrice(price);
+                        product.setCategoryID(categoryID);
+                        product.setImageURL(imageURL);
+                        product.setCurrentStocks(currentStocks);
+                        product.setExpectedStocks(expectedStocks);
+                        product.setLastModified(lastModified);
                     }
-                    
-                    productMap.put(id, null);
-                    product.setName(name);
-                    product.setPrice(price);
-                    product.setCategoryID(categoryID);
-                    product.setImageURL(imageURL);
-                    product.setCurrentStocks(currentStocks);
-                    product.setExpectedStocks(expectedStocks);
-                    product.setLastModified(lastModified);
-                    productMap.put(id, product);
                 }
                 return null;
             }
@@ -468,13 +462,8 @@ public abstract class BaseModel {
                     String newName = (String) newCategory.get(DBCategories.Column.NAME);
                     Timestamp newLastModified = (Timestamp) newCategory.get(DBCategories.Column.LAST_MODIFIED);
                     
-                    // remove old object just for the sake of triggering the listeners
-                    categoryMap.put(id, null);
-                    
-                    // bring back the old category object
                     categoryObject.setName(newName);
                     categoryObject.setLastModified(newLastModified);
-                    categoryMap.put(id, categoryObject);
                 }
                 
                 return null;
@@ -606,12 +595,11 @@ public abstract class BaseModel {
                             name,
                             lastModified
                         );
+                        categoryMap.put(id, category);
+                    } else {
+                        category.setName(name);
+                        category.setLastModified(lastModified);
                     }
-                    
-                    categoryMap.put(id, null);
-                    category.setName(name);
-                    category.setLastModified(lastModified);
-                    categoryMap.put(id, category);
                 }
                 return null;
             }

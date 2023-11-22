@@ -3,14 +3,17 @@ package com.ims.components;
 import com.ims.database.DBProducts;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
+import com.ims.model.UserManagerModel;
 import com.ims.model.UserSessionModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
+import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -116,6 +119,10 @@ public class Product extends GridPane {
         this.textGridPane.add(categoryLabel, 0, 1);
         this.textGridPane.add(stocksLabel, 0, 2);
         this.textGridPane.add(priceLabel, 0, 3);
+        priceLabel.getStyleClass().add("product-price-label");
+        stocksLabel.getStyleClass().add("product-description-label");
+        nameLabel.getStyleClass().add("product-name-label");
+        categoryLabel.getStyleClass().add("product-category-label");
         
         updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
         UserSessionModel.currentUser.addListener(e -> {
@@ -145,12 +152,29 @@ public class Product extends GridPane {
     
     public void setName(String name) {
         nameLabel.setText(name);
-        nameLabel.getStyleClass().add("product-name-label");
     }
     
-    public void setCategory(String category) {
-        categoryLabel.setText(category);
-        categoryLabel.getStyleClass().add("product-category-label");
+    private final ChangeListener<String> categoryChangeListener = (
+        e,
+        oldValue,
+        newValue
+    ) -> {
+        Platform.runLater(() -> {
+            categoryLabel.setText(newValue);
+        });
+    };
+    
+    private CategoryObject oldCategoryObject = null;
+    
+    public void setCategory(int categoryID) {
+        CategoryObject categoryObject = BaseModel.loadAndGetCategory(categoryID);
+        if (categoryObject == null) return;
+        categoryLabel.setText(categoryObject.getName());
+        if (oldCategoryObject != null) {
+            oldCategoryObject.nameProperty().removeListener(categoryChangeListener);
+        }
+        categoryObject.nameProperty().addListener(categoryChangeListener);
+        oldCategoryObject = categoryObject;
     }
     
     public void setStocks(int current, int max) {
@@ -160,13 +184,10 @@ public class Product extends GridPane {
         this.heightProperty().addListener(($1, $2, $3) -> {
             stocksLabel.setMaxHeight(this.getHeight() / 3);
         });
-        
-        stocksLabel.getStyleClass().add("product-description-label");
     }
     
     public void setPrice(float price) {
         priceLabel.setText("₱" + String.format("%.2f", price));
-        priceLabel.getStyleClass().add("product-price-label");
     }
     
     public void setProductObject(ProductObject productObject) {
@@ -176,9 +197,7 @@ public class Product extends GridPane {
             productObject.getCurrentStocks(),
             productObject.getExpectedStocks()
         );
-        this.setCategory(
-            BaseModel.loadAndGetCategory(productObject.getCategoryID()).getName()
-        );
+        this.setCategory(productObject.getCategoryID());
         this.setImage(productObject.getImageURL());
         this.setPrice((float) productObject.getPrice());
     }

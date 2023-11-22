@@ -234,7 +234,6 @@ public class ProductController {
     @FXML
     public void goBack() {
         SceneManager.setScene("base");
-        ProductModel.clearState();
     }
     
     private void updateContents(ProductObject currentProduct) {
