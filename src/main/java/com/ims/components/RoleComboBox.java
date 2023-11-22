@@ -28,37 +28,39 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
     }
     
     private void initializeRoleLazyLoad() {
-        // First of all, we have to add the roles in the model
-        for (int id : UserManagerModel.roleMap.keySet()) {
-            RoleObject roleObject = UserManagerModel.roleMap.get(id);
-            Platform.runLater(() -> {
-                this.addItem(id, roleObject);
-            });
-        }
-        
-        // Load roles whenever the scrollbar hits the bottom.
-        this.getDropDownScrollPane().vvalueProperty().addListener(
-            ($1, $2, scrollValue) -> {
-                if (scrollValue.doubleValue() == 1) {
-                    UserManagerModel.loadRoles(8);
+        Platform.runLater(() -> {
+            // First of all, we have to add the roles in the model
+            for (int id : UserManagerModel.roleMap.keySet()) {
+                RoleObject roleObject = UserManagerModel.roleMap.get(id);
+                Platform.runLater(() -> {
+                    this.addItem(id, roleObject);
+                });
+            }
+            
+            // Load roles whenever the scrollbar hits the bottom.
+            this.getDropDownScrollPane().vvalueProperty().addListener(
+                ($1, $2, scrollValue) -> {
+                    if (scrollValue.doubleValue() == 1) {
+                        UserManagerModel.loadRoles(8);
+                    }
                 }
-            }
-        );
-        
-        // The listener above won't work if there is no scrollbar.
-        // So here, we add components until the scroll pane gets a scrollbar.
-        this.getDropDownScrollPane().viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-            double contentHeight = this.getDropdownContainer()
-                .getBoundsInLocal()
-                .getHeight();
-            double viewportHeight = newValue.getHeight();
-            if (contentHeight < viewportHeight) {
-                UserManagerModel.loadRoles(4);
-            }
+            );
+            
+            // The listener above won't work if there is no scrollbar.
+            // So here, we add components until the scroll pane gets a scrollbar.
+            this.getDropDownScrollPane().viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+                double contentHeight = this.getDropdownContainer()
+                    .getBoundsInLocal()
+                    .getHeight();
+                double viewportHeight = newValue.getHeight();
+                if (contentHeight < viewportHeight) {
+                    UserManagerModel.loadRoles(4);
+                }
+            });
+            
+            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+            // So here, we can trigger it by loading initial roles.
+            UserManagerModel.loadRoles(8);
         });
-        
-        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial roles.
-        UserManagerModel.loadRoles(8);
     }
 }

@@ -220,37 +220,39 @@ public class BaseController {
      * Autoload products whenever needed.
      */
     private void initializeProductLazyLoad() {
-        // First of all, we have to add the products in the model
-        for (int id : BaseModel.productMap.keySet()) {
-            ProductObject productObject = BaseModel.productMap.get(id);
-            if (productObject == null) return;
-            Platform.runLater(() -> {
-                addProduct(productObject);
+        Platform.runLater(() -> {
+            // First of all, we have to add the products in the model
+            for (int id : BaseModel.productMap.keySet()) {
+                ProductObject productObject = BaseModel.productMap.get(id);
+                if (productObject == null) return;
+                Platform.runLater(() -> {
+                    addProduct(productObject);
+                });
+            }
+            
+            // Load products whenever the scrollbar hits the bottom.
+            productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+                if (!searchProductTextField.getText().isEmpty()) return;
+                if (scrollValue.doubleValue() == 1) {
+                    BaseModel.loadProducts(Config.productLoadLimit / 3);
+                }
             });
-        }
-        
-        // Load products whenever the scrollbar hits the bottom.
-        productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-            if (!searchProductTextField.getText().isEmpty()) return;
-            if (scrollValue.doubleValue() == 1) {
-                BaseModel.loadProducts(Config.productLoadLimit / 3);
-            }
+            
+            // The listener above won't work if there is no scrollbar.
+            // So here, we add components until the scroll pane gets a scrollbar.
+            productsScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+                if (!searchProductTextField.getText().isEmpty()) return;
+                double contentHeight = productsFlowPane.getBoundsInLocal().getHeight();
+                double viewportHeight = newValue.getHeight();
+                if (contentHeight < viewportHeight) {
+                    BaseModel.loadProducts(Config.productLoadLimit / 3);
+                }
+            });
+            
+            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+            // So here, we can trigger it by loading initial products.
+            BaseModel.loadProducts(Config.productLoadLimit);
         });
-        
-        // The listener above won't work if there is no scrollbar.
-        // So here, we add components until the scroll pane gets a scrollbar.
-        productsScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-            if (!searchProductTextField.getText().isEmpty()) return;
-            double contentHeight = productsFlowPane.getBoundsInLocal().getHeight();
-            double viewportHeight = newValue.getHeight();
-            if (contentHeight < viewportHeight) {
-                BaseModel.loadProducts(Config.productLoadLimit / 3);
-            }
-        });
-        
-        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial products.
-        BaseModel.loadProducts(Config.productLoadLimit);
     }
     
     private TagButton addCategoryTag(CategoryObject categoryObject, boolean isActive) {
@@ -376,35 +378,37 @@ public class BaseController {
      * Autoload categories whenever needed.
      */
     private void initializeCategoryLazyLoad() {
-        // First of all, we have to add the categories in the model
-        for (int id : BaseModel.categoryMap.keySet()) {
-            CategoryObject categoryObject = BaseModel.categoryMap.get(id);
-            if (categoryObject == null) return;
-            Platform.runLater(() -> {
-                addCategory(categoryObject);
+        Platform.runLater(() -> {
+            // First of all, we have to add the categories in the model
+            for (int id : BaseModel.categoryMap.keySet()) {
+                CategoryObject categoryObject = BaseModel.categoryMap.get(id);
+                if (categoryObject == null) return;
+                Platform.runLater(() -> {
+                    addCategory(categoryObject);
+                });
+            }
+            
+            // Load categories whenever the scrollbar hits the bottom.
+            categoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+                if (scrollValue.doubleValue() == 1) {
+                    BaseModel.loadCategories(12);
+                }
             });
-        }
-        
-        // Load categories whenever the scrollbar hits the bottom.
-        categoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-            if (scrollValue.doubleValue() == 1) {
-                BaseModel.loadCategories(12);
-            }
+            
+            // The listener above won't work if there is no scrollbar.
+            // So here, we add components until the scroll pane gets a scrollbar.
+            categoriesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+                double contentHeight = categoriesFlowPane.getBoundsInLocal().getHeight();
+                double viewportHeight = newValue.getHeight();
+                if (contentHeight < viewportHeight) {
+                    BaseModel.loadCategories(4);
+                }
+            });
+            
+            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+            // So here, we can trigger it by loading initial categories.
+            BaseModel.loadCategories(12);
         });
-        
-        // The listener above won't work if there is no scrollbar.
-        // So here, we add components until the scroll pane gets a scrollbar.
-        categoriesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-            double contentHeight = categoriesFlowPane.getBoundsInLocal().getHeight();
-            double viewportHeight = newValue.getHeight();
-            if (contentHeight < viewportHeight) {
-                BaseModel.loadCategories(4);
-            }
-        });
-        
-        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial categories.
-        BaseModel.loadCategories(12);
     }
     
     private void addCategory(CategoryObject categoryObject) {

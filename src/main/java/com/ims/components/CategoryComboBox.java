@@ -28,37 +28,39 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
     }
     
     private void initializeCategoryLazyLoad() {
-        // First of all, we have to add the categories in the model
-        for (int id : BaseModel.categoryMap.keySet()) {
-            CategoryObject categoryObject = BaseModel.categoryMap.get(id);
-            Platform.runLater(() -> {
-                this.addItem(id, categoryObject);
-            });
-        }
-        
-        // Load categories whenever the scrollbar hits the bottom.
-        this.getDropDownScrollPane().vvalueProperty().addListener(
-            ($1, $2, scrollValue) -> {
-                if (scrollValue.doubleValue() == 1) {
-                    BaseModel.loadCategories(8);
+        Platform.runLater(() -> {
+            // First of all, we have to add the categories in the model
+            for (int id : BaseModel.categoryMap.keySet()) {
+                CategoryObject categoryObject = BaseModel.categoryMap.get(id);
+                Platform.runLater(() -> {
+                    this.addItem(id, categoryObject);
+                });
+            }
+            
+            // Load categories whenever the scrollbar hits the bottom.
+            this.getDropDownScrollPane().vvalueProperty().addListener(
+                ($1, $2, scrollValue) -> {
+                    if (scrollValue.doubleValue() == 1) {
+                        BaseModel.loadCategories(8);
+                    }
                 }
-            }
-        );
-        
-        // The listener above won't work if there is no scrollbar.
-        // So here, we add components until the scroll pane gets a scrollbar.
-        this.getDropDownScrollPane().viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-            double contentHeight = this.getDropdownContainer()
-                .getBoundsInLocal()
-                .getHeight();
-            double viewportHeight = newValue.getHeight();
-            if (contentHeight < viewportHeight) {
-                BaseModel.loadCategories(4);
-            }
+            );
+            
+            // The listener above won't work if there is no scrollbar.
+            // So here, we add components until the scroll pane gets a scrollbar.
+            this.getDropDownScrollPane().viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+                double contentHeight = this.getDropdownContainer()
+                    .getBoundsInLocal()
+                    .getHeight();
+                double viewportHeight = newValue.getHeight();
+                if (contentHeight < viewportHeight) {
+                    BaseModel.loadCategories(4);
+                }
+            });
+            
+            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
+            // So here, we can trigger it by loading initial categories.
+            BaseModel.loadCategories(8);
         });
-        
-        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial categories.
-        BaseModel.loadCategories(8);
     }
 }
