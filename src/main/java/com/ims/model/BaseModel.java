@@ -100,16 +100,13 @@ public abstract class BaseModel {
                     return null;
                 }
                 
-                // Add the product
-                HashMap<DBProducts.Column, Object> newProduct = DBProducts.add(
+                return loadProduct(DBProducts.add(
                     name,
                     categoryID,
                     null,
                     0,
                     0
-                );
-                
-                return loadProduct(newProduct);
+                ));
             }
         };
         
@@ -161,8 +158,7 @@ public abstract class BaseModel {
             protected Void call() throws Exception {
                 isBusyProduct.set(true);
                 
-                // Update in database
-                HashMap<DBProducts.Column, Object> newProduct = DBProducts.update(
+                loadProduct(DBProducts.update(
                     id,
                     name,
                     price,
@@ -170,13 +166,7 @@ public abstract class BaseModel {
                     imageURL,
                     currentStocks,
                     expectedStocks
-                );
-                
-                // Update in list if it exists
-                ProductObject productObject = productMap.get(id);
-                if (productObject != null) {
-                    loadProduct(newProduct);
-                }
+                ));
                 
                 return null;
             }
@@ -256,10 +246,6 @@ public abstract class BaseModel {
                 return null;
             }
         };
-        
-        task.setOnSucceeded(e -> {
-        
-        });
         
         task.setOnFailed(e -> {
             System.out.println(e);
@@ -384,16 +370,7 @@ public abstract class BaseModel {
             @Override
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
-                HashMap<DBCategories.Column, Object> newCategory = DBCategories.add(name);
-                int newID = (Integer) newCategory.get(DBCategories.Column.ID);
-                String newName = (String) newCategory.get(DBCategories.Column.NAME);
-                Timestamp newLastModified = (Timestamp) newCategory.get(DBCategories.Column.LAST_MODIFIED);
-                
-                categoryMap.put(newID, new CategoryObject(
-                    newID,
-                    newName,
-                    newLastModified
-                ));
+                loadCategory(DBCategories.add(name));
                 return null;
             }
         };
@@ -433,18 +410,7 @@ public abstract class BaseModel {
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
                 
-                // Update in database
-                HashMap<DBCategories.Column, Object> newCategory = DBCategories.update(id, name);
-                
-                // Update in list if it exists
-                CategoryObject categoryObject = categoryMap.get(id);
-                if (categoryObject != null) {
-                    String newName = (String) newCategory.get(DBCategories.Column.NAME);
-                    Timestamp newLastModified = (Timestamp) newCategory.get(DBCategories.Column.LAST_MODIFIED);
-                    
-                    categoryObject.setName(newName);
-                    categoryObject.setLastModified(newLastModified);
-                }
+                loadCategory(DBCategories.update(id, name));
                 
                 return null;
             }
@@ -511,13 +477,7 @@ public abstract class BaseModel {
                 
                 HashMap<DBCategories.Column, Object> row = DBCategories.getOne(DBCategories.Column.ID, id);
                 if (row != null) {
-                    CategoryObject categoryObject = new CategoryObject(
-                        id,
-                        (String) row.get(DBCategories.Column.NAME),
-                        (Timestamp) row.get(DBCategories.Column.LAST_MODIFIED)
-                    );
-                    categoryMap.put(id, categoryObject);
-                    return categoryObject;
+                    return loadCategory(row);
                 }
                 
                 return null;
@@ -545,6 +505,61 @@ public abstract class BaseModel {
         return categoryObject;
     }
     
+    public static void searchCategories(String searchText) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                categoryMap.clear();
+                if (searchText.isEmpty()) {
+                    loadCategories(Config.categoryLoadLimit);
+                    return null;
+                }
+                
+                String searchPattern = Utils.textToSearchPattern(searchText);
+                ArrayList<HashMap<DBCategories.Column, Object>> result = DBCategories.search(
+                    searchPattern
+                );
+                
+                for (HashMap<DBCategories.Column, Object> row : result) {
+                    loadCategory(row);
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    private static CategoryObject loadCategory(
+        HashMap<DBCategories.Column, Object> category
+    ) {
+        int id = (Integer) category.get(DBCategories.Column.ID);
+        String name = (String) category.get(DBCategories.Column.NAME);
+        Timestamp lastModified = (Timestamp) category.get(DBCategories.Column.LAST_MODIFIED);
+        
+        CategoryObject categoryObject = categoryMap.get(id);
+        if (!categoryMap.containsKey(id)) {
+            categoryObject = new CategoryObject(
+                id,
+                name,
+                lastModified
+            );
+            categoryMap.put(id, categoryObject);
+        } else {
+            categoryObject.setName(name);
+            categoryObject.setLastModified(lastModified);
+        }
+        
+        return categoryObject;
+    }
+    
     /**
      * Load more categories from the database.
      *
@@ -561,25 +576,7 @@ public abstract class BaseModel {
                 );
                 
                 for (HashMap<DBCategories.Column, Object> row : categoryRows) {
-                    int id = (Integer) row.get(DBCategories.Column.ID);
-                    // Skip if already added (this shouldn't happen but just to be sure)
-                    CategoryObject category = categoryMap.get(id);
-                    
-                    // Add in list
-                    String name = (String) row.get(DBCategories.Column.NAME);
-                    Timestamp lastModified = (Timestamp) row.get(DBCategories.Column.LAST_MODIFIED);
-                    
-                    if (category == null) {
-                        category = new CategoryObject(
-                            id,
-                            name,
-                            lastModified
-                        );
-                        categoryMap.put(id, category);
-                    } else {
-                        category.setName(name);
-                        category.setLastModified(lastModified);
-                    }
+                    loadCategory(row);
                 }
                 return null;
             }

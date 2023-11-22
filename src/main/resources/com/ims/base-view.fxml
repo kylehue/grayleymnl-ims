@@ -279,7 +279,7 @@
                               <MFXButton fx:id="addCategoryButton" text="Add Category" />
                            </children>
                         </HBox>
-                        <MFXTextField floatingText="Search Category" maxWidth="300.0" minWidth="100.0" />
+                        <MFXTextField fx:id="searchCategoryTextField" floatingText="Search Category" maxWidth="300.0" minWidth="100.0" />
                      </children>
                   </GridPane>
                </children>

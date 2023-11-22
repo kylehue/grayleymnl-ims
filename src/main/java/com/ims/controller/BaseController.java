@@ -333,6 +333,10 @@ public class BaseController {
     @FXML
     private MFXButton addCategoryButton;
     
+    // The text field used to search categories
+    @FXML
+    private MFXTextField searchCategoryTextField;
+    
     private HashMap<Integer, Category> categories = new HashMap<>();
     
     private CategoryAddModal addCategoryModal = new CategoryAddModal();
@@ -371,6 +375,11 @@ public class BaseController {
                 addCategoryButton.setVisible(false);
                 addCategoryButton.setManaged(false);
             }
+        });
+        
+        searchCategoryTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            BaseModel.searchCategories(searchCategoryTextField.getText());
         });
     }
     

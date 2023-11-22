@@ -188,6 +188,32 @@ public class DBCategories {
         return rows;
     }
     
+    public static ArrayList<HashMap<Column, Object>> search(
+        String regexPattern
+    ) {
+        ArrayList<HashMap<Column, Object>> rows = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        
+        try {
+            String query = """
+                SELECT * FROM categories
+                WHERE name ~* ?
+                ORDER BY last_modified DESC, id;
+                """;
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, regexPattern);
+            resultSet = preparedStatement.executeQuery();
+            rows = extractRowsFromResultSet(resultSet);
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return rows;
+    }
+    
     public static HashMap<Column, Object> getOne(
         Column columnLabel,
         Object compareValue
