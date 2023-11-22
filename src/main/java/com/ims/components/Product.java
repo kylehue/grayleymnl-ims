@@ -193,7 +193,7 @@ public class Product extends GridPane {
         if (imageUrl.isEmpty()) return;
         
         Platform.runLater(() -> {
-            Image img = new Image(imageUrl);
+            Image img = new Image(imageUrl, true);
             this.imgView.setImage(img);
         });
     }

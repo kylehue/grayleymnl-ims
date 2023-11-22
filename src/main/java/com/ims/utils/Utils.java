@@ -83,4 +83,12 @@ public abstract class Utils {
         
         return randomCode.toString();
     }
+    
+    public static String textToSearchPattern(String text) {
+        String searchPattern = text;
+        searchPattern = text.replaceAll("\\s", "");
+        searchPattern = searchPattern.replaceAll("(.)", "$1.*");
+        searchPattern = searchPattern.substring(0, searchPattern.length() - 2);
+        return searchPattern;
+    }
 }

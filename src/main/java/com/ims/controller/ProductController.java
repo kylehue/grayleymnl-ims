@@ -131,7 +131,7 @@ public class ProductController {
             ($1, $2, imageURL) -> {
                 if (imageURL == null) return;
                 if (imageURL.isEmpty()) return;
-                Image image = new Image(imageURL);
+                Image image = new Image(imageURL, true);
                 productImageView.setImage(image);
             }
         );
@@ -267,7 +267,7 @@ public class ProductController {
                 );
             } else {
                 productImageURLTextField.setText(imageURL);
-                productImageView.setImage(new Image(imageURL));
+                productImageView.setImage(new Image(imageURL, true));
             }
             
             int currentStocks = currentProduct.getCurrentStocks();

@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.Config;
 import com.ims.components.*;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
@@ -17,6 +18,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -206,6 +209,11 @@ public class BaseController {
                 addProductButton.setManaged(false);
             }
         });
+        
+        searchProductTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            BaseModel.searchProducts(searchProductTextField.getText());
+        });
     }
     
     /**
@@ -223,24 +231,26 @@ public class BaseController {
         
         // Load products whenever the scrollbar hits the bottom.
         productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+            if (!searchProductTextField.getText().isEmpty()) return;
             if (scrollValue.doubleValue() == 1) {
-                BaseModel.loadProducts(3);
+                BaseModel.loadProducts(Config.productLoadLimit / 3);
             }
         });
         
         // The listener above won't work if there is no scrollbar.
         // So here, we add components until the scroll pane gets a scrollbar.
         productsScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
+            if (!searchProductTextField.getText().isEmpty()) return;
             double contentHeight = productsFlowPane.getBoundsInLocal().getHeight();
             double viewportHeight = newValue.getHeight();
             if (contentHeight < viewportHeight) {
-                BaseModel.loadProducts(3);
+                BaseModel.loadProducts(Config.productLoadLimit / 3);
             }
         });
         
         // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
         // So here, we can trigger it by loading initial products.
-        BaseModel.loadProducts(9);
+        BaseModel.loadProducts(Config.productLoadLimit);
     }
     
     private TagButton addCategoryTag(CategoryObject categoryObject, boolean isActive) {

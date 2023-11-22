@@ -258,12 +258,45 @@ public class DBProducts {
         try {
             String query = """
                 SELECT * FROM products
-                WHERE %s = ?;
+                WHERE %s = ?
+                ORDER BY last_modified DESC, id ASC;
                 """.formatted(
                 columnLabel
             );
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
+            resultSet = preparedStatement.executeQuery();
+            rows = extractRowsFromResultSet(resultSet);
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return rows;
+    }
+    
+    public static ArrayList<HashMap<Column, Object>> search(
+        String regexPattern
+    ) {
+        ArrayList<HashMap<Column, Object>> rows = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        
+        try {
+            String query = """
+                SELECT * FROM products
+                WHERE CONCAT(
+                	name,
+                	(SELECT name FROM categories WHERE id=category_id),
+                	current_stocks,
+                	expected_stocks,
+                	price
+                ) ~* ?
+                ORDER BY last_modified DESC, id;
+                """;
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
         } catch (SQLException e) {

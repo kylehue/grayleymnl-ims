@@ -1,10 +1,11 @@
 package com.ims.model;
 
+import com.ims.Config;
 import com.ims.database.DBCategories;
 import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
-import javafx.application.Platform;
+import com.ims.utils.Utils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,9 +18,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 public abstract class BaseModel {
     //////////////////////////////////////////////////////////////////////
@@ -107,42 +108,8 @@ public abstract class BaseModel {
                     0,
                     0
                 );
-                int newID = (Integer) newProduct.get(DBProducts.Column.ID);
-                String newName = (String) newProduct.get(
-                    DBProducts.Column.NAME
-                );
-                double newPrice = (double) newProduct.get(
-                    DBProducts.Column.PRICE
-                );
-                int newCategoryID = (Integer) newProduct.get(
-                    DBProducts.Column.CATEGORY_ID
-                );
-                String newImageURL = (String) newProduct.get(
-                    DBProducts.Column.IMAGE_URL
-                );
-                int newCurrentStocks = (Integer) newProduct.get(
-                    DBProducts.Column.CURRENT_STOCKS
-                );
-                int newExpectedStocks = (Integer) newProduct.get(
-                    DBProducts.Column.EXPECTED_STOCKS
-                );
-                Timestamp newLastModified = (Timestamp) newProduct.get(
-                    DBProducts.Column.LAST_MODIFIED
-                );
                 
-                ProductObject productObject = new ProductObject(
-                    newID,
-                    newName,
-                    newPrice,
-                    newCategoryID,
-                    newImageURL,
-                    newCurrentStocks,
-                    newExpectedStocks,
-                    newLastModified
-                );
-                productMap.put(newID, productObject);
-                
-                return productObject;
+                return loadProduct(newProduct);
             }
         };
         
@@ -208,35 +175,7 @@ public abstract class BaseModel {
                 // Update in list if it exists
                 ProductObject productObject = productMap.get(id);
                 if (productObject != null) {
-                    String newName = (String) newProduct.get(
-                        DBProducts.Column.NAME
-                    );
-                    Double newPrice = (Double) newProduct.get(
-                        DBProducts.Column.PRICE
-                    );
-                    Integer newCategoryID = (Integer) newProduct.get(
-                        DBProducts.Column.CATEGORY_ID
-                    );
-                    String newImageURL = (String) newProduct.get(
-                        DBProducts.Column.IMAGE_URL
-                    );
-                    Integer newCurrentStocks = (Integer) newProduct.get(
-                        DBProducts.Column.CURRENT_STOCKS
-                    );
-                    Integer newExpectedStocks = (Integer) newProduct.get(
-                        DBProducts.Column.EXPECTED_STOCKS
-                    );
-                    Timestamp newLastModified = (Timestamp) newProduct.get(
-                        DBProducts.Column.LAST_MODIFIED
-                    );
-                    
-                    productObject.setName(newName);
-                    productObject.setPrice(newPrice);
-                    productObject.setCategoryID(newCategoryID);
-                    productObject.setImageURL(newImageURL);
-                    productObject.setCurrentStocks(newCurrentStocks);
-                    productObject.setExpectedStocks(newExpectedStocks);
-                    productObject.setLastModified(newLastModified);
+                    loadProduct(newProduct);
                 }
                 
                 return null;
@@ -295,6 +234,95 @@ public abstract class BaseModel {
         executor.shutdown();
     }
     
+    public static void searchProducts(String searchText) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                productMap.clear();
+                if (searchText.isEmpty()) {
+                    loadProducts(Config.productLoadLimit);
+                    return null;
+                }
+                
+                String searchPattern = Utils.textToSearchPattern(searchText);
+                ArrayList<HashMap<DBProducts.Column, Object>> result = DBProducts.search(
+                    searchPattern
+                );
+                
+                for (HashMap<DBProducts.Column, Object> row : result) {
+                    loadProduct(row);
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+        
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    private static ProductObject loadProduct(
+        HashMap<DBProducts.Column, Object> product
+    ) {
+        int id = (Integer) product.get(DBProducts.Column.ID);
+        
+        String name = (String) product.get(
+            DBProducts.Column.NAME
+        );
+        Double price = (Double) product.get(
+            DBProducts.Column.PRICE
+        );
+        Integer categoryID = (Integer) product.get(
+            DBProducts.Column.CATEGORY_ID
+        );
+        String imageURL = (String) product.get(
+            DBProducts.Column.IMAGE_URL
+        );
+        Integer currentStocks = (Integer) product.get(
+            DBProducts.Column.CURRENT_STOCKS
+        );
+        Integer expectedStocks = (Integer) product.get(
+            DBProducts.Column.EXPECTED_STOCKS
+        );
+        Timestamp lastModified = (Timestamp) product.get(
+            DBProducts.Column.LAST_MODIFIED
+        );
+        
+        ProductObject productObject = productMap.get(id);
+        if (!productMap.containsKey(id)) {
+            productObject = new ProductObject(
+                id,
+                name,
+                price,
+                categoryID,
+                imageURL,
+                currentStocks,
+                expectedStocks,
+                lastModified
+            );
+            productMap.put(id, productObject);
+        } else {
+            productObject.setName(name);
+            productObject.setPrice(price);
+            productObject.setCategoryID(categoryID);
+            productObject.setImageURL(imageURL);
+            productObject.setCurrentStocks(currentStocks);
+            productObject.setExpectedStocks(expectedStocks);
+            productObject.setLastModified(lastModified);
+        }
+        
+        return productObject;
+    }
+    
     /**
      * Load more products from the database.
      *
@@ -311,55 +339,7 @@ public abstract class BaseModel {
                 );
                 
                 for (HashMap<DBProducts.Column, Object> row : productRows) {
-                    int id = (Integer) row.get(DBProducts.Column.ID);
-                    
-                    // Skip if already added (this shouldn't happen but just to be sure)
-                    ProductObject product = productMap.get(id);
-                    
-                    // Add in list
-                    String name = (String) row.get(
-                        DBProducts.Column.NAME
-                    );
-                    Double price = (Double) row.get(
-                        DBProducts.Column.PRICE
-                    );
-                    Integer categoryID = (Integer) row.get(
-                        DBProducts.Column.CATEGORY_ID
-                    );
-                    String imageURL = (String) row.get(
-                        DBProducts.Column.IMAGE_URL
-                    );
-                    Integer currentStocks = (Integer) row.get(
-                        DBProducts.Column.CURRENT_STOCKS
-                    );
-                    Integer expectedStocks = (Integer) row.get(
-                        DBProducts.Column.EXPECTED_STOCKS
-                    );
-                    Timestamp lastModified = (Timestamp) row.get(
-                        DBProducts.Column.LAST_MODIFIED
-                    );
-                    
-                    if (product == null) {
-                        product = new ProductObject(
-                            id,
-                            name,
-                            price,
-                            categoryID,
-                            imageURL,
-                            currentStocks,
-                            expectedStocks,
-                            lastModified
-                        );
-                        productMap.put(id, product);
-                    } else {
-                        product.setName(name);
-                        product.setPrice(price);
-                        product.setCategoryID(categoryID);
-                        product.setImageURL(imageURL);
-                        product.setCurrentStocks(currentStocks);
-                        product.setExpectedStocks(expectedStocks);
-                        product.setLastModified(lastModified);
-                    }
+                    loadProduct(row);
                 }
                 return null;
             }
