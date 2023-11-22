@@ -19,6 +19,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
@@ -45,8 +47,7 @@ public class Role extends GridPane {
         this.styleClass.add("card");
         this.styleClass.add("role-container");
         
-        // role_name, allow_delete_category, allow_add_category, allow_edit_category
-        // allow_delete_product, allow_add_product, allow_edit_product, controls
+        this.setFocusTraversable(true);
         LayoutUtils.setupGridPane(this, 8, 1);
         
         // Setup name text field
@@ -124,6 +125,11 @@ public class Role extends GridPane {
             //     "Role has been successfully updated.",
             //     "Got it!"
             // ).show();
+        });
+        
+        nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            this.requestFocus();
         });
         
         InvalidationListener toggleListener = e -> {

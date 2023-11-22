@@ -2,6 +2,7 @@ package com.ims.controller;
 
 import com.ims.Config;
 import com.ims.canvas.network.Network;
+import com.ims.model.LoginModel;
 import com.ims.model.RegisterModel;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -10,6 +11,8 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
@@ -36,12 +39,17 @@ public class RegisterController {
     @FXML
     public MFXPasswordField confirmPasswordTextField;
     
+    private TextFieldValidator emailTextFieldValidator;
+    private TextFieldValidator passwordTextFieldValidator;
+    private TextFieldValidator confirmPasswordTextFieldValidator;
+    
     @FXML
     public void initialize() {
         // this.initializeNetworkAnimation();
         LayoutUtils.fitImageViewToParent(vectorImage);
         
-        TextFieldValidator emailTextFieldValidator = new TextFieldValidator(emailTextField);
+        emailTextFieldValidator =
+            new TextFieldValidator(emailTextField);
         emailTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
             "This email address already exists.",
@@ -67,8 +75,9 @@ public class RegisterController {
             emailTextField.textProperty(),
             registerButton.armedProperty()
         );
-
-        TextFieldValidator passwordTextFieldValidator = new TextFieldValidator(passwordTextField);
+        
+        passwordTextFieldValidator =
+            new TextFieldValidator(passwordTextField);
         passwordTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
             "Password must be at least 8 characters long.",
@@ -77,7 +86,8 @@ public class RegisterController {
             registerButton.armedProperty()
         );
         
-        TextFieldValidator confirmPasswordTextFieldValidator = new TextFieldValidator(confirmPasswordTextField);
+        confirmPasswordTextFieldValidator =
+            new TextFieldValidator(confirmPasswordTextField);
         confirmPasswordTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
             "Passwords doesn't match.",
@@ -99,14 +109,33 @@ public class RegisterController {
         });
         
         registerButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
-            if (
-                emailTextFieldValidator.isValid() &&
-                    passwordTextFieldValidator.isValid() &&
-                    confirmPasswordTextFieldValidator.isValid()
-            ) {
-                RegisterModel.register();
-            }
+            tryRegister();
         });
+        
+        emailTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            tryRegister();
+        });
+        
+        passwordTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            tryRegister();
+        });
+        
+        confirmPasswordTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            tryRegister();
+        });
+    }
+    
+    private void tryRegister() {
+        if (
+            emailTextFieldValidator.isValid() &&
+                passwordTextFieldValidator.isValid() &&
+                confirmPasswordTextFieldValidator.isValid()
+        ) {
+            RegisterModel.register();
+        }
     }
     
     private void initializeNetworkAnimation() {

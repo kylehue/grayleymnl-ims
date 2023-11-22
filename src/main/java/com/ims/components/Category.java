@@ -16,6 +16,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
@@ -33,6 +35,7 @@ public class Category extends GridPane {
         LayoutUtils.setupGridPane(this, 2, 1);
         
         // Setup name text field
+        this.setFocusTraversable(true);
         this.add(nameTextField, 0, 0);
         this.nameTextField.setMaxWidth(Double.MAX_VALUE);
         this.nameTextField.setPrefWidth(USE_COMPUTED_SIZE);
@@ -53,6 +56,11 @@ public class Category extends GridPane {
             () -> !nameTextField.getText().isEmpty(),
             nameTextField.textProperty()
         );
+        
+        nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            this.requestFocus();
+        });
         
         // Setup buttons
         HBox controlContainer = new HBox();

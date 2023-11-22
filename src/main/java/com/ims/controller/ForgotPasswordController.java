@@ -15,6 +15,8 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.util.HashMap;
@@ -38,6 +40,8 @@ public class ForgotPasswordController {
     @FXML
     public MFXTextField emailTextField;
     
+    private TextFieldValidator emailTextFieldValidator;
+    
     ConfirmationCodeModal confirmationCodeModal = new ConfirmationCodeModal();
     
     @FXML
@@ -49,9 +53,7 @@ public class ForgotPasswordController {
             SceneManager.setScene("login");
         });
         
-        TextFieldValidator emailTextFieldValidator =
-            new TextFieldValidator(emailTextField);
-        
+        emailTextFieldValidator = new TextFieldValidator(emailTextField);
         emailTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
             "This email address doesn't exist.",
@@ -75,68 +77,77 @@ public class ForgotPasswordController {
             continueButton.disableProperty()
         );
         
+        emailTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            tryProceed();
+        });
+        
         continueButton.setOnMouseClicked(e -> {
-            if (!emailTextFieldValidator.isValid()) return;
-            String email = emailTextField.getText();
-            
-            String confirmationCode = Utils.generateRandomCode(6);
-            
+            tryProceed();
+        });
+    }
+    
+    private void tryProceed() {
+        if (!emailTextFieldValidator.isValid()) return;
+        String email = emailTextField.getText();
+        
+        String confirmationCode = Utils.generateRandomCode(6);
+        
+        sendCode(email, confirmationCode);
+        confirmationCodeModal.show();
+        confirmationCodeModal.setCorrectCode(confirmationCode);
+        
+        confirmationCodeModal.resendCodeButton.setOnMouseClicked(ev -> {
             sendCode(email, confirmationCode);
-            confirmationCodeModal.show();
-            confirmationCodeModal.setCorrectCode(confirmationCode);
+        });
+        
+        confirmationCodeModal.continueButton.setOnMouseClicked(ev -> {
+            if (!confirmationCodeModal.codeTextFieldValidator.isValid()) {
+                return;
+            }
             
-            confirmationCodeModal.resendCodeButton.setOnMouseClicked(ev -> {
-                sendCode(email, confirmationCode);
-            });
+            confirmationCodeModal.hide();
             
-            confirmationCodeModal.continueButton.setOnMouseClicked(ev -> {
-                if (!confirmationCodeModal.codeTextFieldValidator.isValid()) {
-                    return;
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+                        DBUsers.Column.EMAIL,
+                        email
+                    );
+                    
+                    assert user != null;
+                    
+                    // Change user's password
+                    String newPassword = Utils.generateRandomCode(12);
+                    DBUsers.update(
+                        (int) user.get(DBUsers.Column.ID),
+                        Utils.hashPassword(newPassword),
+                        null,
+                        null,
+                        null
+                    );
+                    
+                    sendNewPassword(email, newPassword);
+                    return null;
                 }
-                
-                confirmationCodeModal.hide();
-                
-                Task<Void> task = new Task<>() {
-                    @Override
-                    protected Void call() {
-                        HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
-                            DBUsers.Column.EMAIL,
-                            email
-                        );
-                        
-                        assert user != null;
-                        
-                        // Change user's password
-                        String newPassword = Utils.generateRandomCode(12);
-                        DBUsers.update(
-                            (int) user.get(DBUsers.Column.ID),
-                            Utils.hashPassword(newPassword),
-                            null,
-                            null,
-                            null
-                        );
-                        
-                        sendNewPassword(email, newPassword);
-                        return null;
-                    }
-                };
-                
-                task.setOnSucceeded(event -> {
-                    PopupService.messageDialog.setup(
-                        "Account Recovery",
-                        "Your account has been successfully recovered. Your temporary password has been sent to your email. Please use it to log in and update your password.",
-                        "Got it!"
-                    ).show();
-                });
-                
-                task.setOnFailed(err -> {
-                    System.out.println(err);
-                });
-                
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                executor.submit(task);
-                executor.shutdown();
+            };
+            
+            task.setOnSucceeded(event -> {
+                PopupService.messageDialog.setup(
+                    "Account Recovery",
+                    "Your account has been successfully recovered. Your temporary password has been sent to your email. Please use it to log in and update your password.",
+                    "Got it!"
+                ).show();
             });
+            
+            task.setOnFailed(err -> {
+                System.out.println(err);
+            });
+            
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(task);
+            executor.shutdown();
         });
     }
     

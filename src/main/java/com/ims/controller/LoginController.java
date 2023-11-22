@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 public class LoginController {
@@ -43,6 +45,16 @@ public class LoginController {
         LayoutUtils.fitImageViewToParent(vectorImage);
         
         loginButton.setOnMouseClicked((MouseEvent event) -> {
+            LoginModel.login();
+        });
+        
+        emailTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            LoginModel.login();
+        });
+        
+        passwordTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
             LoginModel.login();
         });
         
