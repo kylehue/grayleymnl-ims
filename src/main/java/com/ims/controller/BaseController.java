@@ -260,24 +260,16 @@ public class BaseController {
     private void addProduct(
         ProductObject productObject
     ) {
+        Product product = new Product();
         Platform.runLater(() -> {
             if (this.products.containsKey(productObject.getID())) return;
-            Product product = new Product(productObject);
+            product.setProductObject(productObject);
             this.products.put(productObject.getID(), product);
             int index = this.getSortedProducts().indexOf(product);
             productsFlowPane.getChildren().add(
                 index,
                 product
             );
-            
-            product.setName(productObject.getName());
-            product.setCategory(productObject.getCategoryID());
-            product.setStocks(
-                productObject.getCurrentStocks(),
-                productObject.getExpectedStocks()
-            );
-            product.setPrice((float) productObject.getPrice());
-            product.setImage(productObject.getImageURL());
         });
     }
     
@@ -406,20 +398,19 @@ public class BaseController {
     }
     
     private void addCategory(CategoryObject categoryObject) {
+        Category category = new Category();
         Platform.runLater(() -> {
             int id = categoryObject.getID();
             if (this.categories.containsKey(id)) return;
-            Category category = new Category(categoryObject);
+            category.setCategoryObject(categoryObject);
             this.categories.put(id, category);
             int index = this.getSortedCategories().indexOf(category);
             categoriesFlowPane.getChildren().add(
                 index,
                 category
             );
-            
             addCategoryTag(categoryObject, false);
         });
-        
     }
     
     private void removeCategory(int id) {

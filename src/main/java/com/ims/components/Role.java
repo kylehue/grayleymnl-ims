@@ -12,6 +12,10 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,8 +33,15 @@ public class Role extends GridPane {
     private final MFXTextField nameTextField = new MFXTextField();
     private RoleObject roleObject;
     public final TextFieldValidator nameTextFieldValidator;
+    private final StringProperty name = new SimpleStringProperty();
+    private final BooleanProperty allowAddCategory = new SimpleBooleanProperty();
+    private final BooleanProperty allowDeleteCategory = new SimpleBooleanProperty();
+    private final BooleanProperty allowEditCategory = new SimpleBooleanProperty();
+    private final BooleanProperty allowAddProduct = new SimpleBooleanProperty();
+    private final BooleanProperty allowDeleteProduct = new SimpleBooleanProperty();
+    private final BooleanProperty allowEditProduct = new SimpleBooleanProperty();
     
-    public Role(RoleObject roleObject) {
+    public Role() {
         this.styleClass.add("card");
         this.styleClass.add("role-container");
         
@@ -147,82 +158,168 @@ public class Role extends GridPane {
                 }
             ).show();
         });
+    }
+    
+    private boolean propertyListenersInitialized = false;
+    
+    private void initializePropertyListeners() {
+        if (propertyListenersInitialized) return;
+        propertyListenersInitialized = true;
+        this.nameProperty().addListener(e -> {
+            this.setName(this.nameProperty().get());
+        });
+        this.allowAddCategoryProperty().addListener(e -> {
+            this.setAllowAddCategory(
+                this.allowAddCategoryProperty().get()
+            );
+        });
+        this.allowDeleteCategoryProperty().addListener(e -> {
+            this.setAllowDeleteCategory(
+                this.allowDeleteCategoryProperty().get()
+            );
+        });
+        this.allowEditCategoryProperty().addListener(e -> {
+            this.setAllowEditCategory(
+                this.allowEditCategoryProperty().get()
+            );
+        });
+        this.allowAddProductProperty().addListener(e -> {
+            this.setAllowAddProduct(
+                this.allowAddProductProperty().get()
+            );
+        });
+        this.allowDeleteProductProperty().addListener(e -> {
+            this.setAllowDeleteProduct(
+                this.allowDeleteProductProperty().get()
+            );
+        });
+        this.allowEditProductProperty().addListener(e -> {
+            this.setAllowEditProduct(
+                this.allowEditProductProperty().get()
+            );
+        });
         
         SceneManager.onChangeScene((currentScene, oldScene) -> {
             if (!currentScene.equals("user-manager")) return;
             this.setRoleObject(this.roleObject);
         });
-        
-        this.setRoleObject(roleObject);
     }
     
     public void setRoleObject(RoleObject roleObject) {
+        initializePropertyListeners();
         this.roleObject = roleObject;
-        Platform.runLater(() -> {
-            this.setName(roleObject.getName());
-            this.setAllowAddCategory(roleObject.isAllowAddCategory());
-            this.setAllowDeleteCategory(roleObject.isAllowDeleteCategory());
-            this.setAllowEditCategory(roleObject.isAllowEditCategory());
-            this.setAllowAddProduct(roleObject.isAllowAddProduct());
-            this.setAllowDeleteProduct(roleObject.isAllowDeleteProduct());
-            this.setAllowEditProduct(roleObject.isAllowEditProduct());
-        });
+        this.nameProperty().unbind();
+        this.nameProperty().bind(roleObject.nameProperty());
+        this.allowAddCategoryProperty().unbind();
+        this.allowAddCategoryProperty().bind(roleObject.allowAddCategoryProperty());
+        this.allowDeleteCategoryProperty().unbind();
+        this.allowDeleteCategoryProperty().bind(roleObject.allowDeleteCategoryProperty());
+        this.allowEditCategoryProperty().unbind();
+        this.allowEditCategoryProperty().bind(roleObject.allowEditCategoryProperty());
+        this.allowAddProductProperty().unbind();
+        this.allowAddProductProperty().bind(roleObject.allowAddProductProperty());
+        this.allowDeleteProductProperty().unbind();
+        this.allowDeleteProductProperty().bind(roleObject.allowDeleteProductProperty());
+        this.allowEditProductProperty().unbind();
+        this.allowEditProductProperty().bind(roleObject.allowEditProductProperty());
     }
     
     public RoleObject getRoleObject() {
         return roleObject;
     }
     
-    public void setAllowAddCategory(boolean v) {
-        this.allowAddCategoryToggle.setSelected(v);
+    private void setAllowAddCategory(boolean v) {
+        Platform.runLater(() -> {
+            this.allowAddCategoryToggle.setSelected(v);
+        });
     }
     
-    public void setAllowEditCategory(boolean v) {
-        this.allowEditCategoryToggle.setSelected(v);
+    private void setAllowEditCategory(boolean v) {
+        Platform.runLater(() -> {
+            this.allowEditCategoryToggle.setSelected(v);
+        });
     }
     
-    public void setAllowDeleteCategory(boolean v) {
-        this.allowDeleteCategoryToggle.setSelected(v);
+    private void setAllowDeleteCategory(boolean v) {
+        Platform.runLater(() -> {
+            this.allowDeleteCategoryToggle.setSelected(v);
+        });
     }
     
-    public void setAllowAddProduct(boolean v) {
-        this.allowAddProductToggle.setSelected(v);
+    private void setAllowAddProduct(boolean v) {
+        Platform.runLater(() -> {
+            this.allowAddProductToggle.setSelected(v);
+        });
     }
     
-    public void setAllowEditProduct(boolean v) {
-        this.allowEditProductToggle.setSelected(v);
+    private void setAllowEditProduct(boolean v) {
+        Platform.runLater(() -> {
+            this.allowEditProductToggle.setSelected(v);
+        });
     }
     
-    public void setAllowDeleteProduct(boolean v) {
-        this.allowDeleteProductToggle.setSelected(v);
+    private void setAllowDeleteProduct(boolean v) {
+        Platform.runLater(() -> {
+            this.allowDeleteProductToggle.setSelected(v);
+        });
     }
     
-    public void setName(String name) {
-        this.nameTextField.setText(name);
+    private void setName(String name) {
+        Platform.runLater(() -> {
+            this.nameTextField.setText(name);
+        });
+    }
+    
+    public StringProperty nameProperty() {
+        return name;
     }
     
     public String getName() {
         return this.nameTextField.getText();
     }
     
+    public BooleanProperty allowAddCategoryProperty() {
+        return allowAddCategory;
+    }
+    
     public boolean isAllowAddCategory() {
         return this.allowAddCategoryToggle.isSelected();
+    }
+    
+    public BooleanProperty allowDeleteCategoryProperty() {
+        return allowDeleteCategory;
     }
     
     public boolean isAllowDeleteCategory() {
         return this.allowDeleteCategoryToggle.isSelected();
     }
     
+    public BooleanProperty allowEditCategoryProperty() {
+        return allowEditCategory;
+    }
+    
     public boolean isAllowEditCategory() {
         return this.allowEditCategoryToggle.isSelected();
+    }
+    
+    public BooleanProperty allowAddProductProperty() {
+        return allowAddProduct;
     }
     
     public boolean isAllowAddProduct() {
         return this.allowAddProductToggle.isSelected();
     }
     
+    public BooleanProperty allowDeleteProductProperty() {
+        return allowDeleteProduct;
+    }
+    
     public boolean isAllowDeleteProduct() {
         return this.allowDeleteProductToggle.isSelected();
+    }
+    
+    public BooleanProperty allowEditProductProperty() {
+        return allowEditProduct;
     }
     
     public boolean isAllowEditProduct() {

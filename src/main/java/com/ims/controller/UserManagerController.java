@@ -114,9 +114,10 @@ public class UserManagerController {
     }
     
     private void addRole(RoleObject roleObject) {
+        Role role = new Role();
         Platform.runLater(() -> {
             if (this.roles.containsKey(roleObject.getID())) return;
-            Role role = new Role(roleObject);
+            role.setRoleObject(roleObject);
             this.roles.put(roleObject.getID(), role);
             int index = this.getSortedRoles().indexOf(role);
             rolesFlowPane.getChildren().add(
@@ -224,9 +225,10 @@ public class UserManagerController {
     }
     
     private void addUser(UserObject userObject) {
+        User user = new User();
         Platform.runLater(() -> {
             if (this.users.containsKey(userObject.getID())) return;
-            User user = new User(userObject);
+            user.setUserObject(userObject);
             this.users.put(userObject.getID(), user);
             int index = this.getSortedUsers().indexOf(user);
             usersFlowPane.getChildren().add(

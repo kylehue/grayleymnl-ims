@@ -11,6 +11,8 @@ import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,9 +25,9 @@ public class Category extends GridPane {
     public final MFXTextField nameTextField = new MFXTextField();
     public final TextFieldValidator nameTextFieldValidator;
     public final MFXButton deleteButton = new MFXButton();
+    private final StringProperty name = new SimpleStringProperty();
     
-    public Category(CategoryObject categoryObject) {
-        this.setCategoryName(categoryObject.getName());
+    public Category() {
         this.styleClass.add("card");
         this.styleClass.add("category-container");
         LayoutUtils.setupGridPane(this, 2, 1);
@@ -85,13 +87,22 @@ public class Category extends GridPane {
                 return;
             }
             
-            BaseModel.updateCategory(categoryObject.getID(), this.getCategoryName());
+            BaseModel.updateCategory(categoryObject.getID(), this.getName());
             
             // PopupService.messageDialog.setup(
             //     "Update Category",
             //     "Category has been successfully updated.",
             //     "Got it!"
             // ).show();
+        });
+    }
+    
+    private boolean propertyListenersInitialized = false;
+    private void initializePropertyListeners() {
+        if (propertyListenersInitialized) return;
+        propertyListenersInitialized = true;
+        this.nameProperty().addListener(e -> {
+            this.setName(this.nameProperty().get());
         });
         
         SceneManager.onChangeScene((currentScene, oldScene) -> {
@@ -105,8 +116,6 @@ public class Category extends GridPane {
             updateEditPermissions(UserSessionModel.currentUserIsAllowEditCategory());
             updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteCategory());
         });
-        
-        this.setCategoryObject(categoryObject);
     }
     
     private void updateEditPermissions(boolean isAllowed) {
@@ -118,17 +127,25 @@ public class Category extends GridPane {
         deleteButton.setManaged(isAllowed);
     }
     
-    public void setCategoryName(String name) {
-        this.nameTextField.setText(name);
+    public StringProperty nameProperty() {
+        return name;
     }
     
-    public String getCategoryName() {
+    private void setName(String name) {
+        Platform.runLater(() -> {
+            this.nameTextField.setText(name);
+        });
+    }
+    
+    public String getName() {
         return this.nameTextField.getText();
     }
     
     public void setCategoryObject(CategoryObject categoryObject) {
+        initializePropertyListeners();
         this.categoryObject = categoryObject;
-        this.setCategoryName(categoryObject.getName());
+        this.nameProperty().unbind();
+        this.nameProperty().bind(categoryObject.nameProperty());
     }
     
     public CategoryObject getCategoryObject() {

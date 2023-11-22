@@ -10,8 +10,7 @@ import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
 import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -29,8 +28,13 @@ public class User extends GridPane {
     private final Label roleLabel = new Label();
     private final Label emailLabel = new Label();
     private UserObject userObject;
+    private final StringProperty email = new SimpleStringProperty();
+    private final IntegerProperty roleID = new SimpleIntegerProperty();
+    private final ObjectProperty<Date> joinedDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<Timestamp> lastActivityDate = new SimpleObjectProperty<>();
     
-    public User(UserObject userObject) {
+    
+    public User() {
         this.styleClass.add("card");
         this.styleClass.add("user-container");
         
@@ -69,12 +73,40 @@ public class User extends GridPane {
             UserEditModel.currentUser.set(this.getUserObject());
             SceneManager.setScene("user");
         });
-        
-        this.setUserObject(userObject);
     }
     
-    public void setEmail(String email) {
-        emailLabel.setText(email);
+    private boolean propertyListenersInitialized = false;
+    
+    private void initializePropertyListeners() {
+        if (propertyListenersInitialized) return;
+        propertyListenersInitialized = true;
+        
+        this.emailProperty().addListener(e -> {
+            this.setEmail(this.emailProperty().get());
+        });
+        this.roleIDProperty().addListener(e -> {
+            this.setRole(this.roleIDProperty().get());
+        });
+        this.joinedDateProperty().addListener(e -> {
+            this.setJoinedDate(this.joinedDateProperty().get());
+        });
+        this.lastActivityDateProperty().addListener(e -> {
+            this.setLastActivityDate(this.lastActivityDateProperty().get());
+        });
+    }
+    
+    public StringProperty emailProperty() {
+        return email;
+    }
+    
+    private void setEmail(String email) {
+        Platform.runLater(() -> {
+            emailLabel.setText(email);
+        });
+    }
+    
+    public IntegerProperty roleIDProperty() {
+        return roleID;
     }
     
     private final ChangeListener<String> roleChangeListener = (e, oldValue, newValue) -> {
@@ -85,10 +117,12 @@ public class User extends GridPane {
     
     private RoleObject oldRoleObject = null;
     
-    public void setRole(int roleID) {
+    private void setRole(int roleID) {
         RoleObject roleObject = UserManagerModel.loadAndGetRole(roleID);
         if (roleObject == null) return;
-        roleLabel.setText(roleObject.getName());
+        Platform.runLater(() -> {
+            roleLabel.setText(roleObject.getName());
+        });
         if (oldRoleObject != null) {
             oldRoleObject.nameProperty().removeListener(roleChangeListener);
         }
@@ -96,12 +130,30 @@ public class User extends GridPane {
         oldRoleObject = roleObject;
     }
     
-    public void setJoinedDate(Date joinedDate) {
-        joinedDateLabel.setText("Joined: " + Utils.formatDate(joinedDate.toLocalDate()));
+    public ObjectProperty<Date> joinedDateProperty() {
+        return joinedDate;
     }
     
-    public void setLastActivityDate(Timestamp lastActivityDate) {
-        lastActivityDateLabel.setText("Last Activity: " + Utils.formatDate(lastActivityDate.toLocalDateTime().toLocalDate()));
+    private void setJoinedDate(Date joinedDate) {
+        Platform.runLater(() -> {
+            joinedDateLabel.setText(
+                "Joined: " + Utils.formatDate(joinedDate.toLocalDate())
+            );
+        });
+    }
+    
+    public ObjectProperty<Timestamp> lastActivityDateProperty() {
+        return lastActivityDate;
+    }
+    
+    private void setLastActivityDate(Timestamp lastActivityDate) {
+        Platform.runLater(() -> {
+            lastActivityDateLabel.setText(
+                "Last Activity: " + Utils.formatDate(
+                    lastActivityDate.toLocalDateTime().toLocalDate()
+                )
+            );
+        });
     }
     
     public UserObject getUserObject() {
@@ -109,20 +161,16 @@ public class User extends GridPane {
     }
     
     public void setUserObject(UserObject userObject) {
+        initializePropertyListeners();
         this.userObject = userObject;
-        
-        this.setEmail(
-            userObject.getEmail()
-        );
-        this.setRole(
-            userObject.getRoleID()
-        );
-        this.setJoinedDate(
-            userObject.getJoinedDate()
-        );
-        this.setLastActivityDate(
-            userObject.getLastActivityDate()
-        );
+        this.emailProperty().unbind();
+        this.emailProperty().bind(userObject.emailProperty());
+        this.roleIDProperty().unbind();
+        this.roleIDProperty().bind(userObject.roleIDProperty());
+        this.joinedDateProperty().unbind();
+        this.joinedDateProperty().bind(userObject.joinedDateProperty());
+        this.lastActivityDateProperty().unbind();
+        this.lastActivityDateProperty().bind(userObject.lastActivityDateProperty());
         
         if (userObject.isDisabled()) {
             this.styleClass.add("user-container-disabled");

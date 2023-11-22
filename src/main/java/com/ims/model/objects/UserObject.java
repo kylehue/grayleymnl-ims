@@ -7,8 +7,8 @@ import java.sql.Timestamp;
 
 public class UserObject {
     private final int id;
-    private final String email;
-    private final Date joinedDate;
+    private final StringProperty email;
+    private final ObjectProperty<Date> joinedDate;
     private final StringProperty password;
     private final ObjectProperty<Timestamp> lastActivityDate;
     private final IntegerProperty roleID;
@@ -26,8 +26,8 @@ public class UserObject {
         boolean isOwner
     ) {
         this.id = id;
-        this.email = email;
-        this.joinedDate = joinedDate;
+        this.email = new SimpleStringProperty(email);
+        this.joinedDate = new SimpleObjectProperty<>(joinedDate);
         this.password = new SimpleStringProperty(password);
         this.lastActivityDate = new SimpleObjectProperty<>(lastActivityDate);
         this.roleID = new SimpleIntegerProperty(roleID);
@@ -39,8 +39,12 @@ public class UserObject {
         return id;
     }
     
-    public String getEmail() {
+    public StringProperty emailProperty() {
         return email;
+    }
+    
+    public String getEmail() {
+        return email.get();
     }
     
     public StringProperty passwordProperty() {
@@ -55,8 +59,12 @@ public class UserObject {
         this.password.set(password);
     }
     
-    public Date getJoinedDate() {
+    public ObjectProperty<Date> joinedDateProperty() {
         return joinedDate;
+    }
+    
+    public Date getJoinedDate() {
+        return joinedDate.get();
     }
     
     public ObjectProperty<Timestamp> lastActivityDateProperty() {

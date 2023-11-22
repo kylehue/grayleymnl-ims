@@ -1,18 +1,16 @@
 package com.ims.components;
 
-import com.ims.database.DBProducts;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
-import com.ims.model.UserManagerModel;
 import com.ims.model.UserSessionModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
-import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -22,7 +20,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class Product extends GridPane {
@@ -38,7 +35,14 @@ public class Product extends GridPane {
     private final Label priceLabel = new Label();
     private final MFXButton editButton = new MFXButton();
     
-    public Product(ProductObject productObject) {
+    private final StringProperty name = new SimpleStringProperty();
+    private final StringProperty imageURL = new SimpleStringProperty();
+    private final IntegerProperty categoryID = new SimpleIntegerProperty();
+    private final IntegerProperty currentStocks = new SimpleIntegerProperty();
+    private final IntegerProperty expectedStocks = new SimpleIntegerProperty();
+    private final DoubleProperty price = new SimpleDoubleProperty();
+    
+    public Product() {
         this.styleClass.add("card");
         this.styleClass.add("product-container");
         
@@ -110,7 +114,7 @@ public class Product extends GridPane {
         });
         
         this.add(imgContainer, 0, 0);
-        this.setImage(
+        this.setImageURL(
             getClass().getResource("/images/image-placeholder.png").toExternalForm()
         );
         
@@ -120,16 +124,49 @@ public class Product extends GridPane {
         this.textGridPane.add(stocksLabel, 0, 2);
         this.textGridPane.add(priceLabel, 0, 3);
         priceLabel.getStyleClass().add("product-price-label");
-        stocksLabel.getStyleClass().add("product-description-label");
+        stocksLabel.getStyleClass().add("product-stocks-label");
         nameLabel.getStyleClass().add("product-name-label");
         categoryLabel.getStyleClass().add("product-category-label");
+    }
+    
+    private boolean propertyListenersInitialized = false;
+    private void initializePropertyListeners() {
+        if (propertyListenersInitialized) return;
+        propertyListenersInitialized = true;
+        this.nameProperty().addListener(e -> {
+            this.setName(this.nameProperty().get());
+        });
+        
+        this.imageURLProperty().addListener(e -> {
+            this.setImageURL(this.imageURLProperty().get());
+        });
+        
+        this.categoryIDProperty().addListener(e -> {
+            this.setCategoryID(this.categoryIDProperty().get());
+        });
+        
+        this.currentStocksProperty().addListener(e -> {
+            this.setStocks(
+                this.currentStocksProperty().get(),
+                this.expectedStocksProperty().get()
+            );
+        });
+        
+        this.expectedStocksProperty().addListener(e -> {
+            this.setStocks(
+                this.currentStocksProperty().get(),
+                this.expectedStocksProperty().get()
+            );
+        });
+        
+        this.priceProperty().addListener(e -> {
+            this.setPrice(this.priceProperty().get());
+        });
         
         updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
         UserSessionModel.currentUser.addListener(e -> {
             updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
         });
-        
-        this.setProductObject(productObject);
     }
     
     private void updateEditPermissions(boolean isAllowed) {
@@ -137,21 +174,28 @@ public class Product extends GridPane {
         editButton.setManaged(isAllowed);
     }
     
-    /**
-     * Set the image of the product.
-     *
-     * @param imageUrl The URL of the image.
-     */
-    public void setImage(String imageUrl) {
+    public StringProperty nameProperty() {
+        return name;
+    }
+    
+    private void setName(String name) {
+        Platform.runLater(() -> {
+            nameLabel.setText(name);
+        });
+    }
+    
+    public StringProperty imageURLProperty() {
+        return imageURL;
+    }
+
+    private void setImageURL(String imageUrl) {
         if (imageUrl == null) return;
         if (imageUrl.isEmpty()) return;
         
-        Image img = new Image(imageUrl);
-        this.imgView.setImage(img);
-    }
-    
-    public void setName(String name) {
-        nameLabel.setText(name);
+        Platform.runLater(() -> {
+            Image img = new Image(imageUrl);
+            this.imgView.setImage(img);
+        });
     }
     
     private final ChangeListener<String> categoryChangeListener = (
@@ -163,13 +207,19 @@ public class Product extends GridPane {
             categoryLabel.setText(newValue);
         });
     };
-    
+
     private CategoryObject oldCategoryObject = null;
     
-    public void setCategory(int categoryID) {
+    public IntegerProperty categoryIDProperty() {
+        return categoryID;
+    }
+    
+    private void setCategoryID(int categoryID) {
         CategoryObject categoryObject = BaseModel.loadAndGetCategory(categoryID);
         if (categoryObject == null) return;
-        categoryLabel.setText(categoryObject.getName());
+        Platform.runLater(() -> {
+            categoryLabel.setText(categoryObject.getName());
+        });
         if (oldCategoryObject != null) {
             oldCategoryObject.nameProperty().removeListener(categoryChangeListener);
         }
@@ -177,29 +227,50 @@ public class Product extends GridPane {
         oldCategoryObject = categoryObject;
     }
     
-    public void setStocks(int current, int max) {
-        stocksLabel.setText("In stock: " + current + "/" + max);
-        stocksLabel.setAlignment(Pos.TOP_LEFT);
-        stocksLabel.setWrapText(true);
-        this.heightProperty().addListener(($1, $2, $3) -> {
-            stocksLabel.setMaxHeight(this.getHeight() / 3);
+    public IntegerProperty expectedStocksProperty() {
+        return expectedStocks;
+    }
+    
+    public IntegerProperty currentStocksProperty() {
+        return currentStocks;
+    }
+    
+    private void setStocks(int current, int max) {
+        Platform.runLater(() -> {
+            stocksLabel.setText("In stock: " + current + "/" + max);
+            stocksLabel.setAlignment(Pos.TOP_LEFT);
+            stocksLabel.setWrapText(true);
+            this.heightProperty().addListener(($1, $2, $3) -> {
+                stocksLabel.setMaxHeight(this.getHeight() / 3);
+            });
         });
     }
     
-    public void setPrice(float price) {
-        priceLabel.setText("₱" + String.format("%.2f", price));
+    public DoubleProperty priceProperty() {
+        return price;
+    }
+    
+    private void setPrice(double price) {
+        Platform.runLater(() -> {
+            priceLabel.setText("₱" + String.format("%.2f", price));
+        });
     }
     
     public void setProductObject(ProductObject productObject) {
+        initializePropertyListeners();
         this.productObject = productObject;
-        this.setName(productObject.getName());
-        this.setStocks(
-            productObject.getCurrentStocks(),
-            productObject.getExpectedStocks()
-        );
-        this.setCategory(productObject.getCategoryID());
-        this.setImage(productObject.getImageURL());
-        this.setPrice((float) productObject.getPrice());
+        this.nameProperty().unbind();
+        this.nameProperty().bind(productObject.nameProperty());
+        this.currentStocksProperty().unbind();
+        this.currentStocksProperty().bind(productObject.currentStocksProperty());
+        this.expectedStocksProperty().unbind();
+        this.expectedStocksProperty().bind(productObject.expectedStocksProperty());
+        this.categoryIDProperty().unbind();
+        this.categoryIDProperty().bind(productObject.categoryIDProperty());
+        this.imageURLProperty().unbind();
+        this.imageURLProperty().bind(productObject.imageURLProperty());
+        this.priceProperty().unbind();
+        this.priceProperty().bind(productObject.priceProperty());
     }
     
     public ProductObject getProductObject() {
