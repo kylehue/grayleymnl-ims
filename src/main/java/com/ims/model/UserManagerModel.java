@@ -364,27 +364,7 @@ public abstract class UserManagerModel {
                 // Update in list if it exists
                 UserObject userObject = userMap.get(id);
                 if (userObject != null) {
-                    String password = (String) user.get(
-                        DBUsers.Column.PASSWORD
-                    );
-                    Timestamp lastActivityDate = (Timestamp) user.get(
-                        DBUsers.Column.LAST_ACTIVITY_DATE
-                    );
-                    int roleID = (Integer) user.get(
-                        DBUsers.Column.ROLE_ID
-                    );
-                    boolean _isDisabled = (boolean) user.get(
-                        DBUsers.Column.IS_DISABLED
-                    );
-                    boolean _isOwner = (boolean) user.get(
-                        DBUsers.Column.IS_OWNER
-                    );
-                    
-                    userObject.setPassword(password);
-                    userObject.setLastActivityDate(lastActivityDate);
-                    userObject.setRoleID(roleID);
-                    userObject.setDisabled(_isDisabled);
-                    userObject.setOwner(_isOwner);
+                    loadUser(user);
                 }
                 
                 return null;
@@ -404,6 +384,59 @@ public abstract class UserManagerModel {
         executor.shutdown();
     }
     
+    public static UserObject loadUserToMap(
+        HashMap<DBUsers.Column, Object> user,
+        ObservableMap<Integer, UserObject> map
+    ) {
+        int id = (Integer) user.get(DBUsers.Column.ID);
+        String email = (String) user.get(DBUsers.Column.EMAIL);
+        String password = (String) user.get(
+            DBUsers.Column.PASSWORD
+        );
+        Date joinedDate = (Date) user.get(
+            DBUsers.Column.JOINED_DATE
+        );
+        Timestamp lastActivityDate = (Timestamp) user.get(
+            DBUsers.Column.LAST_ACTIVITY_DATE
+        );
+        int roleID = (Integer) user.get(
+            DBUsers.Column.ROLE_ID
+        );
+        boolean isDisabled = (boolean) user.get(
+            DBUsers.Column.IS_DISABLED
+        );
+        boolean isOwner = (boolean) user.get(
+            DBUsers.Column.IS_OWNER
+        );
+        
+        UserObject userObject = map.get(id);
+        if (userObject == null) {
+            userObject = new UserObject(
+                id,
+                email,
+                password,
+                joinedDate,
+                lastActivityDate,
+                roleID,
+                isDisabled,
+                isOwner
+            );
+            map.put(id, userObject);
+        } else {
+            userObject.setPassword(password);
+            userObject.setOwner(isOwner);
+            userObject.setRoleID(roleID);
+            userObject.setDisabled(isDisabled);
+            userObject.setLastActivityDate(lastActivityDate);
+        }
+        
+        return userObject;
+    }
+    
+    private static UserObject loadUser(HashMap<DBUsers.Column, Object> user) {
+        return loadUserToMap(user, userMap);
+    }
+    
     /**
      * Load more users from the database.
      *
@@ -420,49 +453,7 @@ public abstract class UserManagerModel {
                 );
                 
                 for (HashMap<DBUsers.Column, Object> row : userRows) {
-                    int id = (Integer) row.get(DBUsers.Column.ID);
-                    UserObject user = userMap.get(id);
-                    
-                    // Add in list
-                    String email = (String) row.get(DBUsers.Column.EMAIL);
-                    String password = (String) row.get(
-                        DBUsers.Column.PASSWORD
-                    );
-                    Date joinedDate = (Date) row.get(
-                        DBUsers.Column.JOINED_DATE
-                    );
-                    Timestamp lastActivityDate = (Timestamp) row.get(
-                        DBUsers.Column.LAST_ACTIVITY_DATE
-                    );
-                    int roleID = (Integer) row.get(
-                        DBUsers.Column.ROLE_ID
-                    );
-                    boolean isDisabled = (boolean) row.get(
-                        DBUsers.Column.IS_DISABLED
-                    );
-                    boolean isOwner = (boolean) row.get(
-                        DBUsers.Column.IS_OWNER
-                    );
-                    
-                    if (user == null) {
-                        user = new UserObject(
-                            id,
-                            email,
-                            password,
-                            joinedDate,
-                            lastActivityDate,
-                            roleID,
-                            isDisabled,
-                            isOwner
-                        );
-                        userMap.put(id, user);
-                    } else {
-                        user.setPassword(password);
-                        user.setOwner(isOwner);
-                        user.setRoleID(roleID);
-                        user.setDisabled(isDisabled);
-                        user.setLastActivityDate(lastActivityDate);
-                    }
+                    loadUser(row);
                 }
                 return null;
             }
