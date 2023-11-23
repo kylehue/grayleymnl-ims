@@ -4,6 +4,8 @@ import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -17,9 +19,11 @@ public class NumberField extends StackPane {
     public final MFXTextField textField = new MFXTextField();
     
     private double step = 1.0;
-    private double value = 0;
     private boolean allowDecimal = true;
     private boolean allowNegative = true;
+    private final DoubleProperty value = new SimpleDoubleProperty(0);
+    private final DoubleProperty maxValue = new SimpleDoubleProperty(Double.MAX_VALUE);
+    private final DoubleProperty minValue = new SimpleDoubleProperty(Double.MIN_VALUE);
     
     public NumberField(boolean showButtons) {
         this.setAlignment(Pos.CENTER_LEFT);
@@ -58,9 +62,9 @@ public class NumberField extends StackPane {
         textField.setFloatingText("Number");
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!isValid(newValue)) {
-                this.value = !oldValue.isEmpty() ? Double.parseDouble(oldValue) : 0;
+                this.setValue(!oldValue.isEmpty() ? Double.parseDouble(oldValue) : 0);
             } else {
-                this.value = !newValue.isEmpty() ? Double.parseDouble(newValue) : 0;
+                this.setValue(!newValue.isEmpty() ? Double.parseDouble(newValue) : 0);
             }
         });
         
@@ -86,7 +90,19 @@ public class NumberField extends StackPane {
             event.consume();
         });
         
-        this.setValue(this.value);
+        this.setValue(this.value.get());
+        
+        this.minValueProperty().addListener(e -> {
+            this.setValue(this.getValue());
+        });
+        
+        this.maxValueProperty().addListener(e -> {
+            this.setValue(this.getValue());
+        });
+        
+        textField.delegateFocusedProperty().addListener(e -> {
+            this.setValue(this.getValue());
+        });
     }
     
     private boolean isValid(String str) {
@@ -106,6 +122,30 @@ public class NumberField extends StackPane {
         return result;
     }
     
+    public DoubleProperty valueProperty() {
+        return value;
+    }
+    
+    public double getValue() {
+        return value.get();
+    }
+    
+    public DoubleProperty maxValueProperty() {
+        return maxValue;
+    }
+    
+    public double getMaxValue() {
+        return maxValue.get();
+    }
+    
+    public DoubleProperty minValueProperty() {
+        return minValue;
+    }
+    
+    public double getMinValue() {
+        return minValue.get();
+    }
+    
     public void setStep(double step) {
         this.step = step;
     }
@@ -115,19 +155,27 @@ public class NumberField extends StackPane {
     }
     
     public void increment() {
-        this.setValue(this.value += this.step);
+        this.setValue(this.getValue() + this.step);
     }
     
     public void decrement() {
-        if (this.value - this.step < 0 && !this.allowNegative) {
-            return;
-        }
-        
-        this.setValue(this.value -= this.step);
+        this.setValue(this.getValue() - this.step);
     }
     
     public void setValue(double value) {
-        this.value = value;
+        if (value < 0 && !this.allowNegative) {
+            value = 0;
+        }
+        
+        if (value > this.getMaxValue()) {
+            value = this.getMaxValue();
+        }
+        
+        if (value < this.getMinValue()) {
+            value = this.getMinValue();
+        }
+        
+        this.value.set(value);
         
         String strValue = Double.toString(value);
         if (isWholeNumber(strValue) || !allowDecimal) {

@@ -97,6 +97,13 @@ public class ProductController {
             )
         );
         
+        currentStocksNumberField.maxValueProperty().bind(
+            expectedStocksNumberField.valueProperty()
+        );
+        expectedStocksNumberField.minValueProperty().bind(
+            currentStocksNumberField.valueProperty()
+        );
+        
         productImageURLTextField.setStyle("-fx-padding: 5 40 5 0 !important");
         
         uploadImageButton.setText("");

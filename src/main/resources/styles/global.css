@@ -125,9 +125,10 @@
 .product-container .product-stocks-label {
     -fx-text-fill: -text-color-fade;
     -fx-text-alignment: center;
+    -fx-alignment: center;
     -fx-font-family: "Roboto Bold" !important;
-    -fx-font-size: 2.5em;
-    -fx-padding: 10 30 10 30;
+    -fx-font-size: 2em;
+    -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-background-color: #d4ffdc;
     -fx-background-radius: 100;
     -fx-border-radius: 100;
