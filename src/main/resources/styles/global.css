@@ -107,28 +107,48 @@
 }
 
 .product-container .product-text-container {
-    -fx-padding: 0 0 0 10;
+
 }
 
-.product-container .product-text-container .product-name-label {
+.product-container .product-name-label {
     -fx-font-family: "Roboto Bold";
-    -fx-font-size: 1.2em;
-    -fx-padding: 0 0 2.5px 0;
+    -fx-text-fill: -text-color-fade;
+    -fx-font-size: 1.5em;
+    -fx-padding: 0 0 2 0;
 }
 
-.product-container .product-text-container .product-category-label {
+.product-container .product-category-label {
     -fx-text-fill: -text-color-fade;
-    -fx-padding: 0 0 10px 0;
+    -fx-padding: 0 0 2 0;
 }
 
-.product-container .product-text-container .product-description-label {
+.product-container .product-stocks-label {
     -fx-text-fill: -text-color-fade;
-    -fx-padding: 0 0 10px 0;
+    -fx-text-alignment: center;
+    -fx-font-family: "Roboto Bold" !important;
+    -fx-font-size: 2.5em;
+    -fx-padding: 10 30 10 30;
+    -fx-background-color: #d4ffdc;
+    -fx-background-radius: 100;
+    -fx-border-radius: 100;
 }
 
-.product-container .product-text-container .product-price-label {
+.product-container .product-stocks-label-success {
+    -fx-background-color: #d4ffdc !important;
+}
+
+.product-container .product-stocks-label-warning {
+    -fx-background-color: #fff7c3 !important;
+}
+
+.product-container .product-stocks-label-danger {
+    -fx-background-color: #ffe0e0 !important;
+}
+
+.product-container .product-price-label {
+    -fx-font-family: "Roboto Bold" !important;
     -fx-text-fill: -text-color-fade;
-    -fx-padding: 0 0 5px 0;
+    -fx-padding: 0 0 5 0;
 }
 
 .product-container .product-image {

@@ -1,5 +1,6 @@
 package com.ims.components;
 
+import com.ims.Config;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.UserSessionModel;
@@ -9,10 +10,12 @@ import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
+import io.github.palexdev.mfxcore.collections.Grid;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -21,12 +24,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
 
 public class Product extends GridPane {
     private ProductObject productObject;
     private final ObservableList<String> styleClass = this.getStyleClass();
     
-    private final GridPane textGridPane = LayoutUtils.createGridPane(4, 1);
+    private final GridPane textGridPane = LayoutUtils.createGridPane(3, 1);
     private final ImageView imgView = new ImageView();
     
     private final Label nameLabel = new Label();
@@ -47,6 +51,8 @@ public class Product extends GridPane {
         this.styleClass.add("product-container");
         
         // Setup main row and columns
+        this.setHgap(10);
+        this.setVgap(10);
         LayoutUtils.setupGridPane(this, 1, 2);
         
         // Setup grid pane for the details
@@ -63,14 +69,14 @@ public class Product extends GridPane {
         textGridPane.getStyleClass().add("product-text-container");
         
         // Setup grid pane for controls
-        GridPane controlGridPane = LayoutUtils.createGridPane(1, 1);
+        GridPane controlGridPane = LayoutUtils.createGridPane(1, 2);
         detailsGridPane.add(controlGridPane, 0, 1);
         RowConstraints controlRow = controlGridPane.getRowConstraints().get(0);
         controlRow.setFillHeight(false);
         controlRow.setValignment(VPos.BOTTOM);
         FlowPane controlFlowPane = new FlowPane();
         controlFlowPane.setAlignment(Pos.BOTTOM_RIGHT);
-        controlGridPane.add(controlFlowPane, 0, 0);
+        controlGridPane.add(controlFlowPane, 1, 0);
         
         // Setup buttons
         editButton.setText("");
@@ -119,14 +125,32 @@ public class Product extends GridPane {
         );
         
         // Setup labels
-        this.textGridPane.add(nameLabel, 0, 0);
-        this.textGridPane.add(categoryLabel, 0, 1);
-        this.textGridPane.add(stocksLabel, 0, 2);
-        this.textGridPane.add(priceLabel, 0, 3);
-        priceLabel.getStyleClass().add("product-price-label");
-        stocksLabel.getStyleClass().add("product-stocks-label");
         nameLabel.getStyleClass().add("product-name-label");
+        this.textGridPane.add(nameLabel, 0, 0);
+        this.textGridPane.getRowConstraints().get(0).setVgrow(Priority.NEVER);
+        
         categoryLabel.getStyleClass().add("product-category-label");
+        this.textGridPane.add(categoryLabel, 0, 1);
+        this.textGridPane.getRowConstraints().get(1).setVgrow(Priority.NEVER);
+        
+        stocksLabel.getStyleClass().add("product-stocks-label");
+        stocksLabel.setAlignment(Pos.CENTER);
+        GridPane.setValignment(stocksLabel, VPos.CENTER);
+        GridPane.setHalignment(stocksLabel, HPos.CENTER);
+        stocksLabel.setMaxWidth(-1);
+        stocksLabel.setMinWidth(-1);
+        stocksLabel.setPrefWidth(-1);
+        this.textGridPane.add(stocksLabel, 0, 2);
+        this.textGridPane.getRowConstraints().get(2).setVgrow(Priority.ALWAYS);
+        this.textGridPane.getRowConstraints().get(2).setValignment(VPos.CENTER);
+        this.textGridPane.getRowConstraints().get(2).setMaxHeight(Double.MAX_VALUE);
+        
+        priceLabel.setPrefWidth(-1);
+        priceLabel.setMaxWidth(Double.MAX_VALUE);
+        priceLabel.setMinWidth(USE_PREF_SIZE);
+        priceLabel.setTextAlignment(TextAlignment.LEFT);
+        priceLabel.getStyleClass().add("product-price-label");
+        controlGridPane.add(priceLabel, 0, 0);
     }
     
     private boolean propertyListenersInitialized = false;
@@ -237,7 +261,22 @@ public class Product extends GridPane {
     
     private void setStocks(int current, int max) {
         Platform.runLater(() -> {
-            stocksLabel.setText("In stock: " + current + "/" + max);
+            double rate = (double) current / (double) Math.max(1, max);
+            if (rate <= 0) {
+                stocksLabel.getStyleClass().add("product-stocks-label-danger");
+                stocksLabel.getStyleClass().remove("product-stocks-label-success");
+                stocksLabel.getStyleClass().remove("product-stocks-label-warning");
+            } else if (rate <= Config.lowStockRate) {
+                stocksLabel.getStyleClass().add("product-stocks-label-warning");
+                stocksLabel.getStyleClass().remove("product-stocks-label-success");
+                stocksLabel.getStyleClass().remove("product-stocks-label-danger");
+            } else {
+                stocksLabel.getStyleClass().add("product-stocks-label-success");
+                stocksLabel.getStyleClass().remove("product-stocks-label-warning");
+                stocksLabel.getStyleClass().remove("product-stocks-label-danger");
+            }
+            
+            stocksLabel.setText(current + "/" + max);
             stocksLabel.setAlignment(Pos.TOP_LEFT);
             stocksLabel.setWrapText(true);
             this.heightProperty().addListener(($1, $2, $3) -> {
@@ -252,7 +291,7 @@ public class Product extends GridPane {
     
     private void setPrice(double price) {
         Platform.runLater(() -> {
-            priceLabel.setText("₱" + String.format("%.2f", price));
+            priceLabel.setText("P" + String.format("%.2f", price));
         });
     }
     
