@@ -3,13 +3,14 @@ package com.ims.components;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Transition;
+import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
-import javafx.beans.property.Property;
+import javafx.beans.property.*;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.*;
@@ -25,6 +26,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class ComboBox<K, V> extends StackPane {
     public final MFXTextField textField = new MFXTextField();
@@ -32,9 +34,10 @@ public class ComboBox<K, V> extends StackPane {
     private final HashMap<K, V> items = new HashMap<>();
     protected final Dropdown<K> dropdown = new Dropdown<>();
     private Stringifier<V> stringifier = Object::toString;
-    private V value = null;
+    private final ObjectProperty<V> value = new SimpleObjectProperty<>();
     private final ArrayList<SelectEvent<V>> selectListeners = new ArrayList<>();
     private final ArrayList<Select2Event<V>> select2Listeners = new ArrayList<>();
+    public final StringProperty searchText = new SimpleStringProperty();
     
     public ComboBox() {
         // Set up the TextField
@@ -91,16 +94,41 @@ public class ComboBox<K, V> extends StackPane {
             }
         });
         
-        // clear selected value when text changed
-        // use event filter instead of event handler cuz mfx sucks
-        textField.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            this.value = null;
+        // clear selected value when text changed manually
+        textField.addEventFilter(KeyEvent.KEY_TYPED, e -> {
+            this.value.set(null);
+            searchText.set(textField.getText());
         });
+        
+        this.searchTextProperty().addListener(e -> {
+            
+            this.search(this.getSearchText());
+        });
+    }
+    
+    public String getSearchText() {
+        return searchText.get();
+    }
+    
+    public StringProperty searchTextProperty() {
+        return searchText;
+    }
+    
+    public void search(String searchText) {
+        String searchPattern = Utils.textToSearchPattern(searchText);
+        Pattern pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
+        HashMap<K, MFXButton> itemMap = dropdown.getItemMap();
+        for (K id : itemMap.keySet()) {
+            MFXButton item = itemMap.get(id);
+            boolean doesMatch = pattern.matcher(item.getText()).find();
+            item.setVisible(doesMatch);
+            item.setManaged(doesMatch);
+        }
     }
     
     public void clearValue() {
         this.textField.clear();
-        this.value = null;
+        this.value.set(null);
     }
     
     public interface Stringifier<T> {
@@ -132,15 +160,19 @@ public class ComboBox<K, V> extends StackPane {
             this.clearValue();
             return;
         }
-        if (value == this.value) return;
-        V oldValue = this.value;
-        this.value = value;
-        this.textField.setText(this.stringifier.call(this.value));
+        if (value == this.value.get()) return;
+        V oldValue = this.value.get();
+        this.value.set(value);
+        this.textField.setText(this.stringifier.call(this.value.get()));
         textField.positionCaret(textField.getText().length());
         this.triggerSelectListeners(value, oldValue);
     }
     
     public V getValue() {
+        return value.get();
+    }
+    
+    public ObjectProperty<V> valueProperty() {
         return value;
     }
     
@@ -184,8 +216,15 @@ public class ComboBox<K, V> extends StackPane {
     
     public void removeItem(K id) {
         Platform.runLater(() -> {
-            items.remove(id);
             dropdown.removeItemByID(id);
+            items.remove(id);
+        });
+    }
+    
+    public void clear() {
+        Platform.runLater(() -> {
+            dropdown.clear();
+            items.clear();
         });
     }
     
@@ -231,15 +270,15 @@ public class ComboBox<K, V> extends StackPane {
         this._setItems(map, null);
     }
     
-    public interface TextPropertyGetter<V> {
-        Property<String> call(V obj);
-    }
-    
     public void setItems(
         ObservableMap<K, V> map,
         TextPropertyGetter<V> textPropertyGetter
     ) {
         this._setItems(map, textPropertyGetter);
+    }
+    
+    public interface TextPropertyGetter<V> {
+        Property<String> call(V obj);
     }
     
     public MFXScrollPane getDropDownScrollPane() {
@@ -333,19 +372,27 @@ public class ComboBox<K, V> extends StackPane {
             });
         }
         
+        public HashMap<K, MFXButton> getItemMap() {
+            return itemMap;
+        }
+        
         public void removeItemByID(K id) {
             MFXButton button = this.itemMap.get(id);
             if (button == null) return;
             this.itemMap.remove(id);
-            Platform.runLater(() -> {
-                container.getChildren().remove(button);
-            });
+            container.getChildren().remove(button);
+        }
+        
+        public void clear() {
+            for (K id : itemMap.keySet()) {
+                container.getChildren().remove(
+                    itemMap.get(id)
+                );
+            }
         }
         
         public void updateItemByID(K id, String text) {
-            Platform.runLater(() -> {
-                this.itemMap.get(id).setText(text);
-            });
+            this.itemMap.get(id).setText(text);
         }
         
         public MFXButton getItemByID(K id) {
@@ -354,14 +401,12 @@ public class ComboBox<K, V> extends StackPane {
         
         public MFXButton addItem(K id, String text) {
             MFXButton button = new MFXButton(text);
-            Platform.runLater(() -> {
-                button.getStyleClass().add("context-menu-item-button");
-                button.setMaxWidth(Double.MAX_VALUE);
-                button.setTextAlignment(TextAlignment.LEFT);
-                button.setAlignment(Pos.CENTER_LEFT);
-                container.getChildren().add(button);
-                this.itemMap.put(id, button);
-            });
+            button.getStyleClass().add("context-menu-item-button");
+            button.setMaxWidth(Double.MAX_VALUE);
+            button.setTextAlignment(TextAlignment.LEFT);
+            button.setAlignment(Pos.CENTER_LEFT);
+            container.getChildren().add(button);
+            this.itemMap.put(id, button);
             return button;
         }
         

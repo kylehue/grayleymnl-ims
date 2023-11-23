@@ -1,15 +1,29 @@
 package com.ims.components;
 
+import com.ims.Config;
+import com.ims.database.DBCategories;
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
+import com.ims.utils.LayoutUtils;
+import com.ims.utils.Utils;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
+    private final ObservableMap<Integer, CategoryObject> model = FXCollections.observableHashMap();
+    
     public CategoryComboBox() {
         this.textField.setFloatingText("Category");
-        this.setItems(BaseModel.categoryMap, CategoryObject::nameProperty);
+        this.setItems(model, CategoryObject::nameProperty);
         this.setStringifier(CategoryObject::getName);
         this.initializeCategoryLazyLoad();
         
@@ -27,40 +41,70 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
         });
     }
     
+    @Override
+    public void search(String searchText) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                model.clear();
+                clear();
+                if (searchText.isEmpty()) {
+                    loadCategories(Config.categoryLoadLimit);
+                    return null;
+                }
+                
+                String searchPattern = Utils.textToSearchPattern(searchText);
+                ArrayList<HashMap<DBCategories.Column, Object>> result = DBCategories.search(
+                    searchPattern
+                );
+                
+                for (HashMap<DBCategories.Column, Object> row : result) {
+                    loadCategory(row);
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    private void loadCategories(int limit) {
+        BaseModel.loadCategoriesToMap(limit, model);
+    }
+    
+    private void loadCategory(HashMap<DBCategories.Column, Object> category) {
+        BaseModel.loadCategoryToMap(category, model);
+    }
+    
     private void initializeCategoryLazyLoad() {
         Platform.runLater(() -> {
-            // First of all, we have to add the categories in the model
-            for (int id : BaseModel.categoryMap.keySet()) {
-                CategoryObject categoryObject = BaseModel.categoryMap.get(id);
-                Platform.runLater(() -> {
-                    this.addItem(id, categoryObject);
-                });
-            }
-            
-            // Load categories whenever the scrollbar hits the bottom.
-            this.getDropDownScrollPane().vvalueProperty().addListener(
-                ($1, $2, scrollValue) -> {
-                    if (scrollValue.doubleValue() == 1) {
-                        BaseModel.loadCategories(8);
+            LayoutUtils.initializeLazyLoad(
+                this.getDropDownScrollPane(),
+                this.getDropdownContainer(),
+                model,
+                (requestType) -> {
+                    switch (requestType) {
+                        case INITIAL:
+                            loadCategories(1);
+                            break;
+                        case HIT_BOTTOM:
+                            if (!this.getSearchText().isEmpty()) return;
+                            loadCategories(Config.categoryLoadLimit);
+                            break;
+                        case INSUFFICIENT:
+                            if (!this.getSearchText().isEmpty()) return;
+                            loadCategories(Config.categoryLoadLimit / 3);
+                            break;
                     }
                 }
             );
-            
-            // The listener above won't work if there is no scrollbar.
-            // So here, we add components until the scroll pane gets a scrollbar.
-            this.getDropDownScrollPane().viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-                double contentHeight = this.getDropdownContainer()
-                    .getBoundsInLocal()
-                    .getHeight();
-                double viewportHeight = newValue.getHeight();
-                if (contentHeight < viewportHeight) {
-                    BaseModel.loadCategories(4);
-                }
-            });
-            
-            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-            // So here, we can trigger it by loading initial categories.
-            BaseModel.loadCategories(8);
         });
     }
 }

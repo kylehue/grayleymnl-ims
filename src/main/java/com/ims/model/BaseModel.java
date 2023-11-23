@@ -541,18 +541,25 @@ public abstract class BaseModel {
     private static CategoryObject loadCategory(
         HashMap<DBCategories.Column, Object> category
     ) {
+        return loadCategoryToMap(category, categoryMap);
+    }
+    
+    public static CategoryObject loadCategoryToMap(
+        HashMap<DBCategories.Column, Object> category,
+        ObservableMap<Integer, CategoryObject> map
+    ) {
         int id = (Integer) category.get(DBCategories.Column.ID);
         String name = (String) category.get(DBCategories.Column.NAME);
         Timestamp lastModified = (Timestamp) category.get(DBCategories.Column.LAST_MODIFIED);
         
-        CategoryObject categoryObject = categoryMap.get(id);
-        if (!categoryMap.containsKey(id)) {
+        CategoryObject categoryObject = map.get(id);
+        if (!map.containsKey(id)) {
             categoryObject = new CategoryObject(
                 id,
                 name,
                 lastModified
             );
-            categoryMap.put(id, categoryObject);
+            map.put(id, categoryObject);
         } else {
             categoryObject.setName(name);
             categoryObject.setLastModified(lastModified);
@@ -567,17 +574,24 @@ public abstract class BaseModel {
      * @param limit The limit of the rows to retrieve.
      */
     public static void loadCategories(int limit) {
+        loadCategoriesToMap(limit, categoryMap);
+    }
+    
+    public static void loadCategoriesToMap(
+        int limit,
+        ObservableMap<Integer, CategoryObject> map
+    ) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
                 ArrayList<HashMap<DBCategories.Column, Object>> categoryRows = DBCategories.getInRange(
-                    categoryMap.size(),
+                    map.size(),
                     limit
                 );
                 
                 for (HashMap<DBCategories.Column, Object> row : categoryRows) {
-                    loadCategory(row);
+                    loadCategoryToMap(row, map);
                 }
                 return null;
             }
