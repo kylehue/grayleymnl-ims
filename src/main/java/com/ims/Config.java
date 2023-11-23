@@ -13,4 +13,5 @@ public abstract class Config {
     public static int productLoadLimit = 9;
     public static int categoryLoadLimit = 12;
     public static int roleLoadLimit = 9;
+    public static int userLoadLimit = 12;
 }

@@ -245,6 +245,39 @@ public class DBUsers {
         return rows;
     }
     
+    public static ArrayList<HashMap<Column, Object>> search(
+        String regexPattern
+    ) {
+        ArrayList<HashMap<Column, Object>> rows = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
+        
+        try {
+            String query = """
+                SELECT u.*, r.name FROM users u
+                JOIN roles r
+                ON u.role_id = r.id
+                WHERE CONCAT(
+                	u.email,
+                	r.name,
+                	TO_CHAR(joined_date, 'FMMonth, DD, YYYY'),
+                	TO_CHAR(last_activity_date, 'FMMonth, DD, YYYY')
+                ) ~* ?
+                ORDER BY u.joined_date DESC, u.id;
+                """;
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, regexPattern);
+            resultSet = preparedStatement.executeQuery();
+            rows = extractRowsFromResultSet(resultSet);
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(resultSet, preparedStatement);
+        }
+        
+        return rows;
+    }
+    
     public static HashMap<DBUsers.Column, Object> getOne(
         DBUsers.Column columnLabel,
         Object compareValue

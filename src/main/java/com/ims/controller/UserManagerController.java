@@ -2,6 +2,7 @@ package com.ims.controller;
 
 import com.ims.Config;
 import com.ims.components.*;
+import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
@@ -15,6 +16,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
@@ -186,6 +189,11 @@ public class UserManagerController {
             usersFlowPane
         );
         this.initializeUserLazyLoad();
+        
+        searchUserTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            UserManagerModel.searchUsers(searchUserTextField.getText());
+        });
     }
     
     public void initializeUserLazyLoad() {

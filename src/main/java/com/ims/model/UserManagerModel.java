@@ -1,12 +1,12 @@
 package com.ims.model;
 
-import com.ims.components.Role;
+import com.ims.Config;
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
-import javafx.application.Platform;
+import com.ims.utils.Utils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -374,6 +374,38 @@ public abstract class UserManagerModel {
         task.setOnSucceeded(e -> {
             isBusyUser.set(false);
         });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    public static void searchUsers(String searchText) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                userMap.clear();
+                if (searchText.isEmpty()) {
+                    loadUsers(Config.categoryLoadLimit);
+                    return null;
+                }
+                
+                String searchPattern = Utils.textToSearchPattern(searchText);
+                ArrayList<HashMap<DBUsers.Column, Object>> result = DBUsers.search(
+                    searchPattern
+                );
+                
+                for (HashMap<DBUsers.Column, Object> row : result) {
+                    loadUser(row);
+                }
+                
+                return null;
+            }
+        };
         
         task.setOnFailed(e -> {
             System.out.println(e);
