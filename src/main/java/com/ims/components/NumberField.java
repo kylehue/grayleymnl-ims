@@ -90,8 +90,6 @@ public class NumberField extends StackPane {
             event.consume();
         });
         
-        this.setValue(this.value.get());
-        
         this.minValueProperty().addListener(e -> {
             this.setValue(this.getValue());
         });
@@ -103,6 +101,8 @@ public class NumberField extends StackPane {
         textField.delegateFocusedProperty().addListener(e -> {
             this.setValue(this.getValue());
         });
+        
+        this.setValue(0);
     }
     
     private boolean isValid(String str) {
@@ -127,7 +127,7 @@ public class NumberField extends StackPane {
     }
     
     public double getValue() {
-        return value.get();
+        return value.get() + 1 - 1;
     }
     
     public DoubleProperty maxValueProperty() {

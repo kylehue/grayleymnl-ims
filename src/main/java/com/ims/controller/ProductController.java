@@ -13,7 +13,6 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -195,7 +194,19 @@ public class ProductController {
         });
         
         backButton.setOnMouseClicked(e -> {
-            goBack();
+            if (!isSaved()) {
+                PopupService.confirmDialog.setup(
+                    "Unsaved Changes",
+                    "There are some unsaved changes, are you sure you want to exit?",
+                    "Exit",
+                    true,
+                    () -> {
+                        goBack();
+                    }
+                ).show();
+            } else {
+                goBack();
+            }
         });
         
         cancelButton.setOnMouseClicked(e -> {
@@ -234,6 +245,16 @@ public class ProductController {
         });
     }
     
+    private boolean isSaved() {
+        ProductObject productObject = ProductModel.currentProduct.get();
+        return productNameTextField.getText().equals(productObject.getName()) &&
+            productPriceNumberField.getValue() == productObject.getPrice() &&
+            productCategoryComboBox.getValue().getID() == productObject.getCategoryID() &&
+            productImageURLTextField.getText().equals(productObject.getImageURL()) &&
+            currentStocksNumberField.getValue() == productObject.getCurrentStocks() &&
+            expectedStocksNumberField.getValue() == productObject.getExpectedStocks();
+    }
+    
     private void updateDeletePermissions(boolean isAllowed) {
         deleteProductButton.setDisable(!isAllowed);
     }
@@ -253,9 +274,7 @@ public class ProductController {
             }
             
             double price = currentProduct.getPrice();
-            productPriceNumberField.textField.setText(String.format(
-                "%.2f", price
-            ));
+            productPriceNumberField.setValue(price);
             
             int categoryID = currentProduct.getCategoryID();
             productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
