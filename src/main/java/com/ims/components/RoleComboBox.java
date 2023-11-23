@@ -1,15 +1,28 @@
 package com.ims.components;
 
+import com.ims.Config;
+import com.ims.database.DBRoles;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
+import com.ims.utils.LayoutUtils;
+import com.ims.utils.Utils;
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RoleComboBox extends ComboBox<Integer, RoleObject> {
+    private final ObservableMap<Integer, RoleObject> model = FXCollections.observableHashMap();
+    
     public RoleComboBox() {
         this.textField.setFloatingText("Role");
-        this.setItems(UserManagerModel.roleMap, RoleObject::nameProperty);
+        this.setItems(model, RoleObject::nameProperty);
         this.setStringifier(RoleObject::getName);
         this.initializeRoleLazyLoad();
         
@@ -27,40 +40,70 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
         });
     }
     
+    @Override
+    public void search(String searchText) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                model.clear();
+                clear();
+                if (searchText.isEmpty()) {
+                    loadRoles(Config.roleLoadLimit);
+                    return null;
+                }
+                
+                String searchPattern = Utils.textToSearchPattern(searchText);
+                ArrayList<HashMap<DBRoles.Column, Object>> result = DBRoles.search(
+                    searchPattern
+                );
+                
+                for (HashMap<DBRoles.Column, Object> row : result) {
+                    loadRole(row);
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
+    private void loadRoles(int limit) {
+        UserManagerModel.loadRolesToMap(limit, model);
+    }
+    
+    private void loadRole(HashMap<DBRoles.Column, Object> role) {
+        UserManagerModel.loadRoleToMap(role, model);
+    }
+    
     private void initializeRoleLazyLoad() {
         Platform.runLater(() -> {
-            // First of all, we have to add the roles in the model
-            for (int id : UserManagerModel.roleMap.keySet()) {
-                RoleObject roleObject = UserManagerModel.roleMap.get(id);
-                Platform.runLater(() -> {
-                    this.addItem(id, roleObject);
-                });
-            }
-            
-            // Load roles whenever the scrollbar hits the bottom.
-            this.getDropDownScrollPane().vvalueProperty().addListener(
-                ($1, $2, scrollValue) -> {
-                    if (scrollValue.doubleValue() == 1) {
-                        UserManagerModel.loadRoles(8);
+            LayoutUtils.initializeLazyLoad(
+                this.getDropDownScrollPane(),
+                this.getDropdownContainer(),
+                model,
+                (requestType) -> {
+                    switch (requestType) {
+                        case INITIAL:
+                            loadRoles(8);
+                            break;
+                        case HIT_BOTTOM:
+                            if (!this.getSearchText().isEmpty()) return;
+                            loadRoles(Config.roleLoadLimit);
+                            break;
+                        case INSUFFICIENT:
+                            if (!this.getSearchText().isEmpty()) return;
+                            loadRoles(Config.roleLoadLimit / 3);
+                            break;
                     }
                 }
             );
-            
-            // The listener above won't work if there is no scrollbar.
-            // So here, we add components until the scroll pane gets a scrollbar.
-            this.getDropDownScrollPane().viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-                double contentHeight = this.getDropdownContainer()
-                    .getBoundsInLocal()
-                    .getHeight();
-                double viewportHeight = newValue.getHeight();
-                if (contentHeight < viewportHeight) {
-                    UserManagerModel.loadRoles(4);
-                }
-            });
-            
-            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-            // So here, we can trigger it by loading initial roles.
-            UserManagerModel.loadRoles(8);
         });
     }
 }

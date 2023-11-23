@@ -12,4 +12,5 @@ public abstract class Config {
     public static float lowStockRate = 0.33f; // 33%
     public static int productLoadLimit = 9;
     public static int categoryLoadLimit = 12;
+    public static int roleLoadLimit = 9;
 }

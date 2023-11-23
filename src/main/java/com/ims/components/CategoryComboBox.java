@@ -4,7 +4,6 @@ import com.ims.Config;
 import com.ims.database.DBCategories;
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
-import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.Utils;
 import javafx.application.Platform;
@@ -92,7 +91,7 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
                 (requestType) -> {
                     switch (requestType) {
                         case INITIAL:
-                            loadCategories(1);
+                            loadCategories(8);
                             break;
                         case HIT_BOTTOM:
                             if (!this.getSearchText().isEmpty()) return;

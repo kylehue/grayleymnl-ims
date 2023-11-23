@@ -37,7 +37,7 @@ public class ComboBox<K, V> extends StackPane {
     private final ObjectProperty<V> value = new SimpleObjectProperty<>();
     private final ArrayList<SelectEvent<V>> selectListeners = new ArrayList<>();
     private final ArrayList<Select2Event<V>> select2Listeners = new ArrayList<>();
-    public final StringProperty searchText = new SimpleStringProperty();
+    public final StringProperty searchText = new SimpleStringProperty("");
     
     public ComboBox() {
         // Set up the TextField
