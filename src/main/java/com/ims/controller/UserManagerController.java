@@ -85,6 +85,11 @@ public class UserManagerController {
             
             roleAddModal.hide();
         });
+        
+        searchRoleTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            UserManagerModel.searchRoles(searchRoleTextField.getText());
+        });
     }
     
     public void initializeRoleLazyLoad() {

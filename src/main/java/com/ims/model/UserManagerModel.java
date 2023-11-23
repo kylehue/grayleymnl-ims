@@ -163,6 +163,38 @@ public abstract class UserManagerModel {
         executor.shutdown();
     }
     
+    public static void searchRoles(String searchText) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                roleMap.clear();
+                if (searchText.isEmpty()) {
+                    loadRoles(Config.roleLoadLimit);
+                    return null;
+                }
+                
+                String searchPattern = Utils.textToSearchPattern(searchText);
+                ArrayList<HashMap<DBRoles.Column, Object>> result = DBRoles.search(
+                    searchPattern
+                );
+                
+                for (HashMap<DBRoles.Column, Object> row : result) {
+                    loadRole(row);
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+    }
+    
     public static RoleObject loadAndGetRole(int id) {
         RoleObject roleObject = roleMap.get(id);
         if (roleObject != null) {
