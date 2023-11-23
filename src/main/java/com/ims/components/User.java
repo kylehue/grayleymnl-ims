@@ -6,6 +6,7 @@ import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
+import com.ims.utils.Transition;
 import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
@@ -73,6 +74,8 @@ public class User extends GridPane {
             UserEditModel.currentUser.set(this.getUserObject());
             SceneManager.setScene("user");
         });
+        
+        Transition.fadeUp(this, 150);
     }
     
     private boolean propertyListenersInitialized = false;

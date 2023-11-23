@@ -7,6 +7,7 @@ import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import com.ims.utils.TextFieldValidator;
+import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
@@ -164,6 +165,8 @@ public class Role extends GridPane {
                 }
             ).show();
         });
+        
+        Transition.fadeUp(this, 150);
     }
     
     private boolean propertyListenersInitialized = false;
