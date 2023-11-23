@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.Config;
 import com.ims.components.*;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
@@ -10,7 +11,9 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -43,7 +46,7 @@ public class UserManagerController {
     @FXML
     FlowPane rolesFlowPane;
     
-    HashMap<Integer, Role> roles = new HashMap<>();
+    final ObservableMap<Integer, Role> roles = FXCollections.observableHashMap();
     
     RoleAddModal roleAddModal = new RoleAddModal();
     
@@ -82,35 +85,28 @@ public class UserManagerController {
     }
     
     public void initializeRoleLazyLoad() {
-        // First of all, we have to add the roles in the model
-        for (int id : UserManagerModel.roleMap.keySet()) {
-            RoleObject roleObject = UserManagerModel.roleMap.get(id);
-            if (roleObject == null) return;
-            Platform.runLater(() -> {
-                addRole(roleObject);
-            });
-        }
-        
-        // Load roles whenever the scrollbar hits the bottom.
-        rolesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-            if (scrollValue.doubleValue() == 1) {
-                UserManagerModel.loadRoles(12);
-            }
+        Platform.runLater(() -> {
+            LayoutUtils.initializeLazyLoad(
+                rolesScrollPane,
+                rolesFlowPane,
+                roles,
+                (requestType) -> {
+                    switch (requestType) {
+                        case INITIAL:
+                            UserManagerModel.loadRoles(1);
+                            break;
+                        case HIT_BOTTOM:
+                            if (!searchRoleTextField.getText().isEmpty()) return;
+                            UserManagerModel.loadRoles(Config.roleLoadLimit);
+                            break;
+                        case INSUFFICIENT:
+                            if (!searchRoleTextField.getText().isEmpty()) return;
+                            UserManagerModel.loadRoles(Config.roleLoadLimit / 3);
+                            break;
+                    }
+                }
+            );
         });
-        
-        // The listener above won't work if there is no scrollbar.
-        // So here, we add components until the scroll pane gets a scrollbar.
-        rolesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-            double contentHeight = rolesFlowPane.getBoundsInLocal().getHeight();
-            double viewportHeight = newValue.getHeight();
-            if (contentHeight < viewportHeight) {
-                UserManagerModel.loadRoles(4);
-            }
-        });
-        
-        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial roles.
-        UserManagerModel.loadRoles(12);
     }
     
     private void addRole(RoleObject roleObject) {
