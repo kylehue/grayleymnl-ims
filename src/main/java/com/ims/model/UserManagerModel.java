@@ -1,7 +1,9 @@
 package com.ims.model;
 
+import com.ims.components.Role;
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
+import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import javafx.application.Platform;
@@ -44,44 +46,7 @@ public abstract class UserManagerModel {
             @Override
             protected Void call() throws Exception {
                 isBusyRole.set(true);
-                HashMap<DBRoles.Column, Object> newRole = DBRoles.add(name);
-                int newID = (Integer) newRole.get(DBRoles.Column.ID);
-                String newName = (String) newRole.get(
-                    DBRoles.Column.NAME
-                );
-                boolean newAllowAddCategory = (boolean) newRole.get(
-                    DBRoles.Column.ALLOW_ADD_CATEGORY
-                );
-                boolean newAllowDeleteCategory = (boolean) newRole.get(
-                    DBRoles.Column.ALLOW_DELETE_CATEGORY
-                );
-                boolean newAllowEditCategory = (boolean) newRole.get(
-                    DBRoles.Column.ALLOW_EDIT_CATEGORY
-                );
-                boolean newAllowAddProduct = (boolean) newRole.get(
-                    DBRoles.Column.ALLOW_ADD_PRODUCT
-                );
-                boolean newAllowDeleteProduct = (boolean) newRole.get(
-                    DBRoles.Column.ALLOW_DELETE_PRODUCT
-                );
-                boolean newAllowEditProduct = (boolean) newRole.get(
-                    DBRoles.Column.ALLOW_EDIT_PRODUCT
-                );
-                Timestamp newLastModified = (Timestamp) newRole.get(
-                    DBRoles.Column.LAST_MODIFIED
-                );
-                
-                roleMap.put(newID, new RoleObject(
-                    newID,
-                    newName,
-                    newAllowAddCategory,
-                    newAllowDeleteCategory,
-                    newAllowEditCategory,
-                    newAllowAddProduct,
-                    newAllowDeleteProduct,
-                    newAllowEditProduct,
-                    newLastModified
-                ));
+                loadRole(DBRoles.add(name));
                 
                 return null;
             }
@@ -127,7 +92,6 @@ public abstract class UserManagerModel {
             protected Void call() throws Exception {
                 isBusyRole.set(true);
                 
-                // Update in database
                 HashMap<DBRoles.Column, Object> newRole = DBRoles.update(
                     id,
                     name,
@@ -142,39 +106,7 @@ public abstract class UserManagerModel {
                 // Update in list if it exists
                 RoleObject roleObject = roleMap.get(id);
                 if (roleObject != null) {
-                    String newName = (String) newRole.get(
-                        DBRoles.Column.NAME
-                    );
-                    boolean newAllowAddCategory = (boolean) newRole.get(
-                        DBRoles.Column.ALLOW_ADD_CATEGORY
-                    );
-                    boolean newAllowDeleteCategory = (boolean) newRole.get(
-                        DBRoles.Column.ALLOW_DELETE_CATEGORY
-                    );
-                    boolean newAllowEditCategory = (boolean) newRole.get(
-                        DBRoles.Column.ALLOW_EDIT_CATEGORY
-                    );
-                    boolean newAllowAddProduct = (boolean) newRole.get(
-                        DBRoles.Column.ALLOW_ADD_PRODUCT
-                    );
-                    boolean newAllowDeleteProduct = (boolean) newRole.get(
-                        DBRoles.Column.ALLOW_DELETE_PRODUCT
-                    );
-                    boolean newAllowEditProduct = (boolean) newRole.get(
-                        DBRoles.Column.ALLOW_EDIT_PRODUCT
-                    );
-                    Timestamp newLastModified = (Timestamp) newRole.get(
-                        DBRoles.Column.LAST_MODIFIED
-                    );
-                    
-                    roleObject.setName(newName);
-                    roleObject.setAllowAddCategory(newAllowAddCategory);
-                    roleObject.setAllowDeleteCategory(newAllowDeleteCategory);
-                    roleObject.setAllowEditCategory(newAllowEditCategory);
-                    roleObject.setAllowAddProduct(newAllowAddProduct);
-                    roleObject.setAllowDeleteProduct(newAllowDeleteProduct);
-                    roleObject.setAllowEditProduct(newAllowEditProduct);
-                    roleObject.setLastModified(newLastModified);
+                    loadRole(newRole);
                 }
                 
                 return null;
@@ -248,33 +180,7 @@ public abstract class UserManagerModel {
                 );
                 
                 if (row != null) {
-                    RoleObject roleObject = new RoleObject(
-                        id,
-                        (String) row.get(DBRoles.Column.NAME),
-                        (boolean) row.get(
-                            DBRoles.Column.ALLOW_ADD_CATEGORY
-                        ),
-                        (boolean) row.get(
-                            DBRoles.Column.ALLOW_DELETE_CATEGORY
-                        ),
-                        (boolean) row.get(
-                            DBRoles.Column.ALLOW_EDIT_CATEGORY
-                        ),
-                        (boolean) row.get(
-                            DBRoles.Column.ALLOW_ADD_PRODUCT
-                        ),
-                        (boolean) row.get(
-                            DBRoles.Column.ALLOW_DELETE_PRODUCT
-                        ),
-                        (boolean) row.get(
-                            DBRoles.Column.ALLOW_EDIT_PRODUCT
-                        ),
-                        (Timestamp) row.get(DBRoles.Column.LAST_MODIFIED)
-                    );
-                    
-                    roleMap.put(id, roleObject);
-                    
-                    return roleObject;
+                    return loadRole(row);
                 }
                 
                 return null;
@@ -302,73 +208,86 @@ public abstract class UserManagerModel {
         return roleObject;
     }
     
+    public static RoleObject loadRoleToMap(
+        HashMap<DBRoles.Column, Object> role,
+        ObservableMap<Integer, RoleObject> map
+    ) {
+        int id = (Integer) role.get(DBRoles.Column.ID);
+        String name = (String) role.get(DBRoles.Column.NAME);
+        boolean allowAddCategory = (boolean) role.get(
+            DBRoles.Column.ALLOW_ADD_CATEGORY
+        );
+        boolean allowDeleteCategory = (boolean) role.get(
+            DBRoles.Column.ALLOW_DELETE_CATEGORY
+        );
+        boolean allowEditCategory = (boolean) role.get(
+            DBRoles.Column.ALLOW_EDIT_CATEGORY
+        );
+        boolean allowAddProduct = (boolean) role.get(
+            DBRoles.Column.ALLOW_ADD_PRODUCT
+        );
+        boolean allowDeleteProduct = (boolean) role.get(
+            DBRoles.Column.ALLOW_DELETE_PRODUCT
+        );
+        boolean allowEditProduct = (boolean) role.get(
+            DBRoles.Column.ALLOW_EDIT_PRODUCT
+        );
+        Timestamp lastModified = (Timestamp) role.get(
+            DBRoles.Column.LAST_MODIFIED
+        );
+        
+        RoleObject roleObject = map.get(id);
+        if (roleObject == null) {
+            roleObject = new RoleObject(
+                id,
+                name,
+                allowAddCategory,
+                allowDeleteCategory,
+                allowEditCategory,
+                allowAddProduct,
+                allowDeleteProduct,
+                allowEditProduct,
+                lastModified
+            );
+            map.put(id, roleObject);
+        } else {
+            roleObject.setName(name);
+            roleObject.setAllowAddProduct(allowAddProduct);
+            roleObject.setAllowDeleteProduct(allowDeleteProduct);
+            roleObject.setAllowEditProduct(allowEditProduct);
+            roleObject.setAllowAddCategory(allowAddCategory);
+            roleObject.setAllowDeleteCategory(allowDeleteCategory);
+            roleObject.setAllowEditCategory(allowEditCategory);
+            roleObject.setLastModified(lastModified);
+        }
+        
+        return roleObject;
+    }
+    
+    private static RoleObject loadRole(HashMap<DBRoles.Column, Object> role) {
+        return loadRoleToMap(role, roleMap);
+    }
+    
     /**
      * Load more roles from the database.
      *
      * @param limit The limit of the rows to retrieve.
      */
-    public static void loadRoles(int limit) {
+    public static void loadRolesToMap(
+        int limit,
+        ObservableMap<Integer, RoleObject> map
+    ) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 isBusyRole.set(true);
                 ArrayList<HashMap<DBRoles.Column, Object>> roleRows = DBRoles.getInRange(
-                    roleMap.size(),
+                    map.size(),
                     limit
                 );
                 
                 for (HashMap<DBRoles.Column, Object> row : roleRows) {
-                    int id = (Integer) row.get(DBRoles.Column.ID);
-                    // Skip if already added (this shouldn't happen but just to be sure)
-                    RoleObject role = roleMap.get(id);
-                    
-                    // Add in list
-                    String name = (String) row.get(DBRoles.Column.NAME);
-                    boolean allowAddCategory = (boolean) row.get(
-                        DBRoles.Column.ALLOW_ADD_CATEGORY
-                    );
-                    boolean allowDeleteCategory = (boolean) row.get(
-                        DBRoles.Column.ALLOW_DELETE_CATEGORY
-                    );
-                    boolean allowEditCategory = (boolean) row.get(
-                        DBRoles.Column.ALLOW_EDIT_CATEGORY
-                    );
-                    boolean allowAddProduct = (boolean) row.get(
-                        DBRoles.Column.ALLOW_ADD_PRODUCT
-                    );
-                    boolean allowDeleteProduct = (boolean) row.get(
-                        DBRoles.Column.ALLOW_DELETE_PRODUCT
-                    );
-                    boolean allowEditProduct = (boolean) row.get(
-                        DBRoles.Column.ALLOW_EDIT_PRODUCT
-                    );
-                    Timestamp lastModified = (Timestamp) row.get(
-                        DBRoles.Column.LAST_MODIFIED
-                    );
-                    
-                    if (role == null) {
-                        role = new RoleObject(
-                            id,
-                            name,
-                            allowAddCategory,
-                            allowDeleteCategory,
-                            allowEditCategory,
-                            allowAddProduct,
-                            allowDeleteProduct,
-                            allowEditProduct,
-                            lastModified
-                        );
-                        roleMap.put(id, role);
-                    } else {
-                        role.setName(name);
-                        role.setAllowAddProduct(allowAddProduct);
-                        role.setAllowDeleteProduct(allowDeleteProduct);
-                        role.setAllowEditProduct(allowEditProduct);
-                        role.setAllowAddCategory(allowAddCategory);
-                        role.setAllowDeleteCategory(allowDeleteCategory);
-                        role.setAllowEditCategory(allowEditCategory);
-                        role.setLastModified(lastModified);
-                    }
+                    loadRoleToMap(row, map);
                 }
                 return null;
             }
@@ -385,6 +304,10 @@ public abstract class UserManagerModel {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
         executor.shutdown();
+    }
+    
+    public static void loadRoles(int limit) {
+        loadRolesToMap(limit, roleMap);
     }
     
     //////////////////////////////////////////////////////////////////////
