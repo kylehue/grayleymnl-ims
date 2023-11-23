@@ -166,7 +166,7 @@ public class UserManagerController {
     @FXML
     MFXScrollPane usersScrollPane;
     
-    HashMap<Integer, User> users = new HashMap<>();
+    final ObservableMap<Integer, User> users = FXCollections.observableHashMap();
     
     public void initializeUserPage() {
         UserManagerModel.userMap.addListener(
@@ -189,35 +189,28 @@ public class UserManagerController {
     }
     
     public void initializeUserLazyLoad() {
-        // First of all, we have to add the users in the model
-        for (int id : UserManagerModel.userMap.keySet()) {
-            UserObject userObject = UserManagerModel.userMap.get(id);
-            if (userObject == null) return;
-            Platform.runLater(() -> {
-                addUser(userObject);
-            });
-        }
-        
-        // Load users whenever the scrollbar hits the bottom.
-        usersScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-            if (scrollValue.doubleValue() == 1) {
-                UserManagerModel.loadUsers(12);
-            }
+        Platform.runLater(() -> {
+            LayoutUtils.initializeLazyLoad(
+                usersScrollPane,
+                usersFlowPane,
+                users,
+                (requestType) -> {
+                    switch (requestType) {
+                        case INITIAL:
+                            UserManagerModel.loadUsers(1);
+                            break;
+                        case HIT_BOTTOM:
+                            if (!searchUserTextField.getText().isEmpty()) return;
+                            UserManagerModel.loadUsers(Config.userLoadLimit);
+                            break;
+                        case INSUFFICIENT:
+                            if (!searchUserTextField.getText().isEmpty()) return;
+                            UserManagerModel.loadUsers(Config.userLoadLimit / 3);
+                            break;
+                    }
+                }
+            );
         });
-        
-        // The listener above won't work if there is no scrollbar.
-        // So here, we add components until the scroll pane gets a scrollbar.
-        usersScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-            double contentHeight = usersFlowPane.getBoundsInLocal().getHeight();
-            double viewportHeight = newValue.getHeight();
-            if (contentHeight < viewportHeight) {
-                UserManagerModel.loadUsers(4);
-            }
-        });
-        
-        // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-        // So here, we can trigger it by loading initial users.
-        UserManagerModel.loadUsers(12);
     }
     
     private void addUser(UserObject userObject) {
