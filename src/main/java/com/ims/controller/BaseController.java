@@ -8,12 +8,14 @@ import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
 import com.ims.model.UserSessionModel;
+import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.chart.PieChart;
@@ -22,6 +24,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Pair;
 
@@ -151,7 +154,7 @@ public class BaseController {
     
     private ProductAddModal addProductModal = new ProductAddModal();
     
-    private HashMap<Integer, Product> products = new HashMap<>();
+    private ObservableMap<Integer, Product> products = FXCollections.observableHashMap();
     
     private void initializeProductPage() {
         BaseModel.productMap.addListener(
@@ -165,6 +168,15 @@ public class BaseController {
                 }
             }
         );
+        
+        // Add the products in the model
+        for (int id : BaseModel.productMap.keySet()) {
+            ProductObject productObject = BaseModel.productMap.get(id);
+            if (productObject == null) return;
+            Platform.runLater(() -> {
+                addProduct(productObject);
+            });
+        }
         
         LayoutUtils.applyVirtualScrolling(productsScrollPane, productsFlowPane);
         this.initializeProductLazyLoad();
@@ -221,39 +233,24 @@ public class BaseController {
      */
     private void initializeProductLazyLoad() {
         Platform.runLater(() -> {
-            // First of all, we have to add the products in the model
-            for (int id : BaseModel.productMap.keySet()) {
-                ProductObject productObject = BaseModel.productMap.get(id);
-                if (productObject == null) return;
-                Platform.runLater(() -> {
-                    addProduct(productObject);
-                });
-            }
-            
-            // Load products whenever the scrollbar hits the bottom.
-            productsScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-                if (!searchProductTextField.getText().isEmpty()) return;
-                if (!getAllActiveCategoryTags().isEmpty()) return;
-                if (scrollValue.doubleValue() == 1) {
-                    BaseModel.loadProducts(Config.productLoadLimit / 3);
+            LayoutUtils.initializeLazyLoad(
+                productsScrollPane,
+                productsFlowPane,
+                products,
+                (requestType) -> {
+                    switch (requestType) {
+                        case INITIAL:
+                            BaseModel.loadProducts(1);
+                            break;
+                        case HIT_BOTTOM:
+                        case INSUFFICIENT:
+                            if (!searchProductTextField.getText().isEmpty()) return;
+                            if (!getAllActiveCategoryTags().isEmpty()) return;
+                            BaseModel.loadProducts(Config.productLoadLimit / 3);
+                            break;
+                    }
                 }
-            });
-            
-            // The listener above won't work if there is no scrollbar.
-            // So here, we add components until the scroll pane gets a scrollbar.
-            productsScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-                if (!searchProductTextField.getText().isEmpty()) return;
-                if (!getAllActiveCategoryTags().isEmpty()) return;
-                double contentHeight = productsFlowPane.getBoundsInLocal().getHeight();
-                double viewportHeight = newValue.getHeight();
-                if (contentHeight < viewportHeight) {
-                    BaseModel.loadProducts(Config.productLoadLimit / 3);
-                }
-            });
-            
-            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-            // So here, we can trigger it by loading initial products.
-            BaseModel.loadProducts(Config.productLoadLimit);
+            );
         });
     }
     
@@ -357,7 +354,7 @@ public class BaseController {
     @FXML
     private MFXTextField searchCategoryTextField;
     
-    private HashMap<Integer, Category> categories = new HashMap<>();
+    private ObservableMap<Integer, Category> categories = FXCollections.observableHashMap();
     
     private CategoryAddModal addCategoryModal = new CategoryAddModal();
     
@@ -373,6 +370,15 @@ public class BaseController {
                 }
             }
         );
+        
+        // Add the current items in the model
+        for (int id : BaseModel.categoryMap.keySet()) {
+            CategoryObject categoryObject = BaseModel.categoryMap.get(id);
+            if (categoryObject == null) return;
+            Platform.runLater(() -> {
+                addCategory(categoryObject);
+            });
+        }
         
         LayoutUtils.applyVirtualScrolling(categoriesScrollPane, categoriesFlowPane);
         this.initializeCategoryLazyLoad();
@@ -408,37 +414,26 @@ public class BaseController {
      */
     private void initializeCategoryLazyLoad() {
         Platform.runLater(() -> {
-            // First of all, we have to add the categories in the model
-            for (int id : BaseModel.categoryMap.keySet()) {
-                CategoryObject categoryObject = BaseModel.categoryMap.get(id);
-                if (categoryObject == null) return;
-                Platform.runLater(() -> {
-                    addCategory(categoryObject);
-                });
-            }
-            
-            // Load categories whenever the scrollbar hits the bottom.
-            categoriesScrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-                if (!searchCategoryTextField.getText().isEmpty()) return;
-                if (scrollValue.doubleValue() == 1) {
-                    BaseModel.loadCategories(12);
+            LayoutUtils.initializeLazyLoad(
+                categoriesScrollPane,
+                categoriesFlowPane,
+                categories,
+                (requestType) -> {
+                    switch (requestType) {
+                        case INITIAL:
+                            BaseModel.loadCategories(1);
+                            break;
+                        case HIT_BOTTOM:
+                            if (!searchCategoryTextField.getText().isEmpty()) return;
+                            BaseModel.loadCategories(Config.categoryLoadLimit);
+                            break;
+                        case INSUFFICIENT:
+                            if (!searchCategoryTextField.getText().isEmpty()) return;
+                            BaseModel.loadCategories(Config.categoryLoadLimit / 3);
+                            break;
+                    }
                 }
-            });
-            
-            // The listener above won't work if there is no scrollbar.
-            // So here, we add components until the scroll pane gets a scrollbar.
-            categoriesScrollPane.viewportBoundsProperty().addListener(($1, $2, newValue) -> {
-                if (!searchCategoryTextField.getText().isEmpty()) return;
-                double contentHeight = categoriesFlowPane.getBoundsInLocal().getHeight();
-                double viewportHeight = newValue.getHeight();
-                if (contentHeight < viewportHeight) {
-                    BaseModel.loadCategories(4);
-                }
-            });
-            
-            // Everything above won't work if the `viewportBoundsProperty` doesn't trigger.
-            // So here, we can trigger it by loading initial categories.
-            BaseModel.loadCategories(12);
+            );
         });
     }
     

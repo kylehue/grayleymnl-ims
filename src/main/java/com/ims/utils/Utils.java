@@ -1,7 +1,16 @@
 package com.ims.utils;
 
+import com.ims.Config;
+import com.ims.components.Category;
+import com.ims.model.BaseModel;
+import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.StringProperty;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
+import javafx.scene.layout.Pane;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.InputStream;
@@ -91,5 +100,9 @@ public abstract class Utils {
         searchPattern = searchPattern.replaceAll("(.)", "$1.*");
         searchPattern = searchPattern.substring(0, searchPattern.length() - 2);
         return searchPattern;
+    }
+    
+    public interface Callable<T> {
+        T call();
     }
 }

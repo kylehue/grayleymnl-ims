@@ -6,7 +6,9 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -114,8 +116,9 @@ public abstract class LayoutUtils {
     
     /**
      * Resize a FlowPane's children based on its width
-     * @param flowPane The FlowPane that contains the children to be resized.
-     * @param minWidth Minimum width of a child in a row.
+     *
+     * @param flowPane    The FlowPane that contains the children to be resized.
+     * @param minWidth    Minimum width of a child in a row.
      * @param aspectRatio The aspect ratio of children. Set to 1 to disable.
      * @apiNote The children of the `FlowPane` must be an instance of the `Pane`
      */
@@ -177,8 +180,8 @@ public abstract class LayoutUtils {
     /**
      * Create a responsive FlowPane that is aware of the width of its children.
      *
-     * @param flowPane The `FlowPane` element.
-     * @param minWidth Minimum width of a child in a row.
+     * @param flowPane    The `FlowPane` element.
+     * @param minWidth    Minimum width of a child in a row.
      * @param aspectRatio The aspect ratio of children. Set to 1 to disable.
      * @apiNote The children of the `FlowPane` must be an instance of the `Pane` class.
      */
@@ -249,7 +252,7 @@ public abstract class LayoutUtils {
      * @param iconURL The URL of the icon.
      * @throws URISyntaxException
      */
-    public static <T extends MFXButton>void addIconToButton(
+    public static <T extends MFXButton> void addIconToButton(
         MFXButton button, String iconURL
     ) {
         try {
@@ -273,7 +276,7 @@ public abstract class LayoutUtils {
             
             button.setGraphicTextGap(8);
             button.setGraphic(icon);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -281,10 +284,10 @@ public abstract class LayoutUtils {
     /**
      * Adds an icon to a node.
      *
-     * @param textField  The node where the icon will be placed.
-     * @param iconURL The URL of the icon.
+     * @param textField The node where the icon will be placed.
+     * @param iconURL   The URL of the icon.
      */
-    public static <T extends MFXButton>void addIconToTextField(
+    public static <T extends MFXButton> void addIconToTextField(
         MFXTextField textField, String iconURL
     ) {
         try {
@@ -302,7 +305,7 @@ public abstract class LayoutUtils {
             
             textField.setGraphicTextGap(8);
             textField.setLeadingIcon(icon);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -371,5 +374,60 @@ public abstract class LayoutUtils {
         
         scrollPane.vvalueProperty().addListener(listener);
         container.heightProperty().addListener(listener);
+    }
+    
+    public enum RequestItemType {
+        HIT_BOTTOM,
+        INITIAL,
+        INSUFFICIENT
+    }
+    
+    public interface RequestItemEvent {
+        void call(RequestItemType requestType);
+    }
+    
+    public static void initializeLazyLoad(
+        MFXScrollPane scrollPane,
+        Pane contentPane,
+        ObservableMap<?, ?> model,
+        RequestItemEvent onRequestItem
+    ) {
+        // Make sure the content pane's height will depend on its children
+        scrollPane.setFitToHeight(false);
+        contentPane.setMaxHeight(-1);
+        contentPane.setPrefHeight(-1);
+        contentPane.setMinHeight(-1);
+        
+        // Load more items whenever the scrollbar hits the bottom.
+        scrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
+            if (scrollValue.doubleValue() == 1) {
+                onRequestItem.call(RequestItemType.HIT_BOTTOM);
+            }
+        });
+        
+        // Load more items whenever there's not enough items to have a scrollbar
+        Utils.Callable<Void> loadItemsWhenNoScrollbar = () -> {
+            Platform.runLater(() -> {
+                double contentHeight = contentPane.getBoundsInLocal().getHeight();
+                double viewportHeight = scrollPane.getViewportBounds().getHeight();
+                if (contentHeight < viewportHeight) {
+                    onRequestItem.call(RequestItemType.INSUFFICIENT);
+                }
+            });
+            return null;
+        };
+        scrollPane.viewportBoundsProperty().addListener(
+            ($1, $2, newValue) -> {
+                loadItemsWhenNoScrollbar.call();
+            }
+        );
+        model.addListener(
+            (MapChangeListener<Object, Object>) change -> {
+                if (!change.wasAdded()) return;
+                loadItemsWhenNoScrollbar.call();
+            }
+        );
+        
+        onRequestItem.call(RequestItemType.INITIAL);
     }
 }
