@@ -30,7 +30,7 @@ public class User extends GridPane {
     private final Label emailLabel = new Label();
     private UserObject userObject;
     private final StringProperty email = new SimpleStringProperty();
-    private final IntegerProperty roleID = new SimpleIntegerProperty();
+    private final ObjectProperty<Integer> roleID = new SimpleObjectProperty<>();
     private final ObjectProperty<Date> joinedDate = new SimpleObjectProperty<>();
     private final ObjectProperty<Timestamp> lastActivityDate = new SimpleObjectProperty<>();
     
@@ -108,7 +108,7 @@ public class User extends GridPane {
         });
     }
     
-    public IntegerProperty roleIDProperty() {
+    public ObjectProperty<Integer> roleIDProperty() {
         return roleID;
     }
     
@@ -120,17 +120,21 @@ public class User extends GridPane {
     
     private RoleObject oldRoleObject = null;
     
-    private void setRole(int roleID) {
-        RoleObject roleObject = UserManagerModel.loadAndGetRole(roleID);
-        if (roleObject == null) return;
+    private void setRole(Integer roleID) {
         Platform.runLater(() -> {
+            if (roleID == null) {
+                roleLabel.setText("No Role Assigned");
+                return;
+            }
+            RoleObject roleObject = UserManagerModel.loadAndGetRole(roleID);
+            if (roleObject == null) return;
             roleLabel.setText(roleObject.getName());
+            if (oldRoleObject != null) {
+                oldRoleObject.nameProperty().removeListener(roleChangeListener);
+            }
+            roleObject.nameProperty().addListener(roleChangeListener);
+            oldRoleObject = roleObject;
         });
-        if (oldRoleObject != null) {
-            oldRoleObject.nameProperty().removeListener(roleChangeListener);
-        }
-        roleObject.nameProperty().addListener(roleChangeListener);
-        oldRoleObject = roleObject;
     }
     
     public ObjectProperty<Date> joinedDateProperty() {

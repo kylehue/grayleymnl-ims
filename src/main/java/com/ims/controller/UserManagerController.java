@@ -24,6 +24,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class UserManagerController {
@@ -144,11 +145,7 @@ public class UserManagerController {
     private ArrayList<Role> getSortedRoles() {
         ArrayList<Role> sortedRoles = new ArrayList<>(
             this.roles.values().stream().sorted(
-                (a, b) -> {
-                    return b.getRoleObject().getLastModified().compareTo(
-                        a.getRoleObject().getLastModified()
-                    );
-                }
+                Comparator.comparing(a -> a.getRoleObject().getLastModified())
             ).toList()
         );
         
@@ -253,11 +250,7 @@ public class UserManagerController {
     private ArrayList<User> getSortedUsers() {
         ArrayList<User> sortedUsers = new ArrayList<>(
             this.users.values().stream().sorted(
-                (a, b) -> {
-                    return b.getUserObject().getJoinedDate().compareTo(
-                        a.getUserObject().getJoinedDate()
-                    );
-                }
+                Comparator.comparing(a -> a.getUserObject().getJoinedDate())
             ).toList()
         );
         

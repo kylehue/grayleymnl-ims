@@ -76,11 +76,13 @@ public class UserController {
         UserEditModel.currentUser.addListener(
             ($1, $2, currentUser) -> {
                 emailTextField.setText(currentUser.getEmail());
-                roleComboBox.setValue(
-                    UserManagerModel.loadAndGetRole(
-                        currentUser.getRoleID()
-                    )
-                );
+                if (currentUser.getRoleID() != null) {
+                    roleComboBox.setValue(
+                        UserManagerModel.loadAndGetRole(
+                            currentUser.getRoleID()
+                        )
+                    );
+                }
                 
                 updateDisableAccountButton(
                     currentUser.isDisabled()

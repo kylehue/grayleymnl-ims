@@ -11,7 +11,7 @@ public class UserObject {
     private final ObjectProperty<Date> joinedDate;
     private final StringProperty password;
     private final ObjectProperty<Timestamp> lastActivityDate;
-    private final IntegerProperty roleID;
+    private final ObjectProperty<Integer> roleID;
     private final BooleanProperty isDisabled;
     private final BooleanProperty isOwner;
     
@@ -21,7 +21,7 @@ public class UserObject {
         String password,
         Date joinedDate,
         Timestamp lastActivityDate,
-        int roleID,
+        Integer roleID,
         boolean isDisabled,
         boolean isOwner
     ) {
@@ -30,7 +30,7 @@ public class UserObject {
         this.joinedDate = new SimpleObjectProperty<>(joinedDate);
         this.password = new SimpleStringProperty(password);
         this.lastActivityDate = new SimpleObjectProperty<>(lastActivityDate);
-        this.roleID = new SimpleIntegerProperty(roleID);
+        this.roleID = new SimpleObjectProperty<>(roleID);
         this.isDisabled = new SimpleBooleanProperty(isDisabled);
         this.isOwner = new SimpleBooleanProperty(isOwner);
     }
@@ -79,15 +79,15 @@ public class UserObject {
         this.lastActivityDate.set(lastActivityDate);
     }
     
-    public IntegerProperty roleIDProperty() {
+    public ObjectProperty<Integer> roleIDProperty() {
         return roleID;
     }
     
-    public int getRoleID() {
+    public Integer getRoleID() {
         return roleID.get();
     }
     
-    public void setRoleID(int roleID) {
+    public void setRoleID(Integer roleID) {
         this.roleID.set(roleID);
     }
     

@@ -1,9 +1,11 @@
 package com.ims.model;
 
 import com.ims.Config;
+import com.ims.components.User;
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
 import com.ims.model.objects.CategoryObject;
+import com.ims.model.objects.ProductObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.Utils;
@@ -129,9 +131,9 @@ public abstract class UserManagerModel {
     /**
      * Remove a role in the database.
      *
-     * @param id The id of the role to remove.
+     * @param roleID The id of the role to remove.
      */
-    public static void removeRole(int id) {
+    public static void removeRole(int roleID) {
         if (!UserSessionModel.currentUserIsOwner()) {
             System.out.println("The user has insufficient permissions.");
             return;
@@ -142,9 +144,16 @@ public abstract class UserManagerModel {
             protected Void call() throws Exception {
                 isBusyRole.set(true);
                 
-                DBRoles.remove(id);
+                DBRoles.remove(roleID);
+                roleMap.remove(roleID);
                 
-                roleMap.remove(id);
+                // Nullify role of users that has the removed role
+                for (int userID : userMap.keySet()) {
+                    UserObject userObject = userMap.get(userID);
+                    if (userObject.getRoleID() == null) continue;
+                    if (userObject.getRoleID() != roleID) continue;
+                    userObject.setRoleID(null);
+                }
                 
                 return null;
             }
