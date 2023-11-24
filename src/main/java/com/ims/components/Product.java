@@ -10,6 +10,7 @@ import com.ims.utils.LayoutUtils;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Transition;
 import io.github.palexdev.materialfx.controls.MFXButton;
+import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.mfxcore.collections.Grid;
 import javafx.application.Platform;
 import javafx.beans.property.*;
@@ -32,6 +33,8 @@ public class Product extends GridPane {
     
     private final GridPane textGridPane = LayoutUtils.createGridPane(3, 1);
     private final ImageView imgView = new ImageView();
+    private final StackPane imgContainer = new StackPane(imgView);
+    private final MFXProgressSpinner imgProgressSpinner = new MFXProgressSpinner();
     
     private final Label nameLabel = new Label();
     private final Label categoryLabel = new Label();
@@ -92,7 +95,6 @@ public class Product extends GridPane {
         Transition.fadeUp(this, 150);
         
         // Setup image
-        StackPane imgContainer = new StackPane(imgView);
         Rectangle rectClip = new Rectangle(0, 0, 0, 0);
         rectClip.setArcWidth(10);
         rectClip.setArcHeight(10);
@@ -104,6 +106,8 @@ public class Product extends GridPane {
         
         imgContainer.setAlignment(Pos.CENTER);
         imgContainer.setClip(rectClip);
+        imgProgressSpinner.setVisible(false);
+        imgContainer.getChildren().add(0, imgProgressSpinner);
         
         this.widthProperty().addListener(($1, $2, $3) -> {
             Platform.runLater(() -> {
@@ -120,9 +124,7 @@ public class Product extends GridPane {
         });
         
         this.add(imgContainer, 0, 0);
-        this.setImageURL(
-            getClass().getResource("/images/image-placeholder.png").toExternalForm()
-        );
+        this.setToDefaultImage();
         
         // Setup labels
         nameLabel.getStyleClass().add("product-name-label");
@@ -214,6 +216,12 @@ public class Product extends GridPane {
         });
     }
     
+    private void setToDefaultImage() {
+        this.setImageURL(
+            getClass().getResource("/images/image-placeholder.png").toExternalForm()
+        );
+    }
+    
     public ObjectProperty<String> imageURLProperty() {
         return imageURL;
     }
@@ -221,9 +229,24 @@ public class Product extends GridPane {
     private void setImageURL(String imageUrl) {
         if (imageUrl == null) return;
         if (imageUrl.isEmpty()) return;
+        imgProgressSpinner.setVisible(true);
+        
+        Image img = new Image(imageUrl, true);
+        img.progressProperty().addListener(($1, $2, progress) -> {
+            if (progress.doubleValue() >= 1) {
+                imgProgressSpinner.setVisible(false);
+            } else {
+                imgProgressSpinner.setVisible(true);
+            }
+        });
+        
+        img.errorProperty().addListener(e -> {
+            if (!img.isError()) return;
+            imgProgressSpinner.setVisible(false);
+            setToDefaultImage();
+        });
         
         Platform.runLater(() -> {
-            Image img = new Image(imageUrl, true);
             this.imgView.setImage(img);
         });
     }
