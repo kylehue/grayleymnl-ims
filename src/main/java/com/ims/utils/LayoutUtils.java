@@ -101,7 +101,7 @@ public abstract class LayoutUtils {
                 makeTabActive(tab, tabs, activeClass);
             }
             
-            tabButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            tabButton.setOnAction(event -> {
                 makeTabActive(tab, tabs, activeClass);
             });
             

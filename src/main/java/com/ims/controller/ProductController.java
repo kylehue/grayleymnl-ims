@@ -1,5 +1,6 @@
 package com.ims.controller;
 
+import com.ims.Config;
 import com.ims.components.CategoryComboBox;
 import com.ims.components.NumberField;
 import com.ims.components.PopupService;
@@ -10,9 +11,11 @@ import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.TextFieldValidator;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -82,6 +85,9 @@ public class ProductController {
     @FXML
     MFXButton deleteProductButton;
     
+    public TextFieldValidator productNameTextFieldValidator;
+    public TextFieldValidator productCategoryComboBoxValidator;
+    
     @FXML
     public void initialize() {
         LayoutUtils.addIconToButton(backButton, "/icons/arrow-left.svg");
@@ -143,6 +149,34 @@ public class ProductController {
             }
         );
         
+        productNameTextFieldValidator = new TextFieldValidator(productNameTextField);
+        productNameTextFieldValidator.addConstraint(
+            TextFieldValidator.Severity.ERROR,
+            "Please enter the product name.",
+            () -> !productNameTextField.getText().isEmpty(),
+            productNameTextField.textProperty(),
+            saveAllButton.armedProperty()
+        );
+        productNameTextFieldValidator.addConstraint(
+            TextFieldValidator.Severity.ERROR,
+            "Product name must be at most %s characters long.".formatted(
+                Config.maxProductNameLength
+            ),
+            () -> productNameTextField.getText().length() <= Config.maxProductNameLength,
+            productNameTextField.textProperty(),
+            saveAllButton.armedProperty()
+        );
+        
+        productCategoryComboBoxValidator = new TextFieldValidator(
+            productCategoryComboBox.textField
+        );
+        productCategoryComboBoxValidator.addConstraint(
+            TextFieldValidator.Severity.ERROR,
+            "Please enter the category name.",
+            () -> productCategoryComboBox.getValue() != null,
+            saveAllButton.armedProperty()
+        );
+        
         currentStocksNumberField.textField.setFloatingText("Current # of Stocks");
         currentStocksNumberField.setAllowDecimal(false);
         currentStocksNumberField.setAllowNegative(false);
@@ -177,6 +211,13 @@ public class ProductController {
         });
         
         saveAllButton.setOnMouseClicked(e -> {
+            if (
+                !productNameTextFieldValidator.isValid() || !productCategoryComboBoxValidator.isValid()
+            ) {
+                tabGeneralButton.fire();
+                return;
+            }
+            
             CategoryObject selectedCategory = productCategoryComboBox.getValue();
             int productID = ProductModel.currentProduct.get().getID();
             BaseModel.updateProduct(
