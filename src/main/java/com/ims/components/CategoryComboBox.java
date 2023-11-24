@@ -53,11 +53,11 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
                 }
                 
                 String searchPattern = Utils.textToSearchPattern(searchText);
-                ArrayList<HashMap<DBCategories.Column, Object>> result = DBCategories.search(
+                DBCategories.CategoryListData result = DBCategories.search(
                     searchPattern
                 );
                 
-                for (HashMap<DBCategories.Column, Object> row : result) {
+                for (DBCategories.CategoryData row : result) {
                     loadCategory(row);
                 }
                 
@@ -78,7 +78,7 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
         BaseModel.loadCategoriesToMap(limit, model);
     }
     
-    private void loadCategory(HashMap<DBCategories.Column, Object> category) {
+    private void loadCategory(DBCategories.CategoryData category) {
         BaseModel.loadCategoryToMap(category, model);
     }
     

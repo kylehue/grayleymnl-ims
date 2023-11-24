@@ -53,11 +53,11 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
                 }
                 
                 String searchPattern = Utils.textToSearchPattern(searchText);
-                ArrayList<HashMap<DBRoles.Column, Object>> result = DBRoles.search(
+                DBRoles.RoleListData result = DBRoles.search(
                     searchPattern
                 );
                 
-                for (HashMap<DBRoles.Column, Object> row : result) {
+                for (DBRoles.RoleData row : result) {
                     loadRole(row);
                 }
                 
@@ -78,7 +78,7 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
         UserManagerModel.loadRolesToMap(limit, model);
     }
     
-    private void loadRole(HashMap<DBRoles.Column, Object> role) {
+    private void loadRole(DBRoles.RoleData role) {
         UserManagerModel.loadRoleToMap(role, model);
     }
     

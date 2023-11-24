@@ -19,8 +19,8 @@ public class DBUsers {
         IS_OWNER
     }
     
-    public static HashMap<Column, Object> add(String email, String password) {
-        HashMap<Column, Object> row = null;
+    public static UserData add(String email, String password) {
+        UserData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -47,14 +47,14 @@ public class DBUsers {
         return row;
     }
     
-    public static HashMap<DBUsers.Column, Object> update(
+    public static UserData update(
         int id,
         String password,
         Integer roleID,
         Boolean isDisabled,
         Boolean isOwner
     ) {
-        HashMap<DBUsers.Column, Object> row = null;
+        UserData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -105,12 +105,12 @@ public class DBUsers {
         }
     }
     
-    private static ArrayList<HashMap<Column, Object>>
+    private static UserListData
     extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
-        ArrayList<HashMap<Column, Object>> rows = new ArrayList<>();
+        UserListData rows = new UserListData();
         
         while (resultSet.next()) {
-            HashMap<Column, Object> data = new HashMap<>();
+            UserData data = new UserData();
             
             int retrievedId = resultSet.getInt(
                 Column.ID.toString()
@@ -188,11 +188,11 @@ public class DBUsers {
      * @param length The limit of rows to retrieve.
      * @return An ArrayList of rows.
      */
-    public static ArrayList<HashMap<DBUsers.Column, Object>> getInRange(
+    public static UserListData getInRange(
         int startIndex,
         int length
     ) {
-        ArrayList<HashMap<DBUsers.Column, Object>> rows = null;
+        UserListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -217,11 +217,11 @@ public class DBUsers {
         return rows;
     }
     
-    public static ArrayList<HashMap<DBUsers.Column, Object>> get(
+    public static UserListData get(
         DBUsers.Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<DBUsers.Column, Object>> rows = null;
+        UserListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -245,10 +245,10 @@ public class DBUsers {
         return rows;
     }
     
-    public static ArrayList<HashMap<Column, Object>> search(
+    public static UserListData search(
         String regexPattern
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        UserListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -278,11 +278,15 @@ public class DBUsers {
         return rows;
     }
     
-    public static HashMap<DBUsers.Column, Object> getOne(
+    public static UserData getOne(
         DBUsers.Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<DBUsers.Column, Object>> rows = get(columnLabel, compareValue);
+        UserListData rows = get(columnLabel, compareValue);
         return !rows.isEmpty() ? rows.getFirst() : null;
     }
+    
+    // Type aliases
+    public static class UserData extends HashMap<Column, Object> {}
+    public static class UserListData extends ArrayList<UserData> {}
 }

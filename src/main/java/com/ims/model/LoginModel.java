@@ -30,9 +30,9 @@ public abstract class LoginModel {
             validProperty.set(false);
             return;
         }
-        Task<ArrayList<HashMap<DBUsers.Column, Object>>> task = new Task<>() {
+        Task<DBUsers.UserListData> task = new Task<>() {
             @Override
-            protected ArrayList<HashMap<DBUsers.Column, Object>> call() {
+            protected DBUsers.UserListData call() {
                 return DBUsers.get(
                     DBUsers.Column.EMAIL,
                     email
@@ -42,13 +42,13 @@ public abstract class LoginModel {
         
         task.setOnSucceeded(e -> {
             try {
-                ArrayList<HashMap<DBUsers.Column, Object>> users = task.get();
+                DBUsers.UserListData users = task.get();
                 if (users.size() != 1) {
                     validProperty.set(false);
                     return;
                 }
                 
-                HashMap<DBUsers.Column, Object> user = users.getFirst();
+                DBUsers.UserData user = users.getFirst();
                 boolean isCorrectPassword = Utils.checkPassword(
                     password,
                     user.get(DBUsers.Column.PASSWORD).toString()
@@ -84,7 +84,7 @@ public abstract class LoginModel {
         Task<UserObject> task = new Task<>() {
             @Override
             protected UserObject call() throws Exception {
-                HashMap<DBUsers.Column, Object> row = DBUsers.getOne(DBUsers.Column.ID, id);
+                DBUsers.UserData row = DBUsers.getOne(DBUsers.Column.ID, id);
                 if (row != null) {
                     UserObject userObject = new UserObject(
                         id,

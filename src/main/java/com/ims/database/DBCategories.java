@@ -13,8 +13,8 @@ public class DBCategories {
         LAST_MODIFIED
     }
     
-    public static HashMap<Column, Object> add(String name) {
-        HashMap<Column, Object> row = null;
+    public static CategoryData add(String name) {
+        CategoryData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -37,8 +37,8 @@ public class DBCategories {
         return row;
     }
     
-    public static HashMap<Column, Object> update(int id, String name) {
-        HashMap<Column, Object> row = null;
+    public static CategoryData update(int id, String name) {
+        CategoryData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -82,12 +82,12 @@ public class DBCategories {
         }
     }
     
-    private static ArrayList<HashMap<Column, Object>>
+    private static CategoryListData
     extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
-        ArrayList<HashMap<Column, Object>> rows = new ArrayList<>();
+        CategoryListData rows = new CategoryListData();
         
         while (resultSet.next()) {
-            HashMap<Column, Object> data = new HashMap<>();
+            CategoryData data = new CategoryData();
             
             int retrievedId = resultSet.getInt(
                 Column.ID.toString()
@@ -125,11 +125,11 @@ public class DBCategories {
      * @param length The limit of rows to retrieve.
      * @return An ArrayList of rows.
      */
-    public static ArrayList<HashMap<Column, Object>> getInRange(
+    public static CategoryListData getInRange(
         int startIndex,
         int length
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        CategoryListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -160,11 +160,11 @@ public class DBCategories {
      * @param compareValue The value used to check if it matches the column's value.
      * @return A row if found, and null if not.
      */
-    public static ArrayList<HashMap<Column, Object>> get(
+    public static CategoryListData get(
         Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        CategoryListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -188,10 +188,10 @@ public class DBCategories {
         return rows;
     }
     
-    public static ArrayList<HashMap<Column, Object>> search(
+    public static CategoryListData search(
         String regexPattern
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        CategoryListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -214,11 +214,15 @@ public class DBCategories {
         return rows;
     }
     
-    public static HashMap<Column, Object> getOne(
+    public static CategoryData getOne(
         Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<Column, Object>> rows = get(columnLabel, compareValue);
+        CategoryListData rows = get(columnLabel, compareValue);
         return !rows.isEmpty() ? rows.getFirst() : null;
     }
+    
+    // Type aliases
+    public static class CategoryData extends HashMap<Column, Object> {}
+    public static class CategoryListData extends ArrayList<CategoryData> {}
 }

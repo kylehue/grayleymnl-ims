@@ -19,8 +19,8 @@ public class DBRoles {
         LAST_MODIFIED
     }
     
-    public static HashMap<DBRoles.Column, Object> add(String name) {
-        HashMap<DBRoles.Column, Object> row = null;
+    public static RoleData add(String name) {
+        RoleData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -43,7 +43,7 @@ public class DBRoles {
         return row;
     }
     
-    public static HashMap<DBRoles.Column, Object> update(
+    public static RoleData update(
         int id,
         String name,
         Boolean allowAddCategory,
@@ -53,7 +53,7 @@ public class DBRoles {
         Boolean allowDeleteProduct,
         Boolean allowEditProduct
     ) {
-        HashMap<DBRoles.Column, Object> row = null;
+        RoleData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -109,12 +109,12 @@ public class DBRoles {
         }
     }
     
-    private static ArrayList<HashMap<DBRoles.Column, Object>>
+    private static RoleListData
     extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
-        ArrayList<HashMap<DBRoles.Column, Object>> rows = new ArrayList<>();
+        RoleListData rows = new RoleListData();
         
         while (resultSet.next()) {
-            HashMap<DBRoles.Column, Object> data = new HashMap<>();
+            RoleData data = new RoleData();
             
             int retrievedId = resultSet.getInt(
                 DBRoles.Column.ID.toString()
@@ -200,11 +200,11 @@ public class DBRoles {
      * @param length The limit of rows to retrieve.
      * @return An ArrayList of rows.
      */
-    public static ArrayList<HashMap<DBRoles.Column, Object>> getInRange(
+    public static RoleListData getInRange(
         int startIndex,
         int length
     ) {
-        ArrayList<HashMap<DBRoles.Column, Object>> rows = null;
+        RoleListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -229,11 +229,11 @@ public class DBRoles {
         return rows;
     }
     
-    public static ArrayList<HashMap<DBRoles.Column, Object>> get(
+    public static RoleListData get(
         DBRoles.Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<DBRoles.Column, Object>> rows = null;
+        RoleListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -257,10 +257,10 @@ public class DBRoles {
         return rows;
     }
     
-    public static ArrayList<HashMap<Column, Object>> search(
+    public static RoleListData search(
         String regexPattern
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        RoleListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -283,11 +283,15 @@ public class DBRoles {
         return rows;
     }
     
-    public static HashMap<DBRoles.Column, Object> getOne(
+    public static RoleData getOne(
         DBRoles.Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<DBRoles.Column, Object>> rows = get(columnLabel, compareValue);
+        RoleListData rows = get(columnLabel, compareValue);
         return !rows.isEmpty() ? rows.getFirst() : null;
     }
+    
+    // Type aliases
+    public static class RoleData extends HashMap<Column, Object> {}
+    public static class RoleListData extends ArrayList<RoleData> {}
 }

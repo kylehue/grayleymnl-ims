@@ -2,7 +2,6 @@ package com.ims.database;
 
 import com.ims.Config;
 
-import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +20,14 @@ public class DBProducts {
         LAST_MODIFIED
     }
     
-    public static HashMap<Column, Object> add(
+    public static ProductData add(
         String name,
         int categoryID,
         String imageURL,
         int currentStocks,
         int expectedStocks
     ) {
-        HashMap<Column, Object> row = null;
+        ProductData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -61,7 +60,7 @@ public class DBProducts {
         return row;
     }
     
-    public static HashMap<Column, Object> update(
+    public static ProductData update(
         int id,
         String name,
         Double price,
@@ -70,7 +69,7 @@ public class DBProducts {
         Integer currentStocks,
         Integer expectedStocks
     ) {
-        HashMap<Column, Object> row = null;
+        ProductData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -105,8 +104,8 @@ public class DBProducts {
         return row;
     }
     
-    public static HashMap<Column, Object> remove(int id) {
-        HashMap<Column, Object> row = null;
+    public static ProductData remove(int id) {
+        ProductData row = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
@@ -128,12 +127,12 @@ public class DBProducts {
         return row;
     }
     
-    private static ArrayList<HashMap<Column, Object>>
+    private static ProductListData
     extractRowsFromResultSet(ResultSet resultSet) throws SQLException {
-        ArrayList<HashMap<Column, Object>> rows = new ArrayList<>();
+        ProductListData rows = new ProductListData();
         
         while (resultSet.next()) {
-            HashMap<Column, Object> data = new HashMap<>();
+            ProductData data = new ProductData();
             
             int retrievedId = resultSet.getInt(
                 Column.ID.toString()
@@ -212,11 +211,11 @@ public class DBProducts {
      * @param length     The limit of rows to retrieve.
      * @return An ArrayList of rows.
      */
-    public static ArrayList<HashMap<Column, Object>> getInRange(
+    public static ProductListData getInRange(
         int startIndex,
         int length
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -248,11 +247,11 @@ public class DBProducts {
      * @param compareValue The value used to check if it matches the column's value.
      * @return A row if found, and null if not.
      */
-    public static ArrayList<HashMap<Column, Object>> get(
+    public static ProductListData get(
         Column columnLabel,
         Object compareValue
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -277,11 +276,11 @@ public class DBProducts {
         return rows;
     }
     
-    public static ArrayList<HashMap<Column, Object>> search(
+    public static ProductListData search(
         String regexPattern,
         String... categories
     ) {
-        ArrayList<HashMap<Column, Object>> rows = null;
+        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -320,7 +319,7 @@ public class DBProducts {
     
     public static int getTotalProductsCount() {
         int count = 0;
-        ArrayList<HashMap<Column, Object>> rows = null;
+        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -342,7 +341,7 @@ public class DBProducts {
     
     public static int getOutOfStockProductsCount() {
         int count = 0;
-        ArrayList<HashMap<Column, Object>> rows = null;
+        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -365,7 +364,7 @@ public class DBProducts {
     
     public static int getLowStockProductsCount() {
         int count = 0;
-        ArrayList<HashMap<Column, Object>> rows = null;
+        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -390,4 +389,8 @@ public class DBProducts {
         
         return count;
     }
+    
+    // Type aliases
+    public static class ProductData extends HashMap<Column, Object> {}
+    public static class ProductListData extends ArrayList<ProductData> {}
 }

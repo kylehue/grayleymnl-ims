@@ -92,7 +92,7 @@ public abstract class UserManagerModel {
             protected Void call() throws Exception {
                 isBusyRole.set(true);
                 
-                HashMap<DBRoles.Column, Object> newRole = DBRoles.update(
+                DBRoles.RoleData newRole = DBRoles.update(
                     id,
                     name,
                     allowAddCategory,
@@ -174,11 +174,11 @@ public abstract class UserManagerModel {
                 }
                 
                 String searchPattern = Utils.textToSearchPattern(searchText);
-                ArrayList<HashMap<DBRoles.Column, Object>> result = DBRoles.search(
+                DBRoles.RoleListData result = DBRoles.search(
                     searchPattern
                 );
                 
-                for (HashMap<DBRoles.Column, Object> row : result) {
+                for (DBRoles.RoleData row : result) {
                     loadRole(row);
                 }
                 
@@ -206,7 +206,7 @@ public abstract class UserManagerModel {
             protected RoleObject call() throws Exception {
                 isBusyRole.set(true);
                 
-                HashMap<DBRoles.Column, Object> row = DBRoles.getOne(
+                DBRoles.RoleData row = DBRoles.getOne(
                     DBRoles.Column.ID,
                     id
                 );
@@ -241,7 +241,7 @@ public abstract class UserManagerModel {
     }
     
     public static RoleObject loadRoleToMap(
-        HashMap<DBRoles.Column, Object> role,
+        DBRoles.RoleData role,
         ObservableMap<Integer, RoleObject> map
     ) {
         int id = (Integer) role.get(DBRoles.Column.ID);
@@ -296,7 +296,7 @@ public abstract class UserManagerModel {
         return roleObject;
     }
     
-    private static RoleObject loadRole(HashMap<DBRoles.Column, Object> role) {
+    private static RoleObject loadRole(DBRoles.RoleData role) {
         return loadRoleToMap(role, roleMap);
     }
     
@@ -313,12 +313,12 @@ public abstract class UserManagerModel {
             @Override
             protected Void call() throws Exception {
                 isBusyRole.set(true);
-                ArrayList<HashMap<DBRoles.Column, Object>> roleRows = DBRoles.getInRange(
+                DBRoles.RoleListData roleRows = DBRoles.getInRange(
                     map.size(),
                     limit
                 );
                 
-                for (HashMap<DBRoles.Column, Object> row : roleRows) {
+                for (DBRoles.RoleData row : roleRows) {
                     loadRoleToMap(row, map);
                 }
                 return null;
@@ -385,7 +385,7 @@ public abstract class UserManagerModel {
             protected Void call() throws Exception {
                 isBusyUser.set(true);
                 
-                HashMap<DBUsers.Column, Object> user = DBUsers.update(
+                DBUsers.UserData user = DBUsers.update(
                     id,
                     password,
                     roleID,
@@ -427,11 +427,11 @@ public abstract class UserManagerModel {
                 }
                 
                 String searchPattern = Utils.textToSearchPattern(searchText);
-                ArrayList<HashMap<DBUsers.Column, Object>> result = DBUsers.search(
+                DBUsers.UserListData result = DBUsers.search(
                     searchPattern
                 );
                 
-                for (HashMap<DBUsers.Column, Object> row : result) {
+                for (DBUsers.UserData row : result) {
                     loadUser(row);
                 }
                 
@@ -449,7 +449,7 @@ public abstract class UserManagerModel {
     }
     
     public static UserObject loadUserToMap(
-        HashMap<DBUsers.Column, Object> user,
+        DBUsers.UserData user,
         ObservableMap<Integer, UserObject> map
     ) {
         int id = (Integer) user.get(DBUsers.Column.ID);
@@ -497,7 +497,7 @@ public abstract class UserManagerModel {
         return userObject;
     }
     
-    private static UserObject loadUser(HashMap<DBUsers.Column, Object> user) {
+    private static UserObject loadUser(DBUsers.UserData user) {
         return loadUserToMap(user, userMap);
     }
     
@@ -511,12 +511,12 @@ public abstract class UserManagerModel {
             @Override
             protected Void call() throws Exception {
                 isBusyUser.set(true);
-                ArrayList<HashMap<DBUsers.Column, Object>> userRows = DBUsers.getInRange(
+                DBUsers.UserListData userRows = DBUsers.getInRange(
                     userMap.size(),
                     limit
                 );
                 
-                for (HashMap<DBUsers.Column, Object> row : userRows) {
+                for (DBUsers.UserData row : userRows) {
                     loadUser(row);
                 }
                 return null;

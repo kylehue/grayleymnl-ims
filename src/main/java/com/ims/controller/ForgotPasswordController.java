@@ -111,7 +111,7 @@ public class ForgotPasswordController {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
-                    HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+                    DBUsers.UserData user = DBUsers.getOne(
                         DBUsers.Column.EMAIL,
                         email
                     );

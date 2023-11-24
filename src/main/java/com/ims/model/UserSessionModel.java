@@ -36,7 +36,7 @@ public abstract class UserSessionModel {
         Task<String> task = new Task<>() {
             @Override
             protected String call() throws Exception {
-                HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+                DBUsers.UserData user = DBUsers.getOne(
                     DBUsers.Column.ID,
                     currentUser.get().getID()
                 );
@@ -63,7 +63,7 @@ public abstract class UserSessionModel {
         return password;
     }
     
-    public static HashMap<DBRoles.Column, Object> getCurrentUserRole() {
+    public static DBRoles.RoleData getCurrentUserRole() {
         if (currentUser.get() == null) return null;
         return getUserRole(currentUser.get().getID());
     }
@@ -76,7 +76,7 @@ public abstract class UserSessionModel {
     public static boolean currentUserIsAllowAddCategory() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        DBRoles.RoleData role = getCurrentUserRole();
         if (role == null) return false;
         return role.get(DBRoles.Column.ALLOW_ADD_CATEGORY).equals(true);
     }
@@ -84,7 +84,7 @@ public abstract class UserSessionModel {
     public static boolean currentUserIsAllowDeleteCategory() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        DBRoles.RoleData role = getCurrentUserRole();
         if (role == null) return false;
         return role.get(DBRoles.Column.ALLOW_DELETE_CATEGORY).equals(true);
     }
@@ -92,7 +92,7 @@ public abstract class UserSessionModel {
     public static boolean currentUserIsAllowEditCategory() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        DBRoles.RoleData role = getCurrentUserRole();
         if (role == null) return false;
         return role.get(DBRoles.Column.ALLOW_EDIT_CATEGORY).equals(true);
     }
@@ -100,7 +100,7 @@ public abstract class UserSessionModel {
     public static boolean currentUserIsAllowAddProduct() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        DBRoles.RoleData role = getCurrentUserRole();
         if (role == null) return false;
         return role.get(DBRoles.Column.ALLOW_ADD_PRODUCT).equals(true);
     }
@@ -108,7 +108,7 @@ public abstract class UserSessionModel {
     public static boolean currentUserIsAllowDeleteProduct() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        DBRoles.RoleData role = getCurrentUserRole();
         if (role == null) return false;
         return role.get(DBRoles.Column.ALLOW_DELETE_PRODUCT).equals(true);
     }
@@ -116,16 +116,16 @@ public abstract class UserSessionModel {
     public static boolean currentUserIsAllowEditProduct() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        HashMap<DBRoles.Column, Object> role = getCurrentUserRole();
+        DBRoles.RoleData role = getCurrentUserRole();
         if (role == null) return false;
         return role.get(DBRoles.Column.ALLOW_EDIT_PRODUCT).equals(true);
     }
     
-    public static HashMap<DBRoles.Column, Object> getUserRole(int userID) {
-        Task<HashMap<DBRoles.Column, Object>> task = new Task<>() {
+    public static DBRoles.RoleData getUserRole(int userID) {
+        Task<DBRoles.RoleData> task = new Task<>() {
             @Override
-            protected HashMap<DBRoles.Column, Object> call() throws Exception {
-                HashMap<DBUsers.Column, Object> user = DBUsers.getOne(
+            protected DBRoles.RoleData call() throws Exception {
+                DBUsers.UserData user = DBUsers.getOne(
                     DBUsers.Column.ID,
                     userID
                 );
@@ -146,7 +146,7 @@ public abstract class UserSessionModel {
         executor.submit(task);
         executor.shutdown();
         
-        HashMap<DBRoles.Column, Object> role = null;
+        DBRoles.RoleData role = null;
         try {
             role = task.get();
         } catch (Exception e) {
@@ -156,12 +156,12 @@ public abstract class UserSessionModel {
         return role;
     }
     
-    public static HashMap<DBUsers.Column, Object> updatePassword(
+    public static DBUsers.UserData updatePassword(
         String password
     ) {
-        Task<HashMap<DBUsers.Column, Object>> task = new Task<>() {
+        Task<DBUsers.UserData> task = new Task<>() {
             @Override
-            protected HashMap<DBUsers.Column, Object> call() throws Exception {
+            protected DBUsers.UserData call() throws Exception {
                 return DBUsers.update(
                     currentUser.get().getID(),
                     password,
@@ -180,7 +180,7 @@ public abstract class UserSessionModel {
         executor.submit(task);
         executor.shutdown();
         
-        HashMap<DBUsers.Column, Object> user = null;
+        DBUsers.UserData user = null;
         try {
             user = task.get();
         } catch (Exception e) {
