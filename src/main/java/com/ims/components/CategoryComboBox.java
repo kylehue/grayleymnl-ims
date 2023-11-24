@@ -51,6 +51,12 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
                 }
             }
         );
+        
+        this.textField.delegateFocusedProperty().addListener(e -> {
+            if (!this.textField.delegateIsFocused()) return;
+            if (!this.getSearchText().isEmpty()) return;
+            this.search("");
+        });
     }
     
     @Override

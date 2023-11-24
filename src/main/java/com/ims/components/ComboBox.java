@@ -163,6 +163,7 @@ public class ComboBox<K, V> extends StackPane {
         if (value == this.value.get()) return;
         V oldValue = this.value.get();
         this.value.set(value);
+        this.searchTextProperty().set("");
         this.textField.setText(this.stringifier.call(this.value.get()));
         textField.positionCaret(textField.getText().length());
         this.triggerSelectListeners(value, oldValue);
@@ -401,12 +402,14 @@ public class ComboBox<K, V> extends StackPane {
         
         public MFXButton addItem(K id, String text) {
             MFXButton button = new MFXButton(text);
-            button.getStyleClass().add("context-menu-item-button");
-            button.setMaxWidth(Double.MAX_VALUE);
-            button.setTextAlignment(TextAlignment.LEFT);
-            button.setAlignment(Pos.CENTER_LEFT);
-            container.getChildren().add(button);
-            this.itemMap.put(id, button);
+            Platform.runLater(() -> {
+                button.getStyleClass().add("context-menu-item-button");
+                button.setMaxWidth(Double.MAX_VALUE);
+                button.setTextAlignment(TextAlignment.LEFT);
+                button.setAlignment(Pos.CENTER_LEFT);
+                container.getChildren().add(button);
+                this.itemMap.put(id, button);
+            });
             return button;
         }
         
