@@ -39,12 +39,12 @@ public class Product extends GridPane {
     private final Label priceLabel = new Label();
     private final MFXButton editButton = new MFXButton();
     
-    private final StringProperty name = new SimpleStringProperty();
-    private final StringProperty imageURL = new SimpleStringProperty();
-    private final IntegerProperty categoryID = new SimpleIntegerProperty();
-    private final IntegerProperty currentStocks = new SimpleIntegerProperty();
-    private final IntegerProperty expectedStocks = new SimpleIntegerProperty();
-    private final DoubleProperty price = new SimpleDoubleProperty();
+    private final ObjectProperty<String> name = new SimpleObjectProperty<>();
+    private final ObjectProperty<String> imageURL = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> categoryID = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> currentStocks = new SimpleObjectProperty<>(0);
+    private final ObjectProperty<Integer> expectedStocks = new SimpleObjectProperty<>(0);
+    private final ObjectProperty<Double> price = new SimpleObjectProperty<>();
     
     public Product() {
         this.styleClass.add("card");
@@ -154,6 +154,7 @@ public class Product extends GridPane {
     }
     
     private boolean propertyListenersInitialized = false;
+    
     private void initializePropertyListeners() {
         if (propertyListenersInitialized) return;
         propertyListenersInitialized = true;
@@ -198,20 +199,25 @@ public class Product extends GridPane {
         editButton.setManaged(isAllowed);
     }
     
-    public StringProperty nameProperty() {
+    public ObjectProperty<String> nameProperty() {
         return name;
     }
     
     private void setName(String name) {
         Platform.runLater(() -> {
+            if (name == null) {
+                categoryLabel.setText("Unknown Category");
+                return;
+            }
+            
             nameLabel.setText(name);
         });
     }
     
-    public StringProperty imageURLProperty() {
+    public ObjectProperty<String> imageURLProperty() {
         return imageURL;
     }
-
+    
     private void setImageURL(String imageUrl) {
         if (imageUrl == null) return;
         if (imageUrl.isEmpty()) return;
@@ -231,35 +237,40 @@ public class Product extends GridPane {
             categoryLabel.setText(newValue);
         });
     };
-
+    
     private CategoryObject oldCategoryObject = null;
     
-    public IntegerProperty categoryIDProperty() {
+    public ObjectProperty<Integer> categoryIDProperty() {
         return categoryID;
     }
     
-    private void setCategoryID(int categoryID) {
-        CategoryObject categoryObject = BaseModel.loadAndGetCategory(categoryID);
-        if (categoryObject == null) return;
+    private void setCategoryID(Integer categoryID) {
         Platform.runLater(() -> {
+            if (categoryID == null) {
+                categoryLabel.setText("Unknown Category");
+                return;
+            }
+            
+            CategoryObject categoryObject = BaseModel.loadAndGetCategory(categoryID);
+            if (categoryObject == null) return;
             categoryLabel.setText(categoryObject.getName());
+            if (oldCategoryObject != null) {
+                oldCategoryObject.nameProperty().removeListener(categoryChangeListener);
+            }
+            categoryObject.nameProperty().addListener(categoryChangeListener);
+            oldCategoryObject = categoryObject;
         });
-        if (oldCategoryObject != null) {
-            oldCategoryObject.nameProperty().removeListener(categoryChangeListener);
-        }
-        categoryObject.nameProperty().addListener(categoryChangeListener);
-        oldCategoryObject = categoryObject;
     }
     
-    public IntegerProperty expectedStocksProperty() {
+    public ObjectProperty<Integer> expectedStocksProperty() {
         return expectedStocks;
     }
     
-    public IntegerProperty currentStocksProperty() {
+    public ObjectProperty<Integer> currentStocksProperty() {
         return currentStocks;
     }
     
-    private void setStocks(int current, int max) {
+    private void setStocks(Integer current, Integer max) {
         Platform.runLater(() -> {
             double rate = (double) current / (double) Math.max(1, max);
             if (rate <= 0) {
@@ -285,11 +296,11 @@ public class Product extends GridPane {
         });
     }
     
-    public DoubleProperty priceProperty() {
+    public ObjectProperty<Double> priceProperty() {
         return price;
     }
     
-    private void setPrice(double price) {
+    private void setPrice(Double price) {
         Platform.runLater(() -> {
             priceLabel.setText("P" + String.format("%.2f", price));
         });

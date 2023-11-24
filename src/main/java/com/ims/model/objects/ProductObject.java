@@ -6,31 +6,31 @@ import java.sql.Timestamp;
 
 public class ProductObject {
     private final int id;
-    private final StringProperty name;
-    private final DoubleProperty price;
-    private final IntegerProperty categoryID;
-    private final StringProperty imageURL;
-    private final IntegerProperty currentStocks;
-    private final IntegerProperty expectedStocks;
+    private final ObjectProperty<String> name;
+    private final ObjectProperty<Double> price;
+    private final ObjectProperty<Integer> categoryID;
+    private final ObjectProperty<String> imageURL;
+    private final ObjectProperty<Integer> currentStocks;
+    private final ObjectProperty<Integer> expectedStocks;
     private final ObjectProperty<Timestamp> lastModified;
     
     public ProductObject(
         int id,
         String name,
-        double price,
-        int categoryID,
+        Double price,
+        Integer categoryID,
         String imageURL,
-        int currentStocks,
-        int expectedStocks,
+        Integer currentStocks,
+        Integer expectedStocks,
         Timestamp lastModified
     ) {
         this.id = id;
-        this.name = new SimpleStringProperty(name);
-        this.price = new SimpleDoubleProperty(price);
-        this.categoryID = new SimpleIntegerProperty(categoryID);
-        this.imageURL = new SimpleStringProperty(imageURL);
-        this.currentStocks = new SimpleIntegerProperty(currentStocks);
-        this.expectedStocks = new SimpleIntegerProperty(expectedStocks);
+        this.name = new SimpleObjectProperty<>(name);
+        this.price = new SimpleObjectProperty<>(price);
+        this.categoryID = new SimpleObjectProperty<>(categoryID);
+        this.imageURL = new SimpleObjectProperty<>(imageURL);
+        this.currentStocks = new SimpleObjectProperty<>(currentStocks);
+        this.expectedStocks = new SimpleObjectProperty<>(expectedStocks);
         this.lastModified = new SimpleObjectProperty<>(lastModified);
     }
     
@@ -38,7 +38,7 @@ public class ProductObject {
         return id;
     }
     
-    public StringProperty nameProperty() {
+    public ObjectProperty<String> nameProperty() {
         return name;
     }
     
@@ -50,7 +50,7 @@ public class ProductObject {
         this.name.set(name);
     }
     
-    public IntegerProperty categoryIDProperty() {
+    public ObjectProperty<Integer> categoryIDProperty() {
         return categoryID;
     }
     
@@ -62,7 +62,7 @@ public class ProductObject {
         this.categoryID.set(categoryID);
     }
     
-    public StringProperty imageURLProperty() {
+    public ObjectProperty<String> imageURLProperty() {
         return imageURL;
     }
     
@@ -74,11 +74,11 @@ public class ProductObject {
         this.imageURL.set(imageURL);
     }
     
-    public IntegerProperty currentStocksProperty() {
+    public ObjectProperty<Integer> currentStocksProperty() {
         return currentStocks;
     }
     
-    public int getCurrentStocks() {
+    public Integer getCurrentStocks() {
         return currentStocks.get();
     }
     
@@ -86,11 +86,11 @@ public class ProductObject {
         this.currentStocks.set(currentStocks);
     }
     
-    public IntegerProperty expectedStocksProperty() {
+    public ObjectProperty<Integer> expectedStocksProperty() {
         return expectedStocks;
     }
     
-    public int getExpectedStocks() {
+    public Integer getExpectedStocks() {
         return expectedStocks.get();
     }
     
@@ -110,11 +110,11 @@ public class ProductObject {
         this.lastModified.set(lastModified);
     }
     
-    public DoubleProperty priceProperty() {
+    public ObjectProperty<Double> priceProperty() {
         return price;
     }
     
-    public double getPrice() {
+    public Double getPrice() {
         return price.get();
     }
     

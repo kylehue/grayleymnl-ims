@@ -75,7 +75,7 @@ public abstract class BaseModel {
      */
     public static ProductObject addProduct(
         String name,
-        int categoryID
+        Integer categoryID
     ) {
         if (name.isEmpty()) return null;
         if (!UserSessionModel.currentUserIsAllowAddProduct()) {
@@ -417,9 +417,9 @@ public abstract class BaseModel {
     /**
      * Remove a category in the database.
      *
-     * @param id The id of the category to remove.
+     * @param categoryID The id of the category to remove.
      */
-    public static void removeCategory(int id) {
+    public static void removeCategory(int categoryID) {
         if (!UserSessionModel.currentUserIsAllowDeleteCategory()) {
             System.out.println("The user has insufficient permissions.");
             return;
@@ -429,23 +429,16 @@ public abstract class BaseModel {
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
                 
-                // DBProducts.ProductListData productsWithRemovedCategory = DBProducts.get(
-                //     DBProducts.Column.CATEGORY_ID,
-                //     id
-                // );
-                // for (DBProducts.ProductData productData : productsWithRemovedCategory) {
-                //     int productID = productData.getID();
-                //     updateProduct(
-                //         productID,
-                //         null,
-                //         null,
-                //
-                //     );
-                // }
-                // // updateProduct();
+                DBCategories.remove(categoryID);
+                categoryMap.remove(categoryID);
                 
-                DBCategories.remove(id);
-                categoryMap.remove(id);
+                // Nullify category of products that has the removed category
+                for (int productID : productMap.keySet()) {
+                    ProductObject productObject = productMap.get(productID);
+                    if (productObject.getCategoryID() == null) continue;
+                    if (productObject.getCategoryID() != categoryID) continue;
+                    productObject.setCategoryID(null);
+                }
                 
                 return null;
             }

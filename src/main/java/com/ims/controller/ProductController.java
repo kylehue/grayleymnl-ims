@@ -177,11 +177,13 @@ public class ProductController {
         });
         
         saveAllButton.setOnMouseClicked(e -> {
+            CategoryObject selectedCategory = productCategoryComboBox.getValue();
+            int productID = ProductModel.currentProduct.get().getID();
             BaseModel.updateProduct(
-                ProductModel.currentProduct.get().getID(),
+                productID,
                 productNameTextField.getText(),
                 Double.parseDouble(productPriceNumberField.textField.getText()),
-                productCategoryComboBox.getValue().getID(),
+                selectedCategory == null ? null : selectedCategory.getID(),
                 productImageURLTextField.getText(),
                 Integer.parseInt(currentStocksNumberField.textField.getText()),
                 Integer.parseInt(expectedStocksNumberField.textField.getText())
@@ -252,7 +254,7 @@ public class ProductController {
         return productNameTextField.getText().equals(productObject.getName()) &&
             productPriceNumberField.getValue() == productObject.getPrice() &&
             (
-                (selectedCategory == null && productObject.getCategoryID() == null) || (selectedCategory != null && selectedCategory.getID() == productObject.getCategoryID())
+                (selectedCategory == null && productObject.getCategoryID() == null) || (selectedCategory != null && productObject.getCategoryID() != null && selectedCategory.getID() == productObject.getCategoryID())
             )
             &&
             productImageURLTextField.getText().equals(productObject.getImageURL()) &&
@@ -278,13 +280,17 @@ public class ProductController {
                 productNameTextField.setText(name);
             }
             
-            double price = currentProduct.getPrice();
+            Double price = currentProduct.getPrice();
             productPriceNumberField.setValue(price);
             
-            int categoryID = currentProduct.getCategoryID();
-            productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
-                categoryID
-            ));
+            Integer categoryID = currentProduct.getCategoryID();
+            if (categoryID == null) {
+                productCategoryComboBox.setValue(null);
+            } else {
+                productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
+                    categoryID
+                ));
+            }
             
             String imageURL = currentProduct.getImageURL();
             if (imageURL == null || imageURL.isEmpty()) {
@@ -301,12 +307,12 @@ public class ProductController {
                 productImageView.setImage(new Image(imageURL, true));
             }
             
-            int currentStocks = currentProduct.getCurrentStocks();
+            Integer currentStocks = currentProduct.getCurrentStocks();
             currentStocksNumberField.textField.setText(
                 String.valueOf(currentStocks)
             );
             
-            int expectedStocks = currentProduct.getExpectedStocks();
+            Integer expectedStocks = currentProduct.getExpectedStocks();
             expectedStocksNumberField.textField.setText(
                 String.valueOf(expectedStocks)
             );

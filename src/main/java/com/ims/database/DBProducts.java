@@ -26,10 +26,10 @@ public class DBProducts {
     
     public static ProductData add(
         String name,
-        int categoryID,
+        Integer categoryID,
         String imageURL,
-        int currentStocks,
-        int expectedStocks
+        Integer currentStocks,
+        Integer expectedStocks
     ) {
         ProductData row = null;
         PreparedStatement preparedStatement = null;
@@ -90,13 +90,13 @@ public class DBProducts {
                 """;
             
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, name);
-            preparedStatement.setDouble(2, price);
-            preparedStatement.setInt(3, categoryID);
-            preparedStatement.setString(4, imageURL);
-            preparedStatement.setInt(5, currentStocks);
-            preparedStatement.setInt(6, expectedStocks);
-            preparedStatement.setInt(7, id);
+            preparedStatement.setObject(1, name);
+            preparedStatement.setObject(2, price);
+            preparedStatement.setObject(3, categoryID);
+            preparedStatement.setObject(4, imageURL);
+            preparedStatement.setObject(5, currentStocks);
+            preparedStatement.setObject(6, expectedStocks);
+            preparedStatement.setObject(7, id);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
         } catch (SQLException e) {
@@ -140,31 +140,31 @@ public class DBProducts {
                 Column.ID.toString()
             );
             
-            String retrievedName = resultSet.getString(
+            String retrievedName = (String) resultSet.getObject(
                 Column.NAME.toString()
             );
             
-            double retrievedPrice = resultSet.getDouble(
+            Double retrievedPrice = (Double) resultSet.getObject(
                 Column.PRICE.toString()
             );
             
-            int retrievedCategoryID = resultSet.getInt(
+            Integer retrievedCategoryID = (Integer) resultSet.getObject(
                 Column.CATEGORY_ID.toString()
             );
             
-            String retrievedImageURL = resultSet.getString(
+            String retrievedImageURL = (String) resultSet.getObject(
                 Column.IMAGE_URL.toString()
             );
             
-            int retrievedCurrentStocks = resultSet.getInt(
+            Integer retrievedCurrentStocks = (Integer) resultSet.getObject(
                 Column.CURRENT_STOCKS.toString()
             );
             
-            int retrievedExpectedStocks = resultSet.getInt(
+            Integer retrievedExpectedStocks = (Integer) resultSet.getObject(
                 Column.EXPECTED_STOCKS.toString()
             );
             
-            Timestamp retrievedLastModified = resultSet.getTimestamp(
+            Timestamp retrievedLastModified = (Timestamp) resultSet.getObject(
                 Column.LAST_MODIFIED.toString()
             );
             

@@ -254,11 +254,12 @@ public class BaseController {
         });
     }
     
-    ArrayList<CategoryTagButton> categoryTagButtons = new ArrayList<>();
+    HashMap<Integer, CategoryTagButton> categoryTagButtons = new HashMap<>();
     
     private ArrayList<String> getAllActiveCategoryTags() {
         ArrayList<String> res = new ArrayList<>();
-        for (CategoryTagButton categoryTagButton : categoryTagButtons) {
+        for (int id : categoryTagButtons.keySet()) {
+            CategoryTagButton categoryTagButton = categoryTagButtons.get(id);
             if (!categoryTagButton.isActive()) continue;
             res.add(categoryTagButton.getCategoryName());
         }
@@ -281,7 +282,7 @@ public class BaseController {
                     );
                 });
                 
-                categoryTagButtons.add(categoryButton);
+                categoryTagButtons.put(categoryObject.getID(), categoryButton);
             }
         });
     }
@@ -461,6 +462,13 @@ public class BaseController {
                 this.categories.remove(
                     categoryToRemove.getCategoryObject().getID()
                 );
+                
+                // Remove category tag button in products if it exists
+                CategoryTagButton categoryTagButton = categoryTagButtons.get(id);
+                if (categoryTagButton != null) {
+                    categoryTagButtons.remove(id);
+                    productsCategoriesFlowPane.getChildren().remove(categoryTagButton);
+                }
             });
         }
     }
