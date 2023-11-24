@@ -374,6 +374,7 @@ public abstract class LayoutUtils {
         
         scrollPane.vvalueProperty().addListener(listener);
         container.heightProperty().addListener(listener);
+        container.getChildren().addListener(listener);
     }
     
     public enum RequestItemType {
