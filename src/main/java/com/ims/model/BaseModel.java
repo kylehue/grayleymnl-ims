@@ -394,10 +394,6 @@ public abstract class BaseModel {
             return;
         }
         if (name.isEmpty()) return;
-        boolean isUnmodified = name.equals(
-            Objects.requireNonNull(categoryMap.get(id)).getName()
-        );
-        if (isUnmodified) return;
         
         Task<Void> task = new Task<>() {
             @Override
