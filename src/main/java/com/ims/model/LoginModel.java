@@ -48,17 +48,17 @@ public abstract class LoginModel {
                     return;
                 }
                 
-                DBUsers.UserData user = users.getFirst();
+                DBUsers.UserData userData = users.getFirst();
                 boolean isCorrectPassword = Utils.checkPassword(
                     password,
-                    user.get(DBUsers.Column.PASSWORD).toString()
+                    userData.getPassword()
                 );
                 
                 if (isCorrectPassword) {
                     SceneManager.setScene("base");
                     validProperty.set(true);
                     
-                    int id = (int) user.get(DBUsers.Column.ID);
+                    int id = userData.getID();
                     
                     UserSessionModel.currentUser.set(
                         getUser(id)
@@ -84,31 +84,18 @@ public abstract class LoginModel {
         Task<UserObject> task = new Task<>() {
             @Override
             protected UserObject call() throws Exception {
-                DBUsers.UserData row = DBUsers.getOne(DBUsers.Column.ID, id);
-                if (row != null) {
-                    UserObject userObject = new UserObject(
+                DBUsers.UserData userData = DBUsers.getOne(DBUsers.Column.ID, id);
+                if (userData != null) {
+                    return new UserObject(
                         id,
-                        (String) row.get(DBUsers.Column.EMAIL),
-                        (String) row.get(
-                            DBUsers.Column.PASSWORD
-                        ),
-                        (Date) row.get(
-                            DBUsers.Column.JOINED_DATE
-                        ),
-                        (Timestamp) row.get(
-                            DBUsers.Column.LAST_ACTIVITY_DATE
-                        ),
-                        (Integer) row.get(
-                            DBUsers.Column.ROLE_ID
-                        ),
-                        (boolean) row.get(
-                            DBUsers.Column.IS_DISABLED
-                        ),
-                        (boolean) row.get(
-                            DBUsers.Column.IS_OWNER
-                        )
+                        userData.getEmail(),
+                        userData.getPassword(),
+                        userData.getJoinedDate(),
+                        userData.getLastActivityDate(),
+                        userData.getRoleID(),
+                        userData.isDisabled(),
+                        userData.isOwner()
                     );
-                    return userObject;
                 }
                 
                 return null;

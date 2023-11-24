@@ -36,12 +36,12 @@ public abstract class UserSessionModel {
         Task<String> task = new Task<>() {
             @Override
             protected String call() throws Exception {
-                DBUsers.UserData user = DBUsers.getOne(
+                DBUsers.UserData userData = DBUsers.getOne(
                     DBUsers.Column.ID,
                     currentUser.get().getID()
                 );
-                if (user == null) return null;
-                return user.get(DBUsers.Column.PASSWORD).toString();
+                if (userData == null) return null;
+                return userData.getPassword();
             }
         };
         
@@ -76,64 +76,64 @@ public abstract class UserSessionModel {
     public static boolean currentUserIsAllowAddCategory() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        DBRoles.RoleData role = getCurrentUserRole();
-        if (role == null) return false;
-        return role.get(DBRoles.Column.ALLOW_ADD_CATEGORY).equals(true);
+        DBRoles.RoleData roleData = getCurrentUserRole();
+        if (roleData == null) return false;
+        return roleData.isAllowAddCategory().equals(true);
     }
     
     public static boolean currentUserIsAllowDeleteCategory() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        DBRoles.RoleData role = getCurrentUserRole();
-        if (role == null) return false;
-        return role.get(DBRoles.Column.ALLOW_DELETE_CATEGORY).equals(true);
+        DBRoles.RoleData roleData = getCurrentUserRole();
+        if (roleData == null) return false;
+        return roleData.isAllowDeleteCategory().equals(true);
     }
     
     public static boolean currentUserIsAllowEditCategory() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        DBRoles.RoleData role = getCurrentUserRole();
-        if (role == null) return false;
-        return role.get(DBRoles.Column.ALLOW_EDIT_CATEGORY).equals(true);
+        DBRoles.RoleData roleData = getCurrentUserRole();
+        if (roleData == null) return false;
+        return roleData.isAllowEditCategory().equals(true);
     }
     
     public static boolean currentUserIsAllowAddProduct() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        DBRoles.RoleData role = getCurrentUserRole();
-        if (role == null) return false;
-        return role.get(DBRoles.Column.ALLOW_ADD_PRODUCT).equals(true);
+        DBRoles.RoleData roleData = getCurrentUserRole();
+        if (roleData == null) return false;
+        return roleData.isAllowAddProduct().equals(true);
     }
     
     public static boolean currentUserIsAllowDeleteProduct() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        DBRoles.RoleData role = getCurrentUserRole();
-        if (role == null) return false;
-        return role.get(DBRoles.Column.ALLOW_DELETE_PRODUCT).equals(true);
+        DBRoles.RoleData roleData = getCurrentUserRole();
+        if (roleData == null) return false;
+        return roleData.isAllowDeleteProduct().equals(true);
     }
     
     public static boolean currentUserIsAllowEditProduct() {
         if (currentUser.get() == null) return false;
         if (currentUserIsOwner()) return true;
-        DBRoles.RoleData role = getCurrentUserRole();
-        if (role == null) return false;
-        return role.get(DBRoles.Column.ALLOW_EDIT_PRODUCT).equals(true);
+        DBRoles.RoleData roleData = getCurrentUserRole();
+        if (roleData == null) return false;
+        return roleData.isAllowEditProduct().equals(true);
     }
     
     public static DBRoles.RoleData getUserRole(int userID) {
         Task<DBRoles.RoleData> task = new Task<>() {
             @Override
             protected DBRoles.RoleData call() throws Exception {
-                DBUsers.UserData user = DBUsers.getOne(
+                DBUsers.UserData userData = DBUsers.getOne(
                     DBUsers.Column.ID,
                     userID
                 );
-                if (user == null) return null;
+                if (userData == null) return null;
                 
                 return DBRoles.getOne(
                     DBRoles.Column.ID,
-                    user.get(DBUsers.Column.ROLE_ID)
+                    userData.getRoleID()
                 );
             }
         };

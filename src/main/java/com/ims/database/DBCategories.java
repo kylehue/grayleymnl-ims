@@ -87,33 +87,26 @@ public class DBCategories {
         CategoryListData rows = new CategoryListData();
         
         while (resultSet.next()) {
-            CategoryData data = new CategoryData();
             
             int retrievedId = resultSet.getInt(
                 Column.ID.toString()
-            );
-            data.put(
-                Column.ID,
-                retrievedId
             );
             
             String retrievedName = resultSet.getString(
                 Column.NAME.toString()
             );
-            data.put(
-                Column.NAME,
-                retrievedName
-            );
             
             Timestamp retrievedLastModified = resultSet.getTimestamp(
                 Column.LAST_MODIFIED.toString()
             );
-            data.put(
-                Column.LAST_MODIFIED,
+            
+            CategoryData categoryData = new CategoryData(
+                retrievedId,
+                retrievedName,
                 retrievedLastModified
             );
             
-            rows.add(data);
+            rows.add(categoryData);
         }
         
         return rows;
@@ -222,7 +215,33 @@ public class DBCategories {
         return !rows.isEmpty() ? rows.getFirst() : null;
     }
     
-    // Type aliases
-    public static class CategoryData extends HashMap<Column, Object> {}
+    public static class CategoryData {
+        private final int id;
+        private final String name;
+        private final Timestamp lastModified;
+        
+        public CategoryData(
+            int id,
+            String name,
+            Timestamp lastModified
+        ) {
+            this.id = id;
+            this.name = name;
+            this.lastModified = lastModified;
+        }
+        
+        public int getID() {
+            return id;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public Timestamp getLastModified() {
+            return lastModified;
+        }
+    }
+    
     public static class CategoryListData extends ArrayList<CategoryData> {}
 }

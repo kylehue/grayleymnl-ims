@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 public abstract class BaseModel {
     //////////////////////////////////////////////////////////////////////
@@ -89,7 +88,7 @@ public abstract class BaseModel {
             protected ProductObject call() throws Exception {
                 isBusyProduct.set(true);
                 // First, we have to make sure the category exists in the database
-                HashMap<DBCategories.Column, Object> retrievedCategory =
+                DBCategories.CategoryData retrievedCategory =
                     DBCategories.getOne(DBCategories.Column.ID, categoryID);
                 if (retrievedCategory == null) {
                     System.out.println(
@@ -235,12 +234,12 @@ public abstract class BaseModel {
                 }
                 
                 String searchPattern = Utils.textToSearchPattern(searchText);
-                ArrayList<HashMap<DBProducts.Column, Object>> result = DBProducts.search(
+                DBProducts.ProductListData result = DBProducts.search(
                     searchPattern,
                     categories
                 );
                 
-                for (HashMap<DBProducts.Column, Object> row : result) {
+                for (DBProducts.ProductData row : result) {
                     loadProduct(row);
                 }
                 
@@ -258,31 +257,16 @@ public abstract class BaseModel {
     }
     
     private static ProductObject loadProduct(
-        HashMap<DBProducts.Column, Object> product
+        DBProducts.ProductData productData
     ) {
-        int id = (Integer) product.get(DBProducts.Column.ID);
-        
-        String name = (String) product.get(
-            DBProducts.Column.NAME
-        );
-        Double price = (Double) product.get(
-            DBProducts.Column.PRICE
-        );
-        Integer categoryID = (Integer) product.get(
-            DBProducts.Column.CATEGORY_ID
-        );
-        String imageURL = (String) product.get(
-            DBProducts.Column.IMAGE_URL
-        );
-        Integer currentStocks = (Integer) product.get(
-            DBProducts.Column.CURRENT_STOCKS
-        );
-        Integer expectedStocks = (Integer) product.get(
-            DBProducts.Column.EXPECTED_STOCKS
-        );
-        Timestamp lastModified = (Timestamp) product.get(
-            DBProducts.Column.LAST_MODIFIED
-        );
+        int id = productData.getID();
+        String name = productData.getName();
+        Double price = productData.getPrice();
+        Integer categoryID = productData.getCategoryID();
+        String imageURL = productData.getImageURL();
+        Integer currentStocks = productData.getCurrentStocks();
+        Integer expectedStocks = productData.getExpectedStocks();
+        Timestamp lastModified = productData.getLastModified();
         
         ProductObject productObject = productMap.get(id);
         if (!productMap.containsKey(id)) {
@@ -320,12 +304,12 @@ public abstract class BaseModel {
             @Override
             protected Void call() {
                 isBusyProduct.set(true);
-                ArrayList<HashMap<DBProducts.Column, Object>> productRows = DBProducts.getInRange(
+                DBProducts.ProductListData productRows = DBProducts.getInRange(
                     productMap.size(),
                     limit
                 );
                 
-                for (HashMap<DBProducts.Column, Object> row : productRows) {
+                for (DBProducts.ProductData row : productRows) {
                     loadProduct(row);
                 }
                 return null;
@@ -445,6 +429,21 @@ public abstract class BaseModel {
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
                 
+                // DBProducts.ProductListData productsWithRemovedCategory = DBProducts.get(
+                //     DBProducts.Column.CATEGORY_ID,
+                //     id
+                // );
+                // for (DBProducts.ProductData productData : productsWithRemovedCategory) {
+                //     int productID = productData.getID();
+                //     updateProduct(
+                //         productID,
+                //         null,
+                //         null,
+                //
+                //     );
+                // }
+                // // updateProduct();
+                
                 DBCategories.remove(id);
                 categoryMap.remove(id);
                 
@@ -476,7 +475,7 @@ public abstract class BaseModel {
             protected CategoryObject call() {
                 isBusyCategory.set(true);
                 
-                HashMap<DBCategories.Column, Object> row = DBCategories.getOne(DBCategories.Column.ID, id);
+                DBCategories.CategoryData row = DBCategories.getOne(DBCategories.Column.ID, id);
                 if (row != null) {
                     return loadCategory(row);
                 }
@@ -517,11 +516,11 @@ public abstract class BaseModel {
                 }
                 
                 String searchPattern = Utils.textToSearchPattern(searchText);
-                ArrayList<HashMap<DBCategories.Column, Object>> result = DBCategories.search(
+                DBCategories.CategoryListData result = DBCategories.search(
                     searchPattern
                 );
                 
-                for (HashMap<DBCategories.Column, Object> row : result) {
+                for (DBCategories.CategoryData row : result) {
                     loadCategory(row);
                 }
                 
@@ -539,18 +538,18 @@ public abstract class BaseModel {
     }
     
     private static CategoryObject loadCategory(
-        HashMap<DBCategories.Column, Object> category
+        DBCategories.CategoryData categoryData
     ) {
-        return loadCategoryToMap(category, categoryMap);
+        return loadCategoryToMap(categoryData, categoryMap);
     }
     
     public static CategoryObject loadCategoryToMap(
-        HashMap<DBCategories.Column, Object> category,
+        DBCategories.CategoryData categoryData,
         ObservableMap<Integer, CategoryObject> map
     ) {
-        int id = (Integer) category.get(DBCategories.Column.ID);
-        String name = (String) category.get(DBCategories.Column.NAME);
-        Timestamp lastModified = (Timestamp) category.get(DBCategories.Column.LAST_MODIFIED);
+        int id = categoryData.getID();
+        String name = categoryData.getName();
+        Timestamp lastModified = categoryData.getLastModified();
         
         CategoryObject categoryObject = map.get(id);
         if (!map.containsKey(id)) {
@@ -585,12 +584,12 @@ public abstract class BaseModel {
             @Override
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
-                ArrayList<HashMap<DBCategories.Column, Object>> categoryRows = DBCategories.getInRange(
+                DBCategories.CategoryListData categoryRows = DBCategories.getInRange(
                     map.size(),
                     limit
                 );
                 
-                for (HashMap<DBCategories.Column, Object> row : categoryRows) {
+                for (DBCategories.CategoryData row : categoryRows) {
                     loadCategoryToMap(row, map);
                 }
                 return null;

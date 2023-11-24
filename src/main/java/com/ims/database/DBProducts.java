@@ -1,6 +1,10 @@
 package com.ims.database;
 
 import com.ims.Config;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -132,69 +136,46 @@ public class DBProducts {
         ProductListData rows = new ProductListData();
         
         while (resultSet.next()) {
-            ProductData data = new ProductData();
-            
             int retrievedId = resultSet.getInt(
                 Column.ID.toString()
-            );
-            data.put(
-                Column.ID,
-                retrievedId
             );
             
             String retrievedName = resultSet.getString(
                 Column.NAME.toString()
             );
-            data.put(
-                Column.NAME,
-                retrievedName
-            );
             
             double retrievedPrice = resultSet.getDouble(
                 Column.PRICE.toString()
-            );
-            data.put(
-                Column.PRICE,
-                retrievedPrice
             );
             
             int retrievedCategoryID = resultSet.getInt(
                 Column.CATEGORY_ID.toString()
             );
-            data.put(
-                Column.CATEGORY_ID,
-                retrievedCategoryID
-            );
             
             String retrievedImageURL = resultSet.getString(
                 Column.IMAGE_URL.toString()
-            );
-            data.put(
-                Column.IMAGE_URL,
-                retrievedImageURL
             );
             
             int retrievedCurrentStocks = resultSet.getInt(
                 Column.CURRENT_STOCKS.toString()
             );
-            data.put(
-                Column.CURRENT_STOCKS,
-                retrievedCurrentStocks
-            );
             
             int retrievedExpectedStocks = resultSet.getInt(
                 Column.EXPECTED_STOCKS.toString()
-            );
-            data.put(
-                Column.EXPECTED_STOCKS,
-                retrievedExpectedStocks
             );
             
             Timestamp retrievedLastModified = resultSet.getTimestamp(
                 Column.LAST_MODIFIED.toString()
             );
-            data.put(
-                Column.LAST_MODIFIED,
+            
+            ProductData data = new ProductData(
+                retrievedId,
+                retrievedName,
+                retrievedPrice,
+                retrievedCategoryID,
+                retrievedImageURL,
+                retrievedCurrentStocks,
+                retrievedExpectedStocks,
                 retrievedLastModified
             );
             
@@ -319,7 +300,6 @@ public class DBProducts {
     
     public static int getTotalProductsCount() {
         int count = 0;
-        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -390,7 +370,67 @@ public class DBProducts {
         return count;
     }
     
-    // Type aliases
-    public static class ProductData extends HashMap<Column, Object> {}
+    public static class ProductData {
+        private final int id;
+        private final String name;
+        private final Double price;
+        private final Integer categoryID;
+        private final String imageURL;
+        private final Integer currentStocks;
+        private final Integer expectedStocks;
+        private final Timestamp lastModified;
+        public ProductData(
+            int id,
+            String name,
+            Double price,
+            Integer categoryID,
+            String imageURL,
+            Integer currentStocks,
+            Integer expectedStocks,
+            Timestamp lastModified
+        ) {
+            this.id = id;
+            this.name = name;
+            this.price = price;
+            this.categoryID = categoryID;
+            this.imageURL = imageURL;
+            this.currentStocks = currentStocks;
+            this.expectedStocks = expectedStocks;
+            this.lastModified = lastModified;
+        }
+        
+        public int getID() {
+            return id;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public String getImageURL() {
+            return imageURL;
+        }
+        
+        public Double getPrice() {
+            return price;
+        }
+        
+        public Integer getCategoryID() {
+            return categoryID;
+        }
+        
+        public Integer getCurrentStocks() {
+            return currentStocks;
+        }
+        
+        public Integer getExpectedStocks() {
+            return expectedStocks;
+        }
+        
+        public Timestamp getLastModified() {
+            return lastModified;
+        }
+    }
+    
     public static class ProductListData extends ArrayList<ProductData> {}
 }

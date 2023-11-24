@@ -2,8 +2,6 @@ package com.ims.database;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 public class DBUsers {
     private static Connection connection = Database.getConnection();
@@ -110,73 +108,50 @@ public class DBUsers {
         UserListData rows = new UserListData();
         
         while (resultSet.next()) {
-            UserData data = new UserData();
-            
             int retrievedId = resultSet.getInt(
                 Column.ID.toString()
-            );
-            data.put(
-                Column.ID,
-                retrievedId
             );
             
             String retrievedEmail = resultSet.getString(
                 Column.EMAIL.toString()
             );
-            data.put(
-                Column.EMAIL,
-                retrievedEmail
-            );
             
             String retrievedPassword = resultSet.getString(
                 Column.PASSWORD.toString()
-            );
-            data.put(
-                Column.PASSWORD,
-                retrievedPassword
             );
             
             Date retrievedJoinedDate = resultSet.getDate(
                 Column.JOINED_DATE.toString()
             );
-            data.put(
-                Column.JOINED_DATE,
-                retrievedJoinedDate
-            );
             
-            Date retrievedLastActivityDate = resultSet.getTimestamp(
+            Timestamp retrievedLastActivityDate = resultSet.getTimestamp(
                 Column.LAST_ACTIVITY_DATE.toString()
-            );
-            data.put(
-                Column.LAST_ACTIVITY_DATE,
-                retrievedLastActivityDate
             );
             
             int retrievedRoleID = resultSet.getInt(
                 Column.ROLE_ID.toString()
             );
-            data.put(
-                Column.ROLE_ID,
-                retrievedRoleID
-            );
             
             boolean retrievedIsDisabled = resultSet.getBoolean(
                 Column.IS_DISABLED.toString()
-            );
-            data.put(
-                Column.IS_DISABLED,
-                retrievedIsDisabled
             );
             
             boolean retrievedIsOwner = resultSet.getBoolean(
                 Column.IS_OWNER.toString()
             );
-            data.put(
-                Column.IS_OWNER,
+            
+            UserData userData = new UserData(
+                retrievedId,
+                retrievedEmail,
+                retrievedPassword,
+                retrievedJoinedDate,
+                retrievedLastActivityDate,
+                retrievedRoleID,
+                retrievedIsDisabled,
                 retrievedIsOwner
             );
             
-            rows.add(data);
+            rows.add(userData);
         }
         
         return rows;
@@ -286,7 +261,68 @@ public class DBUsers {
         return !rows.isEmpty() ? rows.getFirst() : null;
     }
     
-    // Type aliases
-    public static class UserData extends HashMap<Column, Object> {}
+    public static class UserData {
+        private final int id;
+        private final String email;
+        private final String password;
+        private final Date joinedDate;
+        private final Timestamp lastActivityDate;
+        private final Integer roleID;
+        private final Boolean isDisabled;
+        private final Boolean isOwner;
+        
+        public UserData(
+            int id,
+            String email,
+            String password,
+            Date joinedDate,
+            Timestamp lastActivityDate,
+            Integer roleID,
+            Boolean isDisabled,
+            Boolean isOwner
+        ) {
+            this.id = id;
+            this.email = email;
+            this.password = password;
+            this.joinedDate = joinedDate;
+            this.lastActivityDate = lastActivityDate;
+            this.roleID = roleID;
+            this.isDisabled = isDisabled;
+            this.isOwner = isOwner;
+        }
+        
+        public int getID() {
+            return id;
+        }
+        
+        public String getEmail() {
+            return email;
+        }
+        
+        public String getPassword() {
+            return password;
+        }
+        
+        public Date getJoinedDate() {
+            return joinedDate;
+        }
+        
+        public Timestamp getLastActivityDate() {
+            return lastActivityDate;
+        }
+        
+        public Integer getRoleID() {
+            return roleID;
+        }
+        
+        public Boolean isDisabled() {
+            return isDisabled;
+        }
+        
+        public Boolean isOwner() {
+            return isOwner;
+        }
+    }
+    
     public static class UserListData extends ArrayList<UserData> {}
 }

@@ -111,17 +111,17 @@ public class ForgotPasswordController {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
-                    DBUsers.UserData user = DBUsers.getOne(
+                    DBUsers.UserData userData = DBUsers.getOne(
                         DBUsers.Column.EMAIL,
                         email
                     );
                     
-                    assert user != null;
+                    assert userData != null;
                     
                     // Change user's password
                     String newPassword = Utils.generateRandomCode(12);
                     DBUsers.update(
-                        (int) user.get(DBUsers.Column.ID),
+                        userData.getID(),
                         Utils.hashPassword(newPassword),
                         null,
                         null,

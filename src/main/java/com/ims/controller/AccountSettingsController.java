@@ -83,10 +83,9 @@ public class AccountSettingsController {
         UserSessionModel.currentUser.addListener(e -> {
             if (UserSessionModel.currentUser.get() == null) return;
             emailTextField.setText(UserSessionModel.getCurrentUserEmail());
-            DBRoles.RoleData role =
-                UserSessionModel.getCurrentUserRole();
-            if (role != null) {
-                roleTextField.setText(role.get(DBRoles.Column.NAME).toString());
+            DBRoles.RoleData roleData = UserSessionModel.getCurrentUserRole();
+            if (roleData != null) {
+                roleTextField.setText(roleData.getName());
             }
         });
         

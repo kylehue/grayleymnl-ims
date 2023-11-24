@@ -241,32 +241,18 @@ public abstract class UserManagerModel {
     }
     
     public static RoleObject loadRoleToMap(
-        DBRoles.RoleData role,
+        DBRoles.RoleData roleData,
         ObservableMap<Integer, RoleObject> map
     ) {
-        int id = (Integer) role.get(DBRoles.Column.ID);
-        String name = (String) role.get(DBRoles.Column.NAME);
-        boolean allowAddCategory = (boolean) role.get(
-            DBRoles.Column.ALLOW_ADD_CATEGORY
-        );
-        boolean allowDeleteCategory = (boolean) role.get(
-            DBRoles.Column.ALLOW_DELETE_CATEGORY
-        );
-        boolean allowEditCategory = (boolean) role.get(
-            DBRoles.Column.ALLOW_EDIT_CATEGORY
-        );
-        boolean allowAddProduct = (boolean) role.get(
-            DBRoles.Column.ALLOW_ADD_PRODUCT
-        );
-        boolean allowDeleteProduct = (boolean) role.get(
-            DBRoles.Column.ALLOW_DELETE_PRODUCT
-        );
-        boolean allowEditProduct = (boolean) role.get(
-            DBRoles.Column.ALLOW_EDIT_PRODUCT
-        );
-        Timestamp lastModified = (Timestamp) role.get(
-            DBRoles.Column.LAST_MODIFIED
-        );
+        int id = roleData.getID();
+        String name = roleData.getName();
+        Boolean allowAddCategory = roleData.isAllowAddCategory();
+        Boolean allowDeleteCategory = roleData.isAllowDeleteCategory();
+        Boolean allowEditCategory = roleData.isAllowEditCategory();
+        Boolean allowAddProduct = roleData.isAllowAddProduct();
+        Boolean allowDeleteProduct = roleData.isAllowDeleteProduct();
+        Boolean allowEditProduct = roleData.isAllowEditProduct();
+        Timestamp lastModified = roleData.getLastModified();
         
         RoleObject roleObject = map.get(id);
         if (roleObject == null) {
@@ -452,26 +438,14 @@ public abstract class UserManagerModel {
         DBUsers.UserData user,
         ObservableMap<Integer, UserObject> map
     ) {
-        int id = (Integer) user.get(DBUsers.Column.ID);
-        String email = (String) user.get(DBUsers.Column.EMAIL);
-        String password = (String) user.get(
-            DBUsers.Column.PASSWORD
-        );
-        Date joinedDate = (Date) user.get(
-            DBUsers.Column.JOINED_DATE
-        );
-        Timestamp lastActivityDate = (Timestamp) user.get(
-            DBUsers.Column.LAST_ACTIVITY_DATE
-        );
-        int roleID = (Integer) user.get(
-            DBUsers.Column.ROLE_ID
-        );
-        boolean isDisabled = (boolean) user.get(
-            DBUsers.Column.IS_DISABLED
-        );
-        boolean isOwner = (boolean) user.get(
-            DBUsers.Column.IS_OWNER
-        );
+        int id = user.getID();
+        String email = user.getEmail();
+        String password = user.getPassword();
+        Date joinedDate = user.getJoinedDate();
+        Timestamp lastActivityDate = user.getLastActivityDate();
+        Integer roleID = user.getRoleID();
+        Boolean isDisabled = user.isDisabled();
+        Boolean isOwner = user.isOwner();
         
         UserObject userObject = map.get(id);
         if (userObject == null) {

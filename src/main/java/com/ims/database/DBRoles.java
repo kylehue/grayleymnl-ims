@@ -114,81 +114,55 @@ public class DBRoles {
         RoleListData rows = new RoleListData();
         
         while (resultSet.next()) {
-            RoleData data = new RoleData();
-            
             int retrievedId = resultSet.getInt(
                 DBRoles.Column.ID.toString()
-            );
-            data.put(
-                DBRoles.Column.ID,
-                retrievedId
             );
             
             String retrievedName = resultSet.getString(
                 DBRoles.Column.NAME.toString()
             );
-            data.put(
-                DBRoles.Column.NAME,
-                retrievedName
-            );
             
             boolean retrievedAllowAddCategory = resultSet.getBoolean(
                 Column.ALLOW_ADD_CATEGORY.toString()
-            );
-            data.put(
-                Column.ALLOW_ADD_CATEGORY,
-                retrievedAllowAddCategory
             );
             
             boolean retrievedAllowDeleteCategory = resultSet.getBoolean(
                 Column.ALLOW_DELETE_CATEGORY.toString()
             );
-            data.put(
-                Column.ALLOW_DELETE_CATEGORY,
-                retrievedAllowDeleteCategory
-            );
             
             boolean retrievedAllowEditCategory = resultSet.getBoolean(
                 Column.ALLOW_EDIT_CATEGORY.toString()
-            );
-            data.put(
-                Column.ALLOW_EDIT_CATEGORY,
-                retrievedAllowEditCategory
             );
             
             boolean retrievedAllowAddProduct = resultSet.getBoolean(
                 Column.ALLOW_ADD_PRODUCT.toString()
             );
-            data.put(
-                Column.ALLOW_ADD_PRODUCT,
-                retrievedAllowAddProduct
-            );
             
             boolean retrievedAllowDeleteProduct = resultSet.getBoolean(
                 Column.ALLOW_DELETE_PRODUCT.toString()
-            );
-            data.put(
-                Column.ALLOW_DELETE_PRODUCT,
-                retrievedAllowDeleteProduct
             );
             
             boolean retrievedAllowEditProduct = resultSet.getBoolean(
                 Column.ALLOW_EDIT_PRODUCT.toString()
             );
-            data.put(
-                Column.ALLOW_EDIT_PRODUCT,
-                retrievedAllowEditProduct
-            );
             
             Timestamp retrievedLastModified = resultSet.getTimestamp(
                 Column.LAST_MODIFIED.toString()
             );
-            data.put(
-                Column.LAST_MODIFIED,
+            
+            RoleData roleData = new RoleData(
+                retrievedId,
+                retrievedName,
+                retrievedAllowAddCategory,
+                retrievedAllowDeleteCategory,
+                retrievedAllowEditCategory,
+                retrievedAllowAddProduct,
+                retrievedAllowDeleteProduct,
+                retrievedAllowEditProduct,
                 retrievedLastModified
             );
             
-            rows.add(data);
+            rows.add(roleData);
         }
         
         return rows;
@@ -291,7 +265,75 @@ public class DBRoles {
         return !rows.isEmpty() ? rows.getFirst() : null;
     }
     
-    // Type aliases
-    public static class RoleData extends HashMap<Column, Object> {}
+    public static class RoleData {
+        private final int id;
+        private final String name;
+        private final Boolean isAllowAddCategory;
+        private final Boolean isAllowDeleteCategory;
+        private final Boolean isAllowEditCategory;
+        private final Boolean isAllowAddProduct;
+        private final Boolean isAllowDeleteProduct;
+        private final Boolean isAllowEditProduct;
+        private final Timestamp lastModified;
+        
+        public RoleData(
+            int id,
+            String name,
+            Boolean isAllowAddCategory,
+            Boolean isAllowDeleteCategory,
+            Boolean isAllowEditCategory,
+            Boolean isAllowAddProduct,
+            Boolean isAllowDeleteProduct,
+            Boolean isAllowEditProduct,
+            Timestamp lastModified
+        ) {
+            this.id = id;
+            this.name = name;
+            this.isAllowAddCategory = isAllowAddCategory;
+            this.isAllowDeleteCategory = isAllowDeleteCategory;
+            this.isAllowEditCategory = isAllowEditCategory;
+            this.isAllowAddProduct = isAllowAddProduct;
+            this.isAllowDeleteProduct = isAllowDeleteProduct;
+            this.isAllowEditProduct = isAllowEditProduct;
+            this.lastModified = lastModified;
+        }
+        
+        public int getID() {
+            return id;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public Boolean isAllowAddCategory() {
+            return isAllowAddCategory;
+        }
+        
+        public Boolean isAllowDeleteCategory() {
+            return isAllowDeleteCategory;
+        }
+        
+        public Boolean isAllowEditCategory() {
+            return isAllowEditCategory;
+        }
+        
+        public Boolean isAllowAddProduct() {
+            return isAllowAddProduct;
+        }
+        
+        public Boolean isAllowDeleteProduct() {
+            return isAllowDeleteProduct;
+        }
+        
+        public Boolean isAllowEditProduct() {
+            return isAllowEditProduct;
+        }
+        
+        public Timestamp getLastModified() {
+            return lastModified;
+        }
+    }
+    
     public static class RoleListData extends ArrayList<RoleData> {}
 }
