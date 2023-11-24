@@ -185,7 +185,7 @@ public class DBRoles {
         try {
             String query = """
                 SELECT * FROM roles
-                ORDER BY last_modified DESC, id ASC
+                ORDER BY last_modified ASC, id ASC
                 OFFSET ?
                 LIMIT ?;
                 """;

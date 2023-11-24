@@ -128,7 +128,7 @@ public class DBUsers {
                 Column.LAST_ACTIVITY_DATE.toString()
             );
             
-            int retrievedRoleID = resultSet.getInt(
+            Integer retrievedRoleID = (Integer) resultSet.getObject(
                 Column.ROLE_ID.toString()
             );
             
@@ -174,7 +174,7 @@ public class DBUsers {
         try {
             String query = """
                 SELECT * FROM users
-                ORDER BY joined_date DESC, id ASC
+                ORDER BY joined_date ASC, id ASC
                 OFFSET ?
                 LIMIT ?;
                 """;

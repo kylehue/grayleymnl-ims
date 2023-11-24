@@ -203,7 +203,7 @@ public class DBProducts {
         try {
             String query = """
                 SELECT * FROM products
-                ORDER BY last_modified DESC, id ASC
+                ORDER BY last_modified ASC, id ASC
                 OFFSET ?
                 LIMIT ?;
                 """;

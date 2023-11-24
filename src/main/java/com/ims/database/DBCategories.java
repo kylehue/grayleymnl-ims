@@ -129,7 +129,7 @@ public class DBCategories {
         try {
             String query = """
                 SELECT * FROM categories
-                ORDER BY last_modified DESC, id ASC
+                ORDER BY last_modified ASC, id ASC
                 OFFSET ?
                 LIMIT ?;
                 """;
