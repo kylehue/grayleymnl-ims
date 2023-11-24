@@ -2,13 +2,16 @@ package com.ims.components;
 
 import com.ims.Config;
 import com.ims.database.DBRoles;
+import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
+import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.Utils;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 
@@ -38,6 +41,18 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
             }
             roleObject.nameProperty().addListener(roleNameListener);
         });
+        
+        UserManagerModel.roleMap.addListener(
+            (MapChangeListener<Integer, RoleObject>) change -> {
+                if (!change.wasRemoved()) return;
+                int id = change.getKey();
+                model.remove(id);
+                
+                if (this.getValue() != null && this.getValue().getID() == id) {
+                    this.setValue(null);
+                }
+            }
+        );
     }
     
     @Override

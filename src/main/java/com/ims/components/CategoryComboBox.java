@@ -9,6 +9,7 @@ import com.ims.utils.Utils;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 
@@ -38,6 +39,18 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
             }
             categoryObject.nameProperty().addListener(categoryNameListener);
         });
+        
+        BaseModel.categoryMap.addListener(
+            (MapChangeListener<Integer, CategoryObject>) change -> {
+                if (!change.wasRemoved()) return;
+                int id = change.getKey();
+                model.remove(id);
+                
+                if (this.getValue() != null && this.getValue().getID() == id) {
+                    this.setValue(null);
+                }
+            }
+        );
     }
     
     @Override
