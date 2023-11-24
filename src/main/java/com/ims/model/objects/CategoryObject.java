@@ -11,11 +11,17 @@ public class CategoryObject {
     private final int id;
     private final StringProperty name;
     private final ObjectProperty<Timestamp> lastModified;
+    private final boolean isNew;
     
-    public CategoryObject(int id, String name, Timestamp lastModified) {
+    public CategoryObject(int id, String name, Timestamp lastModified, boolean isNew) {
         this.id = id;
         this.name = new SimpleStringProperty(name);
         this.lastModified = new SimpleObjectProperty<>(lastModified);
+        this.isNew = isNew;
+    }
+    
+    public boolean isNew() {
+        return isNew;
     }
     
     public int getID() {

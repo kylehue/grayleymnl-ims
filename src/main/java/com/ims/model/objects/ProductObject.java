@@ -13,6 +13,7 @@ public class ProductObject {
     private final ObjectProperty<Integer> currentStocks;
     private final ObjectProperty<Integer> expectedStocks;
     private final ObjectProperty<Timestamp> lastModified;
+    private final boolean isNew;
     
     public ProductObject(
         int id,
@@ -22,7 +23,8 @@ public class ProductObject {
         String imageURL,
         Integer currentStocks,
         Integer expectedStocks,
-        Timestamp lastModified
+        Timestamp lastModified,
+        boolean isNew
     ) {
         this.id = id;
         this.name = new SimpleObjectProperty<>(name);
@@ -32,6 +34,11 @@ public class ProductObject {
         this.currentStocks = new SimpleObjectProperty<>(currentStocks);
         this.expectedStocks = new SimpleObjectProperty<>(expectedStocks);
         this.lastModified = new SimpleObjectProperty<>(lastModified);
+        this.isNew = isNew;
+    }
+    
+    public boolean isNew() {
+        return isNew;
     }
     
     public int getID() {

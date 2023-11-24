@@ -18,6 +18,7 @@ public class RoleObject {
     private final BooleanProperty allowDeleteProduct;
     private final BooleanProperty allowEditProduct;
     private final ObjectProperty<Timestamp> lastModified;
+    private final boolean isNew;
     
     public RoleObject(
         int id,
@@ -28,7 +29,8 @@ public class RoleObject {
         boolean allowAddProduct,
         boolean allowDeleteProduct,
         boolean allowEditProduct,
-        Timestamp lastModified
+        Timestamp lastModified,
+        boolean isNew
     ) {
         this.id = id;
         this.name = new SimpleStringProperty(name);
@@ -39,6 +41,11 @@ public class RoleObject {
         this.allowDeleteProduct = new SimpleBooleanProperty(allowDeleteProduct);
         this.allowEditProduct = new SimpleBooleanProperty(allowEditProduct);
         this.lastModified = new SimpleObjectProperty<>(lastModified);
+        this.isNew = isNew;
+    }
+    
+    public boolean isNew() {
+        return isNew;
     }
     
     public int getID() {

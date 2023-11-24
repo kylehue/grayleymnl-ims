@@ -124,11 +124,11 @@ public class UserManagerController {
             if (this.roles.containsKey(roleObject.getID())) return;
             role.setRoleObject(roleObject);
             this.roles.put(roleObject.getID(), role);
-            int index = this.getSortedRoles().indexOf(role);
-            rolesFlowPane.getChildren().add(
-                index,
-                role
-            );
+            if (roleObject.isNew()) {
+                rolesFlowPane.getChildren().addFirst(role);
+            } else {
+                rolesFlowPane.getChildren().addLast(role);
+            }
         });
     }
     
@@ -140,16 +140,6 @@ public class UserManagerController {
                 this.roles.remove(roleToRemove.getRoleObject().getID());
             });
         }
-    }
-    
-    private ArrayList<Role> getSortedRoles() {
-        ArrayList<Role> sortedRoles = new ArrayList<>(
-            this.roles.values().stream().sorted(
-                Comparator.comparing(a -> a.getRoleObject().getLastModified())
-            ).toList()
-        );
-        
-        return sortedRoles;
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -229,11 +219,11 @@ public class UserManagerController {
             if (this.users.containsKey(userObject.getID())) return;
             user.setUserObject(userObject);
             this.users.put(userObject.getID(), user);
-            int index = this.getSortedUsers().indexOf(user);
-            usersFlowPane.getChildren().add(
-                index,
-                user
-            );
+            if (userObject.isNew()) {
+                usersFlowPane.getChildren().addFirst(user);
+            } else {
+                usersFlowPane.getChildren().addLast(user);
+            }
         });
     }
     

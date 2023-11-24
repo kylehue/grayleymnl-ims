@@ -48,7 +48,7 @@ public abstract class UserManagerModel {
             @Override
             protected Void call() throws Exception {
                 isBusyRole.set(true);
-                loadRole(DBRoles.add(name));
+                loadRole(DBRoles.add(name), true);
                 
                 return null;
             }
@@ -108,7 +108,7 @@ public abstract class UserManagerModel {
                 // Update in list if it exists
                 RoleObject roleObject = roleMap.get(id);
                 if (roleObject != null) {
-                    loadRole(newRole);
+                    loadRole(newRole, false);
                 }
                 
                 return null;
@@ -188,7 +188,7 @@ public abstract class UserManagerModel {
                 );
                 
                 for (DBRoles.RoleData row : result) {
-                    loadRole(row);
+                    loadRole(row, false);
                 }
                 
                 return null;
@@ -221,7 +221,7 @@ public abstract class UserManagerModel {
                 );
                 
                 if (row != null) {
-                    return loadRole(row);
+                    return loadRole(row, false);
                 }
                 
                 return null;
@@ -251,7 +251,8 @@ public abstract class UserManagerModel {
     
     public static RoleObject loadRoleToMap(
         DBRoles.RoleData roleData,
-        ObservableMap<Integer, RoleObject> map
+        ObservableMap<Integer, RoleObject> map,
+        boolean isNew
     ) {
         int id = roleData.getID();
         String name = roleData.getName();
@@ -274,7 +275,8 @@ public abstract class UserManagerModel {
                 allowAddProduct,
                 allowDeleteProduct,
                 allowEditProduct,
-                lastModified
+                lastModified,
+                isNew
             );
             map.put(id, roleObject);
         } else {
@@ -291,8 +293,8 @@ public abstract class UserManagerModel {
         return roleObject;
     }
     
-    private static RoleObject loadRole(DBRoles.RoleData role) {
-        return loadRoleToMap(role, roleMap);
+    private static RoleObject loadRole(DBRoles.RoleData role, boolean isNew) {
+        return loadRoleToMap(role, roleMap, isNew);
     }
     
     /**
@@ -314,7 +316,7 @@ public abstract class UserManagerModel {
                 );
                 
                 for (DBRoles.RoleData row : roleRows) {
-                    loadRoleToMap(row, map);
+                    loadRoleToMap(row, map, false);
                 }
                 return null;
             }
@@ -391,7 +393,7 @@ public abstract class UserManagerModel {
                 // Update in list if it exists
                 UserObject userObject = userMap.get(id);
                 if (userObject != null) {
-                    loadUser(user);
+                    loadUser(user, false);
                 }
                 
                 return null;
@@ -427,7 +429,7 @@ public abstract class UserManagerModel {
                 );
                 
                 for (DBUsers.UserData row : result) {
-                    loadUser(row);
+                    loadUser(row, false);
                 }
                 
                 return null;
@@ -445,7 +447,8 @@ public abstract class UserManagerModel {
     
     public static UserObject loadUserToMap(
         DBUsers.UserData user,
-        ObservableMap<Integer, UserObject> map
+        ObservableMap<Integer, UserObject> map,
+        boolean isNew
     ) {
         int id = user.getID();
         String email = user.getEmail();
@@ -466,7 +469,8 @@ public abstract class UserManagerModel {
                 lastActivityDate,
                 roleID,
                 isDisabled,
-                isOwner
+                isOwner,
+                isNew
             );
             map.put(id, userObject);
         } else {
@@ -480,8 +484,8 @@ public abstract class UserManagerModel {
         return userObject;
     }
     
-    private static UserObject loadUser(DBUsers.UserData user) {
-        return loadUserToMap(user, userMap);
+    private static UserObject loadUser(DBUsers.UserData user, boolean isNew) {
+        return loadUserToMap(user, userMap, isNew);
     }
     
     /**
@@ -500,7 +504,7 @@ public abstract class UserManagerModel {
                 );
                 
                 for (DBUsers.UserData row : userRows) {
-                    loadUser(row);
+                    loadUser(row, false);
                 }
                 return null;
             }

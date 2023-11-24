@@ -94,7 +94,8 @@ public abstract class LoginModel {
                         userData.getLastActivityDate(),
                         userData.getRoleID(),
                         userData.isDisabled(),
-                        userData.isOwner()
+                        userData.isOwner(),
+                        false
                     );
                 }
                 

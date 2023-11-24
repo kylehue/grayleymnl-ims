@@ -1,6 +1,7 @@
 package com.ims.model;
 
 import com.ims.Config;
+import com.ims.controller.BaseController;
 import com.ims.database.DBCategories;
 import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
@@ -99,13 +100,16 @@ public abstract class BaseModel {
                     return null;
                 }
                 
-                return loadProduct(DBProducts.add(
-                    name,
-                    categoryID,
-                    null,
-                    0,
-                    0
-                ));
+                return loadProduct(
+                    DBProducts.add(
+                        name,
+                        categoryID,
+                        null,
+                        0,
+                        0
+                    ),
+                    true
+                );
             }
         };
         
@@ -157,15 +161,18 @@ public abstract class BaseModel {
             protected Void call() throws Exception {
                 isBusyProduct.set(true);
                 
-                loadProduct(DBProducts.update(
-                    id,
-                    name,
-                    price,
-                    categoryID,
-                    imageURL,
-                    currentStocks,
-                    expectedStocks
-                ));
+                loadProduct(
+                    DBProducts.update(
+                        id,
+                        name,
+                        price,
+                        categoryID,
+                        imageURL,
+                        currentStocks,
+                        expectedStocks
+                    ),
+                    false
+                );
                 
                 return null;
             }
@@ -240,7 +247,7 @@ public abstract class BaseModel {
                 );
                 
                 for (DBProducts.ProductData row : result) {
-                    loadProduct(row);
+                    loadProduct(row, false);
                 }
                 
                 return null;
@@ -257,7 +264,8 @@ public abstract class BaseModel {
     }
     
     private static ProductObject loadProduct(
-        DBProducts.ProductData productData
+        DBProducts.ProductData productData,
+        boolean isNew
     ) {
         int id = productData.getID();
         String name = productData.getName();
@@ -278,7 +286,8 @@ public abstract class BaseModel {
                 imageURL,
                 currentStocks,
                 expectedStocks,
-                lastModified
+                lastModified,
+                isNew
             );
             productMap.put(id, productObject);
         } else {
@@ -310,7 +319,7 @@ public abstract class BaseModel {
                 );
                 
                 for (DBProducts.ProductData row : productRows) {
-                    loadProduct(row);
+                    loadProduct(row, false);
                 }
                 return null;
             }
@@ -355,7 +364,7 @@ public abstract class BaseModel {
             @Override
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
-                loadCategory(DBCategories.add(name));
+                loadCategory(DBCategories.add(name), true);
                 return null;
             }
         };
@@ -395,7 +404,7 @@ public abstract class BaseModel {
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
                 
-                loadCategory(DBCategories.update(id, name));
+                loadCategory(DBCategories.update(id, name), false);
                 
                 return null;
             }
@@ -470,7 +479,7 @@ public abstract class BaseModel {
                 
                 DBCategories.CategoryData row = DBCategories.getOne(DBCategories.Column.ID, id);
                 if (row != null) {
-                    return loadCategory(row);
+                    return loadCategory(row, false);
                 }
                 
                 return null;
@@ -514,7 +523,7 @@ public abstract class BaseModel {
                 );
                 
                 for (DBCategories.CategoryData row : result) {
-                    loadCategory(row);
+                    loadCategory(row, false);
                 }
                 
                 return null;
@@ -531,14 +540,16 @@ public abstract class BaseModel {
     }
     
     private static CategoryObject loadCategory(
-        DBCategories.CategoryData categoryData
+        DBCategories.CategoryData categoryData,
+        boolean isNew
     ) {
-        return loadCategoryToMap(categoryData, categoryMap);
+        return loadCategoryToMap(categoryData, categoryMap, isNew);
     }
     
     public static CategoryObject loadCategoryToMap(
         DBCategories.CategoryData categoryData,
-        ObservableMap<Integer, CategoryObject> map
+        ObservableMap<Integer, CategoryObject> map,
+        boolean isNew
     ) {
         int id = categoryData.getID();
         String name = categoryData.getName();
@@ -549,7 +560,8 @@ public abstract class BaseModel {
             categoryObject = new CategoryObject(
                 id,
                 name,
-                lastModified
+                lastModified,
+                isNew
             );
             map.put(id, categoryObject);
         } else {
@@ -583,7 +595,7 @@ public abstract class BaseModel {
                 );
                 
                 for (DBCategories.CategoryData row : categoryRows) {
-                    loadCategoryToMap(row, map);
+                    loadCategoryToMap(row, map, false);
                 }
                 return null;
             }

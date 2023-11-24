@@ -246,7 +246,7 @@ public class BaseController {
                         case INSUFFICIENT:
                             if (!searchProductTextField.getText().isEmpty()) return;
                             if (!getAllActiveCategoryTags().isEmpty()) return;
-                            BaseModel.loadProducts(Config.productLoadLimit / 3);
+                            BaseModel.loadProducts(Config.productLoadLimit);
                             break;
                     }
                 }
@@ -295,11 +295,11 @@ public class BaseController {
             if (this.products.containsKey(productObject.getID())) return;
             product.setProductObject(productObject);
             this.products.put(productObject.getID(), product);
-            int index = this.getSortedProducts().indexOf(product);
-            productsFlowPane.getChildren().add(
-                index,
-                product
-            );
+            if (productObject.isNew()) {
+                productsFlowPane.getChildren().addFirst(product);
+            } else {
+                productsFlowPane.getChildren().addLast(product);
+            }
         });
     }
     
@@ -311,20 +311,6 @@ public class BaseController {
                 this.products.remove(id);
             }
         });
-    }
-    
-    private ArrayList<Product> getSortedProducts() {
-        ArrayList<Product> sortedProducts = new ArrayList<>(
-            this.products.values().stream().sorted(
-                (a, b) -> {
-                    return b.getProductObject().getLastModified().compareTo(
-                        a.getProductObject().getLastModified()
-                    );
-                }
-            ).toList()
-        );
-        
-        return sortedProducts;
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -425,12 +411,9 @@ public class BaseController {
                             BaseModel.loadCategories(1);
                             break;
                         case HIT_BOTTOM:
-                            if (!searchCategoryTextField.getText().isEmpty()) return;
-                            BaseModel.loadCategories(Config.categoryLoadLimit);
-                            break;
                         case INSUFFICIENT:
                             if (!searchCategoryTextField.getText().isEmpty()) return;
-                            BaseModel.loadCategories(Config.categoryLoadLimit / 3);
+                            BaseModel.loadCategories(Config.categoryLoadLimit);
                             break;
                     }
                 }
@@ -445,11 +428,11 @@ public class BaseController {
             if (this.categories.containsKey(id)) return;
             category.setCategoryObject(categoryObject);
             this.categories.put(id, category);
-            int index = this.getSortedCategories().indexOf(category);
-            categoriesFlowPane.getChildren().add(
-                index,
-                category
-            );
+            if (categoryObject.isNew()) {
+                categoriesFlowPane.getChildren().addFirst(category);
+            } else {
+                categoriesFlowPane.getChildren().addLast(category);
+            }
             addCategoryTag(categoryObject, false);
         });
     }
@@ -471,20 +454,6 @@ public class BaseController {
                 }
             });
         }
-    }
-    
-    private ArrayList<Category> getSortedCategories() {
-        ArrayList<Category> sortedCategories = new ArrayList<>(
-            this.categories.values().stream().sorted(
-                (a, b) -> {
-                    return b.getCategoryObject().getLastModified().compareTo(
-                        a.getCategoryObject().getLastModified()
-                    );
-                }
-            ).toList()
-        );
-        
-        return sortedCategories;
     }
     
     //////////////////////////////////////////////////////////////////////

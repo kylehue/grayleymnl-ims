@@ -14,6 +14,7 @@ public class UserObject {
     private final ObjectProperty<Integer> roleID;
     private final BooleanProperty isDisabled;
     private final BooleanProperty isOwner;
+    private final boolean isNew;
     
     public UserObject(
         int id,
@@ -23,7 +24,8 @@ public class UserObject {
         Timestamp lastActivityDate,
         Integer roleID,
         boolean isDisabled,
-        boolean isOwner
+        boolean isOwner,
+        boolean isNew
     ) {
         this.id = id;
         this.email = new SimpleStringProperty(email);
@@ -33,6 +35,11 @@ public class UserObject {
         this.roleID = new SimpleObjectProperty<>(roleID);
         this.isDisabled = new SimpleBooleanProperty(isDisabled);
         this.isOwner = new SimpleBooleanProperty(isOwner);
+        this.isNew = isNew;
+    }
+    
+    public boolean isNew() {
+        return isNew;
     }
     
     public int getID() {
