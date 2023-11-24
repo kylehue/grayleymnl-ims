@@ -100,7 +100,7 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
     }
     
     private void loadRole(DBRoles.RoleData role) {
-        UserManagerModel.loadRoleToMap(role, model);
+        UserManagerModel.loadRoleToMap(role, model, false);
     }
     
     private void initializeRoleLazyLoad() {
@@ -115,12 +115,9 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
                             loadRoles(8);
                             break;
                         case HIT_BOTTOM:
-                            if (!this.getSearchText().isEmpty()) return;
-                            loadRoles(Config.roleLoadLimit);
-                            break;
                         case INSUFFICIENT:
                             if (!this.getSearchText().isEmpty()) return;
-                            loadRoles(Config.roleLoadLimit / 3);
+                            loadRoles(Config.roleLoadLimit);
                             break;
                     }
                 }

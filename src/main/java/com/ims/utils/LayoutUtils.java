@@ -407,6 +407,7 @@ public abstract class LayoutUtils {
         });
         
         // Load more items whenever there's not enough items to have a scrollbar
+        CountdownTimer loadTimer = new CountdownTimer(1, 4);
         Utils.Callable<Void> loadItemsWhenNoScrollbar = () -> {
             Platform.runLater(() -> {
                 double contentHeight = contentPane.getBoundsInLocal().getHeight();
@@ -425,9 +426,17 @@ public abstract class LayoutUtils {
         model.addListener(
             (MapChangeListener<Object, Object>) change -> {
                 if (!change.wasAdded()) return;
-                loadItemsWhenNoScrollbar.call();
+                loadTimer.start();
+                
+                // for some weird reason I have to call this so that its property
+                // listeners can work
+                loadTimer.endedProperty().get();
             }
         );
+        
+        loadTimer.endedProperty().addListener(e -> {
+            loadItemsWhenNoScrollbar.call();
+        });
         
         onRequestItem.call(RequestItemType.INITIAL);
     }

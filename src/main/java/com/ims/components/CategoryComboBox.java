@@ -98,7 +98,7 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
     }
     
     private void loadCategory(DBCategories.CategoryData category) {
-        BaseModel.loadCategoryToMap(category, model);
+        BaseModel.loadCategoryToMap(category, model, false);
     }
     
     private void initializeCategoryLazyLoad() {
@@ -113,12 +113,9 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
                             loadCategories(8);
                             break;
                         case HIT_BOTTOM:
-                            if (!this.getSearchText().isEmpty()) return;
-                            loadCategories(Config.categoryLoadLimit);
-                            break;
                         case INSUFFICIENT:
                             if (!this.getSearchText().isEmpty()) return;
-                            loadCategories(Config.categoryLoadLimit / 3);
+                            loadCategories(Config.categoryLoadLimit);
                             break;
                     }
                 }
