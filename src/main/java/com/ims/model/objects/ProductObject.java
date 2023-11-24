@@ -54,11 +54,11 @@ public class ProductObject {
         return categoryID;
     }
     
-    public int getCategoryID() {
+    public Integer getCategoryID() {
         return categoryID.get();
     }
     
-    public void setCategoryID(int categoryID) {
+    public void setCategoryID(Integer categoryID) {
         this.categoryID.set(categoryID);
     }
     

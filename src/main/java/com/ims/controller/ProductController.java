@@ -6,6 +6,7 @@ import com.ims.components.PopupService;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.UserSessionModel;
+import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
@@ -247,9 +248,13 @@ public class ProductController {
     
     private boolean isSaved() {
         ProductObject productObject = ProductModel.currentProduct.get();
+        CategoryObject selectedCategory = productCategoryComboBox.getValue();
         return productNameTextField.getText().equals(productObject.getName()) &&
             productPriceNumberField.getValue() == productObject.getPrice() &&
-            productCategoryComboBox.getValue().getID() == productObject.getCategoryID() &&
+            (
+                (selectedCategory == null && productObject.getCategoryID() == null) || (selectedCategory != null && selectedCategory.getID() == productObject.getCategoryID())
+            )
+            &&
             productImageURLTextField.getText().equals(productObject.getImageURL()) &&
             currentStocksNumberField.getValue() == productObject.getCurrentStocks() &&
             expectedStocksNumberField.getValue() == productObject.getExpectedStocks();
