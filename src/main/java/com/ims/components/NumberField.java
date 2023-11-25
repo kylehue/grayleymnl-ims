@@ -23,7 +23,7 @@ public class NumberField extends StackPane {
     private boolean allowNegative = true;
     private final DoubleProperty value = new SimpleDoubleProperty(0);
     private final DoubleProperty maxValue = new SimpleDoubleProperty(Double.MAX_VALUE);
-    private final DoubleProperty minValue = new SimpleDoubleProperty(Double.MIN_VALUE);
+    private final DoubleProperty minValue = new SimpleDoubleProperty(-Double.MAX_VALUE);
     
     public NumberField(boolean showButtons) {
         this.setAlignment(Pos.CENTER_LEFT);

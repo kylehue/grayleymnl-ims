@@ -292,13 +292,16 @@ public class ProductController {
     private boolean isSaved() {
         ProductObject productObject = ProductModel.currentProduct.get();
         CategoryObject selectedCategory = productCategoryComboBox.getValue();
+        String imageURL = productObject.getImageURL();
         return productNameTextField.getText().equals(productObject.getName()) &&
             productPriceNumberField.getValue() == productObject.getPrice() &&
             (
                 (selectedCategory == null && productObject.getCategoryID() == null) || (selectedCategory != null && productObject.getCategoryID() != null && selectedCategory.getID() == productObject.getCategoryID())
             )
             &&
-            productImageURLTextField.getText().equals(productObject.getImageURL()) &&
+            (
+                (imageURL != null && productImageURLTextField.getText().equals(imageURL)) || (imageURL == null && productImageURLTextField.getText().isEmpty())
+            ) &&
             currentStocksNumberField.getValue() == productObject.getCurrentStocks() &&
             expectedStocksNumberField.getValue() == productObject.getExpectedStocks();
     }
@@ -349,14 +352,10 @@ public class ProductController {
             }
             
             Integer currentStocks = currentProduct.getCurrentStocks();
-            currentStocksNumberField.textField.setText(
-                String.valueOf(currentStocks)
-            );
+            currentStocksNumberField.setValue(currentStocks);
             
             Integer expectedStocks = currentProduct.getExpectedStocks();
-            expectedStocksNumberField.textField.setText(
-                String.valueOf(expectedStocks)
-            );
+            expectedStocksNumberField.setValue(expectedStocks);
         });
     }
 }
