@@ -24,6 +24,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 
@@ -61,6 +62,7 @@ public class Product extends GridPane {
         // Setup grid pane for the details
         GridPane detailsGridPane = LayoutUtils.createGridPane(2, 1);
         this.add(detailsGridPane, 1, 0);
+        detailsGridPane.getRowConstraints().get(0).setVgrow(Priority.ALWAYS);
         
         // Setup grid pane for text
         detailsGridPane.add(this.textGridPane, 0, 0);
@@ -135,6 +137,7 @@ public class Product extends GridPane {
         this.textGridPane.add(categoryLabel, 0, 1);
         this.textGridPane.getRowConstraints().get(1).setVgrow(Priority.NEVER);
         
+        StackPane stocksLabelContainer = new StackPane(stocksLabel);
         stocksLabel.getStyleClass().add("product-stocks-label");
         stocksLabel.setAlignment(Pos.CENTER);
         GridPane.setValignment(stocksLabel, VPos.CENTER);
@@ -142,7 +145,7 @@ public class Product extends GridPane {
         stocksLabel.setMaxWidth(-1);
         stocksLabel.setMinWidth(-1);
         stocksLabel.setPrefWidth(-1);
-        this.textGridPane.add(stocksLabel, 0, 2);
+        this.textGridPane.add(stocksLabelContainer, 0, 2);
         this.textGridPane.getRowConstraints().get(2).setVgrow(Priority.ALWAYS);
         this.textGridPane.getRowConstraints().get(2).setValignment(VPos.CENTER);
         this.textGridPane.getRowConstraints().get(2).setMaxHeight(Double.MAX_VALUE);
