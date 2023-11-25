@@ -53,7 +53,7 @@
       </HBox>
       <StackPane GridPane.rowIndex="2">
          <children>
-            <GridPane fx:id="tabDashboardPane" visible="false">
+            <GridPane fx:id="tabDashboardPane">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
@@ -85,12 +85,7 @@
                                  </FlowPane.margin>
                                  <children>
                                     <Label styleClass="text-medium" text="Total Products" />
-                                    <Label fx:id="totalProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                                       <styleClass>
-                                          <String fx:value="h4" />
-                                          <String fx:value="text-bold" />
-                                       </styleClass>
-                                    </Label>
+                                    <Label fx:id="totalProductsLabel" styleClass="dashboard-analytics-number" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                                  </children>
                               </GridPane>
                               <GridPane prefHeight="200.0" prefWidth="250.0" styleClass="card">
@@ -103,12 +98,7 @@
                                  </rowConstraints>
                                  <children>
                                     <Label styleClass="text-medium" text="Low Stock Products" />
-                                    <Label fx:id="lowStocksProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                                       <styleClass>
-                                          <String fx:value="h4" />
-                                          <String fx:value="text-bold" />
-                                       </styleClass>
-                                    </Label>
+                                    <Label fx:id="lowStocksProductsLabel" styleClass="dashboard-analytics-number" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                                  </children>
                                  <FlowPane.margin>
                                     <Insets />
@@ -124,12 +114,7 @@
                                  </rowConstraints>
                                  <children>
                                     <Label styleClass="text-medium" text="Out of Stock Products" />
-                                    <Label fx:id="outOfStocksProductsLabel" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                                       <styleClass>
-                                          <String fx:value="h4" />
-                                          <String fx:value="text-bold" />
-                                       </styleClass>
-                                    </Label>
+                                    <Label fx:id="outOfStocksProductsLabel" styleClass="dashboard-analytics-number" text="123,000" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                                  </children>
                                  <FlowPane.margin>
                                     <Insets />
@@ -244,7 +229,7 @@
                   </GridPane>
                </children>
             </GridPane>
-            <GridPane fx:id="tabCategoriesPane">
+            <GridPane fx:id="tabCategoriesPane" visible="false">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>

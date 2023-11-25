@@ -102,6 +102,12 @@
     -fx-padding: 10px;
 }
 
+.dashboard-analytics-number {
+    -fx-font-family: "Roboto Bold" !important;
+    -fx-text-fill: -text-color-fade;
+    -fx-font-size: 3em;
+}
+
 .product-container {
 
 }
