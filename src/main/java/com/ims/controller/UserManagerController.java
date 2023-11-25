@@ -6,6 +6,7 @@ import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
+import com.ims.utils.LazyLoader;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -94,27 +95,26 @@ public class UserManagerController {
     }
     
     public void initializeRoleLazyLoad() {
-        Platform.runLater(() -> {
-            LayoutUtils.initializeLazyLoad(
-                rolesScrollPane,
-                rolesFlowPane,
-                roles,
-                (requestType) -> {
-                    switch (requestType) {
-                        case INITIAL:
-                            UserManagerModel.loadRoles(1);
-                            break;
-                        case HIT_BOTTOM:
-                            if (!searchRoleTextField.getText().isEmpty()) return;
-                            UserManagerModel.loadRoles(Config.roleLoadLimit);
-                            break;
-                        case INSUFFICIENT:
-                            if (!searchRoleTextField.getText().isEmpty()) return;
-                            UserManagerModel.loadRoles(Config.roleLoadLimit / 3);
-                            break;
-                    }
-                }
-            );
+        LazyLoader lazyLoader = new LazyLoader(
+            rolesScrollPane,
+            rolesFlowPane,
+            roles
+        );
+        
+        lazyLoader.setLoader((requestType) -> {
+            switch (requestType) {
+                case INITIAL:
+                    UserManagerModel.loadRoles(1);
+                    break;
+                case HIT_BOTTOM:
+                    if (!searchRoleTextField.getText().isEmpty()) return;
+                    UserManagerModel.loadRoles(Config.roleLoadLimit);
+                    break;
+                case INSUFFICIENT:
+                    if (!searchRoleTextField.getText().isEmpty()) return;
+                    UserManagerModel.loadRoles(Config.roleLoadLimit / 3);
+                    break;
+            }
         });
     }
     
@@ -189,27 +189,26 @@ public class UserManagerController {
     }
     
     public void initializeUserLazyLoad() {
-        Platform.runLater(() -> {
-            LayoutUtils.initializeLazyLoad(
-                usersScrollPane,
-                usersFlowPane,
-                users,
-                (requestType) -> {
-                    switch (requestType) {
-                        case INITIAL:
-                            UserManagerModel.loadUsers(1);
-                            break;
-                        case HIT_BOTTOM:
-                            if (!searchUserTextField.getText().isEmpty()) return;
-                            UserManagerModel.loadUsers(Config.userLoadLimit);
-                            break;
-                        case INSUFFICIENT:
-                            if (!searchUserTextField.getText().isEmpty()) return;
-                            UserManagerModel.loadUsers(Config.userLoadLimit / 3);
-                            break;
-                    }
-                }
-            );
+        LazyLoader lazyLoader = new LazyLoader(
+            usersScrollPane,
+            usersFlowPane,
+            users
+        );
+        
+        lazyLoader.setLoader((requestType) -> {
+            switch (requestType) {
+                case INITIAL:
+                    UserManagerModel.loadUsers(1);
+                    break;
+                case HIT_BOTTOM:
+                    if (!searchUserTextField.getText().isEmpty()) return;
+                    UserManagerModel.loadUsers(Config.userLoadLimit);
+                    break;
+                case INSUFFICIENT:
+                    if (!searchUserTextField.getText().isEmpty()) return;
+                    UserManagerModel.loadUsers(Config.userLoadLimit / 3);
+                    break;
+            }
         });
     }
     

@@ -15,7 +15,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import javafx.util.Pair;
@@ -29,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
@@ -375,69 +375,5 @@ public abstract class LayoutUtils {
         scrollPane.vvalueProperty().addListener(listener);
         container.heightProperty().addListener(listener);
         container.getChildren().addListener(listener);
-    }
-    
-    public enum RequestItemType {
-        HIT_BOTTOM,
-        INITIAL,
-        INSUFFICIENT
-    }
-    
-    public interface RequestItemEvent {
-        void call(RequestItemType requestType);
-    }
-    
-    public static void initializeLazyLoad(
-        MFXScrollPane scrollPane,
-        Pane contentPane,
-        ObservableMap<?, ?> model,
-        RequestItemEvent onRequestItem
-    ) {
-        // Make sure the content pane's height will depend on its children
-        scrollPane.setFitToHeight(false);
-        contentPane.setMaxHeight(-1);
-        contentPane.setPrefHeight(-1);
-        contentPane.setMinHeight(-1);
-        
-        // Load more items whenever the scrollbar hits the bottom.
-        scrollPane.vvalueProperty().addListener(($1, $2, scrollValue) -> {
-            if (scrollValue.doubleValue() == 1) {
-                onRequestItem.call(RequestItemType.HIT_BOTTOM);
-            }
-        });
-        
-        // Load more items whenever there's not enough items to have a scrollbar
-        CountdownTimer loadTimer = new CountdownTimer(1, 4);
-        Utils.Callable<Void> loadItemsWhenNoScrollbar = () -> {
-            Platform.runLater(() -> {
-                double contentHeight = contentPane.getBoundsInLocal().getHeight();
-                double viewportHeight = scrollPane.getViewportBounds().getHeight();
-                if (contentHeight < viewportHeight) {
-                    onRequestItem.call(RequestItemType.INSUFFICIENT);
-                }
-            });
-            return null;
-        };
-        scrollPane.viewportBoundsProperty().addListener(
-            ($1, $2, newValue) -> {
-                loadItemsWhenNoScrollbar.call();
-            }
-        );
-        model.addListener(
-            (MapChangeListener<Object, Object>) change -> {
-                if (!change.wasAdded()) return;
-                loadTimer.start();
-                
-                // for some weird reason I have to call this so that its property
-                // listeners can work
-                loadTimer.endedProperty().get();
-            }
-        );
-        
-        loadTimer.endedProperty().addListener(e -> {
-            loadItemsWhenNoScrollbar.call();
-        });
-        
-        onRequestItem.call(RequestItemType.INITIAL);
     }
 }

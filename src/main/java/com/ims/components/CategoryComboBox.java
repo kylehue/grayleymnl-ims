@@ -5,6 +5,7 @@ import com.ims.database.DBCategories;
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.LazyLoader;
 import com.ims.utils.Utils;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -102,24 +103,23 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
     }
     
     private void initializeCategoryLazyLoad() {
-        Platform.runLater(() -> {
-            LayoutUtils.initializeLazyLoad(
-                this.getDropDownScrollPane(),
-                this.getDropdownContainer(),
-                model,
-                (requestType) -> {
-                    switch (requestType) {
-                        case INITIAL:
-                            loadCategories(8);
-                            break;
-                        case HIT_BOTTOM:
-                        case INSUFFICIENT:
-                            if (!this.getSearchText().isEmpty()) return;
-                            loadCategories(Config.categoryLoadLimit);
-                            break;
-                    }
-                }
-            );
+        LazyLoader lazyLoader = new LazyLoader(
+            this.getDropDownScrollPane(),
+            this.getDropdownContainer(),
+            model
+        );
+        
+        lazyLoader.setLoader((requestType) -> {
+            switch (requestType) {
+                case INITIAL:
+                    loadCategories(8);
+                    break;
+                case HIT_BOTTOM:
+                case INSUFFICIENT:
+                    if (!this.getSearchText().isEmpty()) return;
+                    loadCategories(Config.categoryLoadLimit);
+                    break;
+            }
         });
     }
 }

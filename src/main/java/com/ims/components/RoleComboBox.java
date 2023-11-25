@@ -7,6 +7,7 @@ import com.ims.model.UserManagerModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.LazyLoader;
 import com.ims.utils.Utils;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -104,24 +105,23 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
     }
     
     private void initializeRoleLazyLoad() {
-        Platform.runLater(() -> {
-            LayoutUtils.initializeLazyLoad(
-                this.getDropDownScrollPane(),
-                this.getDropdownContainer(),
-                model,
-                (requestType) -> {
-                    switch (requestType) {
-                        case INITIAL:
-                            loadRoles(8);
-                            break;
-                        case HIT_BOTTOM:
-                        case INSUFFICIENT:
-                            if (!this.getSearchText().isEmpty()) return;
-                            loadRoles(Config.roleLoadLimit);
-                            break;
-                    }
-                }
-            );
+        LazyLoader lazyLoader = new LazyLoader(
+            this.getDropDownScrollPane(),
+            this.getDropdownContainer(),
+            model
+        );
+        
+        lazyLoader.setLoader((requestType) -> {
+            switch (requestType) {
+                case INITIAL:
+                    loadRoles(8);
+                    break;
+                case HIT_BOTTOM:
+                case INSUFFICIENT:
+                    if (!this.getSearchText().isEmpty()) return;
+                    loadRoles(Config.roleLoadLimit);
+                    break;
+            }
         });
     }
 }

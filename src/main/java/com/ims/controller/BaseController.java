@@ -6,6 +6,7 @@ import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
+import com.ims.utils.LazyLoader;
 import com.ims.utils.SceneManager;
 import com.ims.model.UserSessionModel;
 import com.ims.utils.Utils;
@@ -232,25 +233,24 @@ public class BaseController {
      * Autoload products whenever needed.
      */
     private void initializeProductLazyLoad() {
-        Platform.runLater(() -> {
-            LayoutUtils.initializeLazyLoad(
-                productsScrollPane,
-                productsFlowPane,
-                products,
-                (requestType) -> {
-                    switch (requestType) {
-                        case INITIAL:
-                            BaseModel.loadProducts(1);
-                            break;
-                        case HIT_BOTTOM:
-                        case INSUFFICIENT:
-                            if (!searchProductTextField.getText().isEmpty()) return;
-                            if (!getAllActiveCategoryTags().isEmpty()) return;
-                            BaseModel.loadProducts(Config.productLoadLimit);
-                            break;
-                    }
-                }
-            );
+        LazyLoader lazyLoader = new LazyLoader(
+            productsScrollPane,
+            productsFlowPane,
+            products
+        );
+        
+        lazyLoader.setLoader((requestType) -> {
+            switch (requestType) {
+                case INITIAL:
+                    BaseModel.loadProducts(1);
+                    break;
+                case HIT_BOTTOM:
+                case INSUFFICIENT:
+                    if (!searchProductTextField.getText().isEmpty()) return;
+                    if (!getAllActiveCategoryTags().isEmpty()) return;
+                    BaseModel.loadProducts(Config.productLoadLimit);
+                    break;
+            }
         });
     }
     
@@ -400,24 +400,23 @@ public class BaseController {
      * Autoload categories whenever needed.
      */
     private void initializeCategoryLazyLoad() {
-        Platform.runLater(() -> {
-            LayoutUtils.initializeLazyLoad(
-                categoriesScrollPane,
-                categoriesFlowPane,
-                categories,
-                (requestType) -> {
-                    switch (requestType) {
-                        case INITIAL:
-                            BaseModel.loadCategories(1);
-                            break;
-                        case HIT_BOTTOM:
-                        case INSUFFICIENT:
-                            if (!searchCategoryTextField.getText().isEmpty()) return;
-                            BaseModel.loadCategories(Config.categoryLoadLimit);
-                            break;
-                    }
-                }
-            );
+        LazyLoader lazyLoader = new LazyLoader(
+            categoriesScrollPane,
+            categoriesFlowPane,
+            categories
+        );
+        
+        lazyLoader.setLoader((requestType) -> {
+            switch (requestType) {
+                case INITIAL:
+                    BaseModel.loadCategories(1);
+                    break;
+                case HIT_BOTTOM:
+                case INSUFFICIENT:
+                    if (!searchCategoryTextField.getText().isEmpty()) return;
+                    BaseModel.loadCategories(Config.categoryLoadLimit);
+                    break;
+            }
         });
     }
     
