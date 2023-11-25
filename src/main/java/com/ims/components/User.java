@@ -10,7 +10,6 @@ import com.ims.utils.Transition;
 import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
@@ -33,7 +32,7 @@ public class User extends GridPane {
     private final ObjectProperty<Integer> roleID = new SimpleObjectProperty<>();
     private final ObjectProperty<Date> joinedDate = new SimpleObjectProperty<>();
     private final ObjectProperty<Timestamp> lastActivityDate = new SimpleObjectProperty<>();
-    
+    private final BooleanProperty userDisabled = new SimpleBooleanProperty();
     
     public User() {
         this.styleClass.add("card");
@@ -95,6 +94,9 @@ public class User extends GridPane {
         });
         this.lastActivityDateProperty().addListener(e -> {
             this.setLastActivityDate(this.lastActivityDateProperty().get());
+        });
+        this.userDisabledProperty().addListener(e -> {
+            this.setUserDisabled(this.userDisabledProperty().get());
         });
     }
     
@@ -163,6 +165,18 @@ public class User extends GridPane {
         });
     }
     
+    public BooleanProperty userDisabledProperty() {
+        return userDisabled;
+    }
+    
+    public void setUserDisabled(boolean userDisabled) {
+        if (userDisabled) {
+            this.styleClass.add("user-container-disabled");
+        } else {
+            this.styleClass.remove("user-container-disabled");
+        }
+    }
+    
     public UserObject getUserObject() {
         return userObject;
     }
@@ -178,11 +192,7 @@ public class User extends GridPane {
         this.joinedDateProperty().bind(userObject.joinedDateProperty());
         this.lastActivityDateProperty().unbind();
         this.lastActivityDateProperty().bind(userObject.lastActivityDateProperty());
-        
-        if (userObject.isDisabled()) {
-            this.styleClass.add("user-container-disabled");
-        } else {
-            this.styleClass.remove("user-container-disabled");
-        }
+        this.userDisabledProperty().unbind();
+        this.userDisabledProperty().bind(userObject.isDisabledProperty());
     }
 }

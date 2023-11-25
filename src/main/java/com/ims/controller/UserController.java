@@ -149,11 +149,7 @@ public class UserController {
         });
         
         UserSessionModel.currentUser.addListener(e -> {
-            if (UserSessionModel.currentUserIsOwner()) {
-                disableAccountButton.setDisable(true);
-            } else {
-                disableAccountButton.setDisable(false);
-            }
+            disableAccountButton.setDisable(!UserSessionModel.currentUserIsOwner());
         });
     }
     
