@@ -8,6 +8,8 @@ import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
 public class ConfirmDeleteAccountModal extends Modal {
@@ -16,6 +18,7 @@ public class ConfirmDeleteAccountModal extends Modal {
     public final MFXPasswordField passwordField = new MFXPasswordField();
     public final TextFieldValidator emailTextFieldValidator;
     public final TextFieldValidator passwordFieldValidator;
+    private Utils.Callable<Void> listener = null;
     
     public ConfirmDeleteAccountModal() {
         deleteButton.getStyleClass().add("button-danger");
@@ -74,5 +77,35 @@ public class ConfirmDeleteAccountModal extends Modal {
             emailTextFieldValidator.reset();
             passwordFieldValidator.reset();
         });
+        
+        emailTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            doAction();
+        });
+        
+        passwordField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            doAction();
+        });
+        
+        deleteButton.setOnAction(e -> {
+            doAction();
+        });
+    }
+    
+    private boolean isValid() {
+        boolean emailIsValid = emailTextFieldValidator.isValid();
+        boolean passwordIsValid = passwordFieldValidator.isValid();
+        return emailIsValid && passwordIsValid;
+    }
+    
+    private void doAction() {
+        if (this.listener == null) return;
+        if (!isValid()) return;
+        this.listener.call();
+    }
+    
+    public void setOnAction(Utils.Callable<Void> listener) {
+        this.listener = listener;
     }
 }

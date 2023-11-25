@@ -4,10 +4,13 @@ import com.ims.Config;
 import com.ims.utils.CountdownTimer;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
+import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 public class ConfirmationCodeModal extends Modal {
@@ -16,6 +19,7 @@ public class ConfirmationCodeModal extends Modal {
     public final MFXTextField codeTextField = new MFXTextField();
     public final TextFieldValidator codeTextFieldValidator;
     private String correctCode;
+    private Utils.Callable<Void> listener = null;
     
     public ConfirmationCodeModal() {
         this.headerText.setText("Account Recovery");
@@ -58,6 +62,23 @@ public class ConfirmationCodeModal extends Modal {
         resendCodeButton.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             temporarilyDisableResend();
         });
+        
+        codeTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            if (this.listener == null) return;
+            if (!codeTextFieldValidator.isValid()) return;
+            this.listener.call();
+        });
+        
+        continueButton.setOnAction(e -> {
+            if (this.listener == null) return;
+            if (!codeTextFieldValidator.isValid()) return;
+            this.listener.call();
+        });
+    }
+    
+    public void setOnAction(Utils.Callable<Void> listener) {
+        this.listener = listener;
     }
     
     public void setCorrectCode(String correctCode) {

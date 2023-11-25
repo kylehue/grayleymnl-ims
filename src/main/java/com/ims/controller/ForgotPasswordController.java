@@ -101,11 +101,7 @@ public class ForgotPasswordController {
             sendCode(email, confirmationCode);
         });
         
-        confirmationCodeModal.continueButton.setOnMouseClicked(ev -> {
-            if (!confirmationCodeModal.codeTextFieldValidator.isValid()) {
-                return;
-            }
-            
+        confirmationCodeModal.setOnAction(() -> {
             confirmationCodeModal.hide();
             
             Task<Void> task = new Task<>() {
@@ -148,6 +144,8 @@ public class ForgotPasswordController {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(task);
             executor.shutdown();
+            
+            return null;
         });
     }
     

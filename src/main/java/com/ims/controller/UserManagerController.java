@@ -78,14 +78,14 @@ public class UserManagerController {
             roleAddModal.show();
         });
         
-        roleAddModal.addButton.setOnMouseClicked(e -> {
-            if (!roleAddModal.nameTextFieldValidator.isValid()) return;
-            
+        roleAddModal.setOnAction(() -> {
             UserManagerModel.addRole(
                 roleAddModal.nameTextField.getText()
             );
             
             roleAddModal.hide();
+            
+            return null;
         });
         
         searchRoleTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {

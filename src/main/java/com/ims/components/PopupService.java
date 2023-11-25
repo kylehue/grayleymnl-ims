@@ -2,6 +2,8 @@ package com.ims.components;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public abstract class PopupService {
     public static final ConfirmDialog confirmDialog = new ConfirmDialog();
@@ -14,6 +16,7 @@ public abstract class PopupService {
         public final MFXButton confirmButton = new MFXButton();
         
         private final Label messageLabel = new Label();
+        private ConfirmListener confirmListener = null;
         
         public ConfirmDialog() {
             this.controlContainer.getChildren().add(confirmButton);
@@ -29,6 +32,20 @@ public abstract class PopupService {
                 false,
                 () -> {}
             );
+            
+            this.showingProperty().addListener(e -> {
+                if (this.isShowing()) {
+                    confirmButton.requestFocus();
+                    return;
+                }
+                confirmListener = null;
+            });
+            
+            confirmButton.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+                if (this.confirmListener == null) return;
+                if (e.getCode() != KeyCode.ENTER) return;
+                this.confirmListener.call();
+            });
         }
         
         public interface ConfirmListener {
@@ -45,6 +62,7 @@ public abstract class PopupService {
             this.headerText.setText(headerText);
             this.messageLabel.setText(message);
             this.confirmButton.setText(confirmText);
+            this.confirmListener = confirmListener;
             
             if (isDanger) {
                 confirmButton.getStyleClass().add("button-danger");
@@ -83,6 +101,18 @@ public abstract class PopupService {
             );
             
             okButton.setOnMouseClicked(e -> {
+                this.hide();
+            });
+            
+            
+            this.showingProperty().addListener(e -> {
+                if (this.isShowing()) {
+                    okButton.requestFocus();
+                }
+            });
+            
+            okButton.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+                if (e.getCode() != KeyCode.ENTER) return;
                 this.hide();
             });
         }

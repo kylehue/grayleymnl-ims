@@ -172,15 +172,7 @@ public class AccountSettingsController {
             confirmDeleteAccountModal.show();
         });
         
-        confirmDeleteAccountModal.deleteButton.setOnMouseClicked(e -> {
-            if (
-                UserSessionModel.currentUser.get() == null ||
-                    !confirmDeleteAccountModal.emailTextFieldValidator.isValid() ||
-                    !confirmDeleteAccountModal.passwordFieldValidator.isValid()
-            ) {
-                return;
-            }
-            
+        confirmDeleteAccountModal.setOnAction(() -> {
             UserSessionModel.deleteAccount();
             
             confirmDeleteAccountModal.hide();
@@ -195,6 +187,8 @@ public class AccountSettingsController {
                 "Account has been deleted.",
                 "Got it!"
             ).show();
+            
+            return null;
         });
         
         UserSessionModel.currentUser.addListener(e -> {

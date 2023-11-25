@@ -5,8 +5,11 @@ import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
+import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public class ProductAddModal extends Modal {
     public final MFXButton addButton = new MFXButton("Add");
@@ -14,6 +17,7 @@ public class ProductAddModal extends Modal {
     public final CategoryComboBox categoryComboBox = new CategoryComboBox();
     public final TextFieldValidator nameTextFieldValidator;
     public final TextFieldValidator categoryComboBoxValidator;
+    private Utils.Callable<Void> listener = null;
     
     public ProductAddModal() {
         this.headerText.setText("Add Product");
@@ -75,5 +79,35 @@ public class ProductAddModal extends Modal {
             nameTextFieldValidator.reset();
             categoryComboBoxValidator.reset();
         });
+        
+        nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            doAction();
+        });
+        
+        categoryComboBox.textField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            doAction();
+        });
+        
+        addButton.setOnAction(e -> {
+            doAction();
+        });
+    }
+    
+    private boolean isValid() {
+        boolean nameIsValid = nameTextFieldValidator.isValid();
+        boolean categoryIsValid = categoryComboBoxValidator.isValid();
+        return nameIsValid && categoryIsValid;
+    }
+    
+    private void doAction() {
+        if (this.listener == null) return;
+        if (!isValid()) return;
+        this.listener.call();
+    }
+    
+    public void setOnAction(Utils.Callable<Void> listener) {
+        this.listener = listener;
     }
 }

@@ -9,7 +9,6 @@ import com.ims.model.objects.ProductObject;
 import com.ims.utils.LazyLoader;
 import com.ims.utils.SceneManager;
 import com.ims.model.UserSessionModel;
-import com.ims.utils.Utils;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -25,7 +24,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Pair;
 
@@ -186,17 +184,10 @@ public class BaseController {
             addProductModal.show();
         });
         
-        addProductModal.addButton.setOnMouseClicked((e) -> {
+        addProductModal.setOnAction(() -> {
             if (!UserSessionModel.currentUserIsAllowAddProduct()) {
                 System.out.println("The user has insufficient permissions.");
-                return;
-            }
-            
-            if (
-                !addProductModal.nameTextFieldValidator.isValid() ||
-                    !addProductModal.categoryComboBoxValidator.isValid()
-            ) {
-                return;
+                return null;
             }
             
             String name = addProductModal.nameTextField.getText();
@@ -211,6 +202,8 @@ public class BaseController {
             SceneManager.setScene("product");
             
             addProductModal.hide();
+            
+            return null;
         });
         
         UserSessionModel.currentUser.addListener(e -> {
@@ -373,11 +366,11 @@ public class BaseController {
             addCategoryModal.show();
         });
         
-        addCategoryModal.addButton.setOnMouseClicked((e) -> {
+        addCategoryModal.setOnAction(() -> {
             String name = addCategoryModal.nameTextField.getText();
-            if (!addCategoryModal.nameTextFieldValidator.isValid()) return;
             addCategoryModal.hide();
             BaseModel.addCategory(name);
+            return null;
         });
         
         UserSessionModel.currentUser.addListener(e -> {
