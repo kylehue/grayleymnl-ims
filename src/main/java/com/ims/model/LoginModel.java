@@ -1,5 +1,6 @@
 package com.ims.model;
 
+import com.ims.components.PopupService;
 import com.ims.database.DBUsers;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
@@ -55,6 +56,15 @@ public abstract class LoginModel {
                 );
                 
                 if (isCorrectPassword) {
+                    if (userData.isDisabled() && !userData.isOwner()) {
+                        PopupService.messageDialog.setup(
+                            "Disabled Account",
+                            "Your account has been disabled by the owner.",
+                            "Close"
+                        ).show();
+                        return;
+                    }
+                    
                     SceneManager.setScene("base");
                     validProperty.set(true);
                     
