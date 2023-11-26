@@ -27,6 +27,7 @@ public class User extends GridPane {
     private final Label joinedDateLabel = new Label();
     private final Label roleLabel = new Label();
     private final Label emailLabel = new Label();
+    private final MFXButton editButton;
     private UserObject userObject;
     private final StringProperty email = new SimpleStringProperty();
     private final ObjectProperty<Integer> roleID = new SimpleObjectProperty<>();
@@ -52,9 +53,12 @@ public class User extends GridPane {
         FlowPane controlFlowPane = new FlowPane();
         controlFlowPane.setAlignment(Pos.BOTTOM_RIGHT);
         controlGridPane.add(controlFlowPane, 0, 0);
+        for (int i = 0; i < this.getRowConstraints().size(); i++) {
+            this.getRowConstraints().get(i).setVgrow(Priority.NEVER);
+        }
         
         // Setup buttons
-        MFXButton editButton = new MFXButton();
+        editButton = new MFXButton();
         editButton.setText("");
         LayoutUtils.addIconToButton(editButton, "/icons/pencil.svg");
         editButton.getStyleClass().add("icon-button");
@@ -101,6 +105,8 @@ public class User extends GridPane {
         });
         this.isOwnerProperty().addListener(e -> {
             this.setRole(this.roleIDProperty().get());
+            editButton.setVisible(!this.isOwnerProperty().get());
+            editButton.setManaged(!this.isOwnerProperty().get());
         });
     }
     
