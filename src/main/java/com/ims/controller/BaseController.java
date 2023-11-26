@@ -9,6 +9,7 @@ import com.ims.model.objects.ProductObject;
 import com.ims.utils.LazyLoader;
 import com.ims.utils.SceneManager;
 import com.ims.model.UserSessionModel;
+import com.ims.utils.TabGroup;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -61,7 +62,12 @@ public class BaseController {
     @FXML
     private StackPane inventoryStackPane;
     
+    private boolean dashboardPageInitialized = false;
     private void initializeDashboardPage() {
+        if (dashboardPageInitialized) {
+            return;
+        }
+        dashboardPageInitialized = true;
         ObservableList<PieChart.Data> inventoryData = FXCollections.observableArrayList(
             new PieChart.Data("In Stock", 30),
             new PieChart.Data("Low Stock", 25),
@@ -155,7 +161,12 @@ public class BaseController {
     
     private ObservableMap<Integer, Product> products = FXCollections.observableHashMap();
     
+    private boolean productPageInitialized = false;
     private void initializeProductPage() {
+        if (productPageInitialized) {
+            return;
+        }
+        productPageInitialized = true;
         BaseModel.productMap.addListener(
             (MapChangeListener<Integer, ProductObject>) change -> {
                 int id = change.getKey();
@@ -198,8 +209,8 @@ public class BaseController {
                 category.getID()
             );
             
-            ProductModel.currentProduct.set(addedProductObject);
-            SceneManager.setScene("product");
+            // ProductModel.currentProduct.set(addedProductObject);
+            // SceneManager.setScene("product");
             
             addProductModal.hide();
             
@@ -338,7 +349,12 @@ public class BaseController {
     
     private CategoryAddModal addCategoryModal = new CategoryAddModal();
     
+    private boolean categoryPageInitialized = false;
     private void initializeCategoryPage() {
+        if (categoryPageInitialized) {
+            return;
+        }
+        categoryPageInitialized = true;
         BaseModel.categoryMap.addListener(
             (MapChangeListener<Integer, CategoryObject>) change -> {
                 int id = change.getKey();
@@ -469,14 +485,26 @@ public class BaseController {
         settingsButton.getStyleClass().add("icon-button");
         settingsButton.setText("");
         
-        LayoutUtils.createTabGroup(
+        TabGroup tabGroup = new TabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabDashboardButton, tabDashboardPane),
                 new Pair<>(tabProductsButton, tabProductsPane),
                 new Pair<>(tabCategoriesButton, tabCategoriesPane)
-            )
+            ),
+            "base"
         );
+        
+        tabGroup.currentTabProperty().addListener(($1, $2, currentTab) -> {
+            String tabText = currentTab.getKey().getText();
+            if (Objects.equals(tabText, "Dashboard")) {
+                this.initializeDashboardPage();
+            } else if (Objects.equals(tabText, "Products")) {
+                this.initializeProductPage();
+            } else if (Objects.equals(tabText, "Categories")) {
+                this.initializeCategoryPage();
+            }
+        });
         
         LayoutUtils.createResponsiveFlowPane(
             analyticsFlowPane,
@@ -522,10 +550,6 @@ public class BaseController {
         managerUsersButton.setOnMouseClicked((e) -> {
             SceneManager.setScene("user-manager");
         });
-        
-        this.initializeDashboardPage();
-        this.initializeProductPage();
-        this.initializeCategoryPage();
         
         UserSessionModel.currentUser.addListener(e -> {
             if (UserSessionModel.currentUserIsOwner()) {

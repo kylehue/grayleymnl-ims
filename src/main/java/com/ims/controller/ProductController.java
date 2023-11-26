@@ -11,6 +11,7 @@ import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.TabGroup;
 import com.ims.utils.TextFieldValidator;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -94,13 +95,14 @@ public class ProductController {
         backButton.getStyleClass().add("icon-button");
         backButton.setText("");
         
-        LayoutUtils.createTabGroup(
+        TabGroup tabGroup = new TabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabGeneralButton, tabGeneralPane),
                 new Pair<>(tabStocksButton, tabStocksPane),
                 new Pair<>(tabOthersButton, tabOthersPane)
-            )
+            ),
+            "product"
         );
         
         currentStocksNumberField.maxValueProperty().bind(

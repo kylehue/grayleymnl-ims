@@ -8,6 +8,7 @@ import com.ims.model.UserSessionModel;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.TabGroup;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
@@ -54,12 +55,13 @@ public class UserController {
         backButton.getStyleClass().add("icon-button");
         backButton.setText("");
         
-        LayoutUtils.createTabGroup(
+        TabGroup tabGroup = new TabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabGeneralButton, tabGeneralPane),
                 new Pair<>(tabOthersButton, tabOthersPane)
-            )
+            ),
+            "user"
         );
         
         roleComboBox.setMinWidth(100);

@@ -3,10 +3,7 @@ package com.ims.controller;
 import com.ims.components.PopupService;
 import com.ims.database.DBRoles;
 import com.ims.model.UserSessionModel;
-import com.ims.utils.LayoutUtils;
-import com.ims.utils.SceneManager;
-import com.ims.utils.TextFieldValidator;
-import com.ims.utils.Utils;
+import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -66,13 +63,14 @@ public class AccountSettingsController {
         backButton.getStyleClass().add("icon-button");
         backButton.setText("");
         
-        LayoutUtils.createTabGroup(
+        TabGroup tabGroup = new TabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabGeneralButton, tabGeneralPane),
                 new Pair<>(tabSecurityButton, tabSecurityPane),
                 new Pair<>(tabOthersButton, tabOthersPane)
-            )
+            ),
+            "account-settings"
         );
         
         UserSessionModel.currentUser.addListener(e -> {

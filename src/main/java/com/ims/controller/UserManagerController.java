@@ -9,6 +9,7 @@ import com.ims.model.objects.UserObject;
 import com.ims.utils.LazyLoader;
 import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
+import com.ims.utils.TabGroup;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -23,10 +24,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 public class UserManagerController {
     //////////////////////////////////////////////////////////////////////
@@ -55,7 +53,12 @@ public class UserManagerController {
     
     RoleAddModal roleAddModal = new RoleAddModal();
     
+    private boolean rolePageInitialized = false;
     public void initializeRolePage() {
+        if (rolePageInitialized) {
+            return;
+        }
+        rolePageInitialized = true;
         UserManagerModel.roleMap.addListener(
             (MapChangeListener<Integer, RoleObject>) change -> {
                 int id = change.getKey();
@@ -163,7 +166,12 @@ public class UserManagerController {
     
     final ObservableMap<Integer, User> users = FXCollections.observableHashMap();
     
+    private boolean userPageInitialized = false;
     public void initializeUserPage() {
+        if (userPageInitialized) {
+            return;
+        }
+        userPageInitialized = true;
         UserManagerModel.userMap.addListener(
             (MapChangeListener<Integer, UserObject>) change -> {
                 int id = change.getKey();
@@ -259,13 +267,23 @@ public class UserManagerController {
         backButton.getStyleClass().add("icon-button");
         backButton.setText("");
         
-        LayoutUtils.createTabGroup(
+        TabGroup tabGroup = new TabGroup(
             "tab-button-active",
             Arrays.asList(
                 new Pair<>(tabUsersButton, tabUsersPane),
                 new Pair<>(tabRolesButton, tabRolesPane)
-            )
+            ),
+            "user-manager"
         );
+        
+        tabGroup.currentTabProperty().addListener(($1, $2, currentTab) -> {
+            String tabText = currentTab.getKey().getText();
+            if (Objects.equals(tabText, "Users")) {
+                this.initializeUserPage();
+            } else if (Objects.equals(tabText, "Roles")) {
+                this.initializeRolePage();
+            }
+        });
         
         LayoutUtils.createResponsiveFlowPane(
             usersFlowPane,
@@ -279,9 +297,6 @@ public class UserManagerController {
             1,
             false
         );
-        
-        initializeUserPage();
-        initializeRolePage();
     }
     
     @FXML
