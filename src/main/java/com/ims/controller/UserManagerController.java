@@ -41,6 +41,9 @@ public class UserManagerController {
     MFXButton addRoleButton;
     
     @FXML
+    MFXButton refreshRolesButton;
+    
+    @FXML
     MFXTextField searchRoleTextField;
     
     @FXML
@@ -94,6 +97,13 @@ public class UserManagerController {
         searchRoleTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             UserManagerModel.searchRoles(searchRoleTextField.getText());
+        });
+        
+        LayoutUtils.addIconToButton(refreshRolesButton, "/icons/refresh.svg");
+        refreshRolesButton.getStyleClass().add("icon-button");
+        refreshRolesButton.setText("");
+        refreshRolesButton.setOnAction(e -> {
+            UserManagerModel.searchRoles("");
         });
     }
     
@@ -159,6 +169,9 @@ public class UserManagerController {
     MFXTextField searchUserTextField;
     
     @FXML
+    MFXButton refreshUsersButton;
+    
+    @FXML
     FlowPane usersFlowPane;
     
     @FXML
@@ -193,6 +206,13 @@ public class UserManagerController {
         searchUserTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             UserManagerModel.searchUsers(searchUserTextField.getText());
+        });
+        
+        LayoutUtils.addIconToButton(refreshUsersButton, "/icons/refresh.svg");
+        refreshUsersButton.getStyleClass().add("icon-button");
+        refreshUsersButton.setText("");
+        refreshUsersButton.setOnAction(e -> {
+            UserManagerModel.searchUsers("");
         });
     }
     

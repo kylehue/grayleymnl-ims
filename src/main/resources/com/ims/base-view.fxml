@@ -59,17 +59,29 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
+                <RowConstraints vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Analytics">
-                     <styleClass>
-                        <String fx:value="h5" />
-                        <String fx:value="text-medium" />
-                     </styleClass>
-                  </Label>
-                  <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" vvalue="1.0" GridPane.rowIndex="1">
+                  <GridPane>
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="ALWAYS" />
+                      <ColumnConstraints hgrow="NEVER" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Analytics">
+                           <styleClass>
+                              <String fx:value="h5" />
+                              <String fx:value="text-medium" />
+                           </styleClass>
+                        </Label>
+                        <MFXButton fx:id="refreshDashboardButton" text="Refresh" GridPane.columnIndex="1" />
+                     </children>
+                  </GridPane>
+                  <MFXScrollPane fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="1">
                      <content>
                         <FlowPane fx:id="analyticsFlowPane" hgap="10.0" vgap="10.0">
                            <children>
@@ -199,6 +211,7 @@
                   <GridPane hgap="10.0" vgap="10.0" GridPane.halignment="LEFT">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                        <ColumnConstraints hgrow="NEVER" />
                         <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
                      </columnConstraints>
                      <rowConstraints>
@@ -206,11 +219,12 @@
                      </rowConstraints>
                      <children>
                         <MFXTextField fx:id="searchProductTextField" floatingText="Search" maxWidth="300.0" minWidth="100.0" />
-                        <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1">
+                        <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="2">
                            <children>
                               <MFXButton fx:id="addProductButton" text="Add Product" />
                            </children>
                         </HBox>
+                        <MFXButton fx:id="refreshProductsButton" text="Refresh" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
                   <FlowPane fx:id="productsCategoriesFlowPane" hgap="5.0" vgap="5.0" GridPane.rowIndex="1">
@@ -265,18 +279,20 @@
                   <GridPane hgap="10.0" vgap="10.0">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                        <ColumnConstraints fillWidth="false" hgrow="NEVER" />
                         <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="10.0" />
                      </columnConstraints>
                      <rowConstraints>
                         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.columnIndex="1">
+                        <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.columnIndex="2">
                            <children>
                               <MFXButton fx:id="addCategoryButton" text="Add Category" />
                            </children>
                         </HBox>
                         <MFXTextField fx:id="searchCategoryTextField" floatingText="Search Category" maxWidth="300.0" minWidth="100.0" />
+                        <MFXButton fx:id="refreshCategoriesButton" text="Refresh" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
                </children>

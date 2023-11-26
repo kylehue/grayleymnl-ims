@@ -70,9 +70,13 @@ public class BaseController {
     @FXML
     private VBox historyVBox;
     
+    @FXML
+    private MFXButton refreshDashboardButton;
+    
     ObservableMap<Integer, HistoryItem> history = FXCollections.observableHashMap();
     
     private boolean dashboardPageInitialized = false;
+    
     private void initializeDashboardPage() {
         if (dashboardPageInitialized) {
             return;
@@ -157,6 +161,15 @@ public class BaseController {
         BaseModel.lowStockProductsCount.addListener(listener);
         BaseModel.outOfStockProductsCount.addListener(listener);
         BaseModel.updateProductStats();
+        
+        LayoutUtils.addIconToButton(refreshDashboardButton, "/icons/refresh.svg");
+        refreshDashboardButton.getStyleClass().add("icon-button");
+        refreshDashboardButton.setText("");
+        refreshDashboardButton.setOnAction(e -> {
+            BaseModel.updateProductStats();
+            BaseModel.historyMap.clear();
+            BaseModel.loadHistory(1);
+        });
     }
     
     /**
@@ -246,11 +259,15 @@ public class BaseController {
     @FXML
     private MFXButton addProductButton;
     
+    @FXML
+    private MFXButton refreshProductsButton;
+    
     private ProductAddModal addProductModal = new ProductAddModal();
     
     private ObservableMap<Integer, Product> products = FXCollections.observableHashMap();
     
     private boolean productPageInitialized = false;
+    
     private void initializeProductPage() {
         if (productPageInitialized) {
             return;
@@ -321,6 +338,13 @@ public class BaseController {
         searchProductTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             BaseModel.searchProducts(searchProductTextField.getText());
+        });
+        
+        LayoutUtils.addIconToButton(refreshProductsButton, "/icons/refresh.svg");
+        refreshProductsButton.getStyleClass().add("icon-button");
+        refreshProductsButton.setText("");
+        refreshProductsButton.setOnAction(e -> {
+            BaseModel.searchProducts("");
         });
     }
     
@@ -432,6 +456,9 @@ public class BaseController {
     @FXML
     private MFXButton addCategoryButton;
     
+    @FXML
+    private MFXButton refreshCategoriesButton;
+    
     // The text field used to search categories
     @FXML
     private MFXTextField searchCategoryTextField;
@@ -441,6 +468,7 @@ public class BaseController {
     private CategoryAddModal addCategoryModal = new CategoryAddModal();
     
     private boolean categoryPageInitialized = false;
+    
     private void initializeCategoryPage() {
         if (categoryPageInitialized) {
             return;
@@ -495,6 +523,13 @@ public class BaseController {
         searchCategoryTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             BaseModel.searchCategories(searchCategoryTextField.getText());
+        });
+        
+        LayoutUtils.addIconToButton(refreshCategoriesButton, "/icons/refresh.svg");
+        refreshCategoriesButton.getStyleClass().add("icon-button");
+        refreshCategoriesButton.setText("");
+        refreshCategoriesButton.setOnAction(e -> {
+            BaseModel.searchCategories("");
         });
     }
     

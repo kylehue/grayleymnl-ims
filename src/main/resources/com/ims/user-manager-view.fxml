@@ -55,7 +55,7 @@
                 <Insets top="10.0" />
             </GridPane.margin>
             <children>
-                <GridPane fx:id="tabUsersPane" visible="false">
+                <GridPane fx:id="tabUsersPane">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -72,10 +72,22 @@
                         <Insets top="10.0" />
                      </GridPane.margin>
                   </MFXScrollPane>
-                  <MFXTextField fx:id="searchUserTextField" floatingText="Search User" maxWidth="300.0" minWidth="100.0" />
+                  <GridPane hgap="10.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                      <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <MFXTextField fx:id="searchUserTextField" floatingText="Search User" maxWidth="300.0" minWidth="100.0" />
+                        <MFXButton fx:id="refreshUsersButton" text="Refresh" GridPane.columnIndex="1" />
+                     </children>
+                  </GridPane>
                </children>
                 </GridPane>
-            <GridPane fx:id="tabRolesPane">
+            <GridPane fx:id="tabRolesPane" visible="false">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                </columnConstraints>
@@ -95,6 +107,7 @@
                   <GridPane hgap="10.0">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" />
+                        <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />
                      </columnConstraints>
                      <rowConstraints>
@@ -102,7 +115,8 @@
                      </rowConstraints>
                      <children>
                         <MFXTextField fx:id="searchRoleTextField" floatingText="Search Role" maxWidth="300.0" minWidth="100.0" />
-                        <MFXButton fx:id="addRoleButton" text="Add Role" GridPane.columnIndex="1" />
+                        <MFXButton fx:id="addRoleButton" text="Add Role" GridPane.columnIndex="2" />
+                        <MFXButton fx:id="refreshRolesButton" text="Refresh" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
                </children>
