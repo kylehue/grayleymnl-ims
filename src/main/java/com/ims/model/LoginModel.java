@@ -71,7 +71,7 @@ public abstract class LoginModel {
                     int id = userData.getID();
                     
                     UserSessionModel.currentUser.set(
-                        getUser(id)
+                        UserManagerModel.loadAndGetUser(id)
                     );
                 } else {
                     validProperty.set(false);
@@ -88,46 +88,5 @@ public abstract class LoginModel {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
         executor.shutdown();
-    }
-    
-    public static UserObject getUser(int id) {
-        Task<UserObject> task = new Task<>() {
-            @Override
-            protected UserObject call() throws Exception {
-                DBUsers.UserData userData = DBUsers.getOne(DBUsers.Column.ID, id);
-                if (userData != null) {
-                    return new UserObject(
-                        id,
-                        userData.getEmail(),
-                        userData.getPassword(),
-                        userData.getJoinedDate(),
-                        userData.getLastActivityDate(),
-                        userData.getRoleID(),
-                        userData.isDisabled(),
-                        userData.isOwner(),
-                        false
-                    );
-                }
-                
-                return null;
-            }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(task);
-        executor.shutdown();
-        
-        UserObject userObject = null;
-        try {
-            userObject = task.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return userObject;
     }
 }

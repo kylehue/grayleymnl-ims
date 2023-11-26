@@ -87,6 +87,12 @@
                                 <VBox spacing="10.0">
                                     <children>
                                         <MFXButton fx:id="disableAccountButton" styleClass="outline-button" text="Disable Account" />
+                              <MFXButton fx:id="transferOwnershipButton" text="Transfer Ownership">
+                                 <styleClass>
+                                    <String fx:value="outline-button" />
+                                    <String fx:value="button-danger" />
+                                 </styleClass>
+                              </MFXButton>
                                     </children>
                                 </VBox>
                             </content>

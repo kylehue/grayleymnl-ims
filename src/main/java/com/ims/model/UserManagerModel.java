@@ -2,6 +2,7 @@ package com.ims.model;
 
 import com.ims.Config;
 import com.ims.components.User;
+import com.ims.database.DBCategories;
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
 import com.ims.model.objects.CategoryObject;
@@ -479,6 +480,47 @@ public abstract class UserManagerModel {
             userObject.setRoleID(roleID);
             userObject.setDisabled(isDisabled);
             userObject.setLastActivityDate(lastActivityDate);
+        }
+        
+        return userObject;
+    }
+    
+    public static UserObject loadAndGetUser(int id) {
+        UserObject userObject = userMap.get(id);
+        if (userObject != null) {
+            return userObject;
+        }
+        
+        Task<UserObject> task = new Task<>() {
+            @Override
+            protected UserObject call() {
+                isBusyUser.set(true);
+                
+                DBUsers.UserData userData = DBUsers.getOne(DBUsers.Column.ID, id);
+                if (userData != null) {
+                    return loadUser(userData, false);
+                }
+                
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            isBusyUser.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        
+        try {
+            userObject = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         
         return userObject;

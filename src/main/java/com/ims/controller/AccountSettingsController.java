@@ -1,6 +1,5 @@
 package com.ims.controller;
 
-import com.ims.components.ConfirmDeleteAccountModal;
 import com.ims.components.PopupService;
 import com.ims.database.DBRoles;
 import com.ims.model.UserSessionModel;
@@ -16,7 +15,6 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 
 public class AccountSettingsController {
@@ -61,9 +59,6 @@ public class AccountSettingsController {
     
     @FXML
     MFXButton updatePasswordButton;
-    
-    ConfirmDeleteAccountModal confirmDeleteAccountModal =
-        new ConfirmDeleteAccountModal();
     
     @FXML
     public void initialize() {
@@ -169,26 +164,21 @@ public class AccountSettingsController {
         });
         
         deleteAccountButton.setOnMouseClicked(e -> {
-            confirmDeleteAccountModal.show();
-        });
-        
-        confirmDeleteAccountModal.setOnAction(() -> {
-            UserSessionModel.deleteAccount();
-            
-            confirmDeleteAccountModal.hide();
-            
-            confirmDeleteAccountModal.emailTextField.setText("");
-            confirmDeleteAccountModal.passwordField.setText("");
-            confirmDeleteAccountModal.emailTextFieldValidator.reset();
-            confirmDeleteAccountModal.passwordFieldValidator.reset();
-            
-            PopupService.messageDialog.setup(
+            PopupService.confirmWithAuthModal.setup(
                 "Delete Account",
-                "Account has been deleted.",
-                "Got it!"
+                "Delete",
+                () -> {
+                    UserSessionModel.deleteAccount();
+                    
+                    PopupService.confirmWithAuthModal.hide();
+                    
+                    PopupService.messageDialog.setup(
+                        "Delete Account",
+                        "Account has been deleted.",
+                        "Got it!"
+                    ).show();
+                }
             ).show();
-            
-            return null;
         });
         
         UserSessionModel.currentUser.addListener(e -> {

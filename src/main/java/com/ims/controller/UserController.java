@@ -1,6 +1,7 @@
 package com.ims.controller;
 
 import com.ims.components.*;
+import com.ims.model.BaseModel;
 import com.ims.model.UserEditModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.UserSessionModel;
@@ -9,6 +10,7 @@ import com.ims.utils.SceneManager;
 import com.ims.utils.LayoutUtils;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -22,6 +24,9 @@ public class UserController {
     
     @FXML
     MFXButton disableAccountButton;
+    
+    @FXML
+    MFXButton transferOwnershipButton;
     
     @FXML
     MFXButton tabGeneralButton;
@@ -90,7 +95,7 @@ public class UserController {
             }
         );
         
-        disableAccountButton.setOnMouseClicked(e -> {
+        disableAccountButton.setOnAction(e -> {
             if (UserEditModel.currentUser.get().isDisabled()) {
                 PopupService.confirmDialog.setup(
                     "Enable Account",
@@ -148,8 +153,40 @@ public class UserController {
             }
         });
         
-        UserSessionModel.currentUser.addListener(e -> {
-            disableAccountButton.setDisable(!UserSessionModel.currentUserIsOwner());
+        transferOwnershipButton.setOnAction(e -> {
+            PopupService.confirmWithAuthModal.setup(
+                "Transfer Ownership",
+                "Transfer",
+                () -> {
+                    UserEditModel.transferOwnershipToCurrentUser();
+                    
+                    Platform.runLater(() -> {
+                        SceneManager.setScene("base");
+                        
+                        // Reset to trigger listeners that restrict regular users
+                        UserObject currentUser = UserSessionModel.currentUser.get();
+                        currentUser.setOwner(false);
+                        UserSessionModel.currentUser.set(null);
+                        UserSessionModel.currentUser.set(currentUser);
+                        
+                        PopupService.messageDialog.setup(
+                            "Transfer Ownership",
+                            "The ownership has been successfully transferred.",
+                            "Got it!"
+                        ).show();
+                    });
+                }
+            ).show();
+        });
+        
+        UserEditModel.currentUser.addListener(e -> {
+            boolean isOwner = UserEditModel.currentUser.get().isOwner();
+            disableAccountButton.setDisable(isOwner);
+            roleComboBox.textField.setDisable(isOwner);
+            transferOwnershipButton.setDisable(isOwner);
+            if (isOwner) {
+                roleComboBox.textField.setText("Owner");
+            }
         });
     }
     

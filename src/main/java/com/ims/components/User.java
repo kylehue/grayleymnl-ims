@@ -33,6 +33,7 @@ public class User extends GridPane {
     private final ObjectProperty<Date> joinedDate = new SimpleObjectProperty<>();
     private final ObjectProperty<Timestamp> lastActivityDate = new SimpleObjectProperty<>();
     private final BooleanProperty userDisabled = new SimpleBooleanProperty();
+    private final BooleanProperty isOwner = new SimpleBooleanProperty();
     
     public User() {
         this.styleClass.add("card");
@@ -98,6 +99,9 @@ public class User extends GridPane {
         this.userDisabledProperty().addListener(e -> {
             this.setUserDisabled(this.userDisabledProperty().get());
         });
+        this.isOwnerProperty().addListener(e -> {
+            this.setRole(this.roleIDProperty().get());
+        });
     }
     
     public StringProperty emailProperty() {
@@ -124,6 +128,10 @@ public class User extends GridPane {
     
     private void setRole(Integer roleID) {
         Platform.runLater(() -> {
+            if (this.isOwnerProperty().get()) {
+                roleLabel.setText("Owner");
+                return;
+            }
             if (roleID == null) {
                 roleLabel.setText("No Role Assigned");
                 return;
@@ -170,15 +178,21 @@ public class User extends GridPane {
     }
     
     public void setUserDisabled(boolean userDisabled) {
-        if (userDisabled) {
-            this.styleClass.add("user-container-disabled");
-        } else {
-            this.styleClass.remove("user-container-disabled");
-        }
+        Platform.runLater(() -> {
+            if (userDisabled) {
+                this.styleClass.add("user-container-disabled");
+            } else {
+                this.styleClass.remove("user-container-disabled");
+            }
+        });
     }
     
     public UserObject getUserObject() {
         return userObject;
+    }
+    
+    public BooleanProperty isOwnerProperty() {
+        return isOwner;
     }
     
     public void setUserObject(UserObject userObject) {
@@ -194,5 +208,7 @@ public class User extends GridPane {
         this.lastActivityDateProperty().bind(userObject.lastActivityDateProperty());
         this.userDisabledProperty().unbind();
         this.userDisabledProperty().bind(userObject.isDisabledProperty());
+        this.isOwnerProperty().unbind();
+        this.isOwnerProperty().bind(userObject.isOwnerProperty());
     }
 }

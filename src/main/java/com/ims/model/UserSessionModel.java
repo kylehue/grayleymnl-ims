@@ -22,7 +22,6 @@ public abstract class UserSessionModel {
     }
     
     public static Integer getCurrentUserID() {
-        if (currentUser.get() == null) return null;
         return currentUser.get().getID();
     }
     

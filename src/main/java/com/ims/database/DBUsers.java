@@ -83,6 +83,26 @@ public class DBUsers {
         return row;
     }
     
+    public static void transferOwnership(
+        int userID
+    ) {
+        PreparedStatement preparedStatement = null;
+        try {
+            String query = """
+                UPDATE users
+                SET is_owner = CASE WHEN id = ? THEN true ELSE false END;
+                """;
+            
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userID);
+            preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            Database.closeStuff(null, preparedStatement);
+        }
+    }
+    
     public static void remove(int id) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
