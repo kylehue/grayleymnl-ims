@@ -160,7 +160,7 @@ public class User extends GridPane {
     private void setJoinedDate(Date joinedDate) {
         Platform.runLater(() -> {
             joinedDateLabel.setText(
-                "Joined: " + Utils.formatDate(joinedDate.toLocalDate())
+                "Joined: " + Utils.formatDate(joinedDate.toLocalDate().atTime(0, 0))
             );
         });
     }
@@ -173,7 +173,7 @@ public class User extends GridPane {
         Platform.runLater(() -> {
             lastActivityDateLabel.setText(
                 "Last Activity: " + Utils.formatDate(
-                    lastActivityDate.toLocalDateTime().toLocalDate()
+                    lastActivityDate.toLocalDateTime()
                 )
             );
         });

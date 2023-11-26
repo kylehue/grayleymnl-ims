@@ -1,17 +1,18 @@
 package com.ims;
 
 public abstract class Config {
-    public static int maxCategoryNameLength = 30;
-    public static int maxRoleNameLength = 50;
-    public static int maxEmailLength = 320;
-    public static int maxProductNameLength = 50;
-    public static int maxImageURLLength = 2048;
+    public final static int maxCategoryNameLength = 30;
+    public final static int maxRoleNameLength = 50;
+    public final static int maxEmailLength = 320;
+    public final static int maxProductNameLength = 50;
+    public final static int maxImageURLLength = 2048;
     /**
      * The threshold rate indicating when a product's stock is considered low.
      */
-    public static float lowStockRate = 0.33f; // 33%
-    public static int productLoadLimit = 9;
-    public static int categoryLoadLimit = 12;
-    public static int roleLoadLimit = 9;
-    public static int userLoadLimit = 12;
+    public final static float lowStockRate = 0.33f; // 33%
+    public final static int productLoadLimit = 9;
+    public final static int categoryLoadLimit = 12;
+    public final static int roleLoadLimit = 9;
+    public final static int userLoadLimit = 12;
+    public final static int historyLoadLimit = 12;
 }

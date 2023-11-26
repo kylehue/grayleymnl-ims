@@ -2,6 +2,7 @@ package com.ims.controller;
 
 import com.ims.Config;
 import com.ims.components.*;
+import com.ims.database.DBHistory;
 import com.ims.model.BaseModel;
 import com.ims.model.ProductModel;
 import com.ims.model.objects.CategoryObject;
@@ -26,6 +27,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -62,12 +64,44 @@ public class BaseController {
     @FXML
     private StackPane inventoryStackPane;
     
+    @FXML
+    private MFXScrollPane historyScrollPane;
+    
+    @FXML
+    private VBox historyVBox;
+    
+    ObservableMap<Integer, HistoryItem> history = FXCollections.observableHashMap();
+    
     private boolean dashboardPageInitialized = false;
     private void initializeDashboardPage() {
         if (dashboardPageInitialized) {
             return;
         }
         dashboardPageInitialized = true;
+        BaseModel.historyMap.addListener(
+            (MapChangeListener<Integer, DBHistory.HistoryData>) change -> {
+                int id = change.getKey();
+                if (change.wasAdded()) {
+                    DBHistory.HistoryData historyData = change.getValueAdded();
+                    addHistory(historyData);
+                } else if (change.wasRemoved()) {
+                    removeHistory(id);
+                }
+            }
+        );
+        
+        // Add the history in the model
+        for (int id : BaseModel.historyMap.keySet()) {
+            DBHistory.HistoryData historyData = BaseModel.historyMap.get(id);
+            if (historyData == null) return;
+            Platform.runLater(() -> {
+                addHistory(historyData);
+            });
+        }
+        
+        LayoutUtils.applyVirtualScrolling(historyScrollPane, historyVBox);
+        this.initializeHistoryLazyLoad();
+        
         ObservableList<PieChart.Data> inventoryData = FXCollections.observableArrayList(
             new PieChart.Data("In Stock", 30),
             new PieChart.Data("Low Stock", 25),
@@ -123,6 +157,61 @@ public class BaseController {
         BaseModel.lowStockProductsCount.addListener(listener);
         BaseModel.outOfStockProductsCount.addListener(listener);
         BaseModel.updateProductStats();
+    }
+    
+    /**
+     * Autoload history whenever needed.
+     */
+    private void initializeHistoryLazyLoad() {
+        LazyLoader lazyLoader = new LazyLoader(
+            historyScrollPane,
+            historyVBox,
+            history
+        );
+        
+        lazyLoader.setLoader((requestType) -> {
+            switch (requestType) {
+                case INITIAL:
+                    BaseModel.loadHistory(1);
+                    break;
+                case HIT_BOTTOM:
+                case INSUFFICIENT:
+                    BaseModel.loadHistory(Config.historyLoadLimit);
+                    break;
+            }
+        });
+    }
+    
+    private void addHistory(DBHistory.HistoryData historyData) {
+        HistoryItem historyItem = new HistoryItem();
+        
+        Platform.runLater(() -> {
+            if (this.history.containsKey(historyData.getID())) return;
+            historyItem.setHistoryData(historyData);
+            this.history.put(historyData.getID(), historyItem);
+            historyVBox.getChildren().add(
+                getSortedHistory().indexOf(historyItem),
+                historyItem
+            );
+        });
+    }
+    
+    private void removeHistory(int id) {
+        Platform.runLater(() -> {
+            HistoryItem historyToRemove = this.history.get(id);
+            if (historyToRemove != null) {
+                historyVBox.getChildren().remove(historyToRemove);
+                this.history.remove(id);
+            }
+        });
+    }
+    
+    private ArrayList<HistoryItem> getSortedHistory() {
+        return new ArrayList<>(
+            this.history.values().stream().sorted(
+                Comparator.comparing(a -> a.getHistoryData().getLastModified())
+            ).toList().reversed()
+        );
     }
     
     //////////////////////////////////////////////////////////////////////

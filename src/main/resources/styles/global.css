@@ -108,6 +108,33 @@
     -fx-font-size: 3em;
 }
 
+.history-item {
+    -fx-padding: 10;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-background-color: rgba(125, 125, 125, 0.025);
+    -fx-border-color: rgba(125, 125, 125, 0.05);
+    -fx-border-width: 1;
+}
+
+.history-item-user-label {
+    -fx-text-fill: -text-color;
+}
+
+.history-item-action-label {
+    -fx-text-fill: -text-color-fade;
+}
+
+.history-item-subject-label {
+    -fx-font-family: "Roboto Bold" !important;
+    -fx-text-fill: -text-color;
+}
+
+.history-item-timestamp-label {
+    -fx-text-fill: -text-color-fader;
+    -fx-font-size: 0.9em;
+}
+
 .product-container {
 
 }

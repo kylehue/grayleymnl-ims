@@ -244,16 +244,6 @@ public class UserManagerController {
         }
     }
     
-    private ArrayList<User> getSortedUsers() {
-        ArrayList<User> sortedUsers = new ArrayList<>(
-            this.users.values().stream().sorted(
-                Comparator.comparing(a -> a.getUserObject().getJoinedDate())
-            ).toList()
-        );
-        
-        return sortedUsers;
-    }
-    
     //////////////////////////////////////////////////////////////////////
     // ---------------------------- MAIN ------------------------------ //
     //////////////////////////////////////////////////////////////////////

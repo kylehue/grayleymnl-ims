@@ -15,6 +15,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Properties;
@@ -24,14 +25,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Utils {
-    public static String formatDate(LocalDate date) {
-        LocalDate today = LocalDate.now();
+    public static String formatDate(LocalDateTime date) {
+        LocalDate today = LocalDateTime.now().toLocalDate();
         LocalDate yesterday = today.minusDays(1);
         
-        if (date.equals(today)) {
-            return "Today";
-        } else if (date.equals(yesterday)) {
-            return "Yesterday";
+        if (date.toLocalDate().equals(today)) {
+            return "Today at " + date.format(DateTimeFormatter.ofPattern("h:mm a"));
+        } else if (date.toLocalDate().equals(yesterday)) {
+            return "Yesterday at " + date.format(DateTimeFormatter.ofPattern("h:mm a"));
         } else {
             return date.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"));
         }

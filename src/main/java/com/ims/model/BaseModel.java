@@ -1,8 +1,8 @@
 package com.ims.model;
 
 import com.ims.Config;
-import com.ims.controller.BaseController;
 import com.ims.database.DBCategories;
+import com.ims.database.DBHistory;
 import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
@@ -16,9 +16,6 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,6 +27,10 @@ public abstract class BaseModel {
     public static final IntegerProperty totalProductsCount = new SimpleIntegerProperty(0);
     public static final IntegerProperty lowStockProductsCount = new SimpleIntegerProperty(0);
     public static final IntegerProperty outOfStockProductsCount = new SimpleIntegerProperty(0);
+    public static final ObservableMap<Integer, DBHistory.HistoryData>
+        historyMap = FXCollections.observableHashMap();
+    public static final BooleanProperty
+        isBusyHistory = new SimpleBooleanProperty(false);
     
     public static void updateProductStats() {
         Task<Void> task = new Task<>() {
@@ -54,7 +55,41 @@ public abstract class BaseModel {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
         executor.shutdown();
+    }
+    
+    /**
+     * Load more history from the database.
+     *
+     * @param limit The limit of the rows to retrieve.
+     */
+    public static void loadHistory(int limit) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                isBusyHistory.set(true);
+                DBHistory.HistoryListData productRows = DBHistory.getInRange(
+                    historyMap.size(),
+                    limit
+                );
+                
+                for (DBHistory.HistoryData historyData : productRows) {
+                    historyMap.put(historyData.getID(), historyData);
+                }
+                return null;
+            }
+        };
         
+        task.setOnSucceeded(e -> {
+            isBusyHistory.set(false);
+        });
+        
+        task.setOnFailed(e -> {
+            System.out.println(e);
+        });
+        
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -99,6 +134,12 @@ public abstract class BaseModel {
                     );
                     return null;
                 }
+                
+                DBHistory.add(
+                    DBHistory.Action.ADD_PRODUCT,
+                    name,
+                    UserSessionModel.getCurrentUserID()
+                );
                 
                 return loadProduct(
                     DBProducts.add(
@@ -174,6 +215,12 @@ public abstract class BaseModel {
                     false
                 );
                 
+                DBHistory.add(
+                    DBHistory.Action.EDIT_PRODUCT,
+                    name,
+                    UserSessionModel.getCurrentUserID()
+                );
+                
                 return null;
             }
         };
@@ -209,6 +256,14 @@ public abstract class BaseModel {
                 isBusyProduct.set(true);
                 
                 DBProducts.remove(id);
+                
+                ProductObject productObject = productMap.get(id);
+                
+                DBHistory.add(
+                    DBHistory.Action.REMOVE_PRODUCT,
+                    productObject == null ? "" : productObject.getName(),
+                    UserSessionModel.getCurrentUserID()
+                );
                 
                 productMap.remove(id);
                 
@@ -338,7 +393,6 @@ public abstract class BaseModel {
         executor.shutdown();
     }
     
-    
     //////////////////////////////////////////////////////////////////////
     // ------------------------ CATEGORY PAGE ------------------------- //
     //////////////////////////////////////////////////////////////////////
@@ -365,6 +419,13 @@ public abstract class BaseModel {
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
                 loadCategory(DBCategories.add(name), true);
+                
+                DBHistory.add(
+                    DBHistory.Action.ADD_CATEGORY,
+                    name,
+                    UserSessionModel.getCurrentUserID()
+                );
+                
                 return null;
             }
         };
@@ -402,6 +463,12 @@ public abstract class BaseModel {
                 
                 loadCategory(DBCategories.update(id, name), false);
                 
+                DBHistory.add(
+                    DBHistory.Action.EDIT_CATEGORY,
+                    name,
+                    UserSessionModel.getCurrentUserID()
+                );
+                
                 return null;
             }
         };
@@ -436,6 +503,14 @@ public abstract class BaseModel {
                 
                 DBCategories.remove(categoryID);
                 categoryMap.remove(categoryID);
+                
+                CategoryObject categoryObject = categoryMap.get(categoryID);
+                
+                DBHistory.add(
+                    DBHistory.Action.REMOVE_CATEGORY,
+                    categoryObject == null ? "" : categoryObject.getName(),
+                    UserSessionModel.getCurrentUserID()
+                );
                 
                 // Nullify category of products that has the removed category
                 for (int productID : productMap.keySet()) {
