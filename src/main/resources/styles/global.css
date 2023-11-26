@@ -94,12 +94,12 @@
 
 .card {
     -fx-background-color: -card-background-color;
-    -fx-background-radius: 3px;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
     -fx-border-color: -card-border-color;
-    -fx-border-radius: 3px;
     -fx-border-width: 0;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 4, 0, 0, 2);
-    -fx-padding: 10px;
+    -fx-padding: 15 20 15 20;
 }
 
 .dashboard-analytics-number {
@@ -159,8 +159,8 @@
 }
 
 .product-container .product-image {
-    -fx-background-radius: 5px;
-    -fx-border-radius: 5px;
+    -fx-background-radius: 9px;
+    -fx-border-radius: 9px;
 }
 
 .user-container {
@@ -193,8 +193,8 @@
 
 .context-menu {
     -fx-background-color: -card-background-color !important;
-    -fx-border-radius: 3;
-    -fx-background-radius: 3;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-font-size: 14px;
 }
 
@@ -230,8 +230,8 @@
 
 .modal {
     -fx-background-color: -card-background-color;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-padding: 10 25 15 25;
     -fx-font-size: 14px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 12, 0, 0, 6);

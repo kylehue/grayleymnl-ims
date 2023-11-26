@@ -25,6 +25,7 @@ public class DonutChart extends PieChart {
         
         this.setDepthTest(DepthTest.DISABLE);
         this.setEffect(null);
+        this.setAnimated(true);
     }
     
     @Override

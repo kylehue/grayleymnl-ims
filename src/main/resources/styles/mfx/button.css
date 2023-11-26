@@ -4,8 +4,8 @@
 .mfx-button:hover,
 .mfx-button:focused,
 .mfx-button {
-    -fx-border-radius: 3px;
-    -fx-background-radius: 3px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
     -fx-background-insets: 0px;
     -fx-pref-height: -field-height;
     -fx-padding: 0 20px 0 20px;
@@ -108,7 +108,8 @@
 .tab-button, .tab-button:armed, .tab-button:focused {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-border-radius: 0;
+    -fx-border-radius: 5 5 0 0!important;
+    -fx-background-radius: 5 5 0 0!important;
     -fx-text-fill: -text-color;
     -fx-font-family: "Roboto Medium" !important;
     -fx-underline: false;

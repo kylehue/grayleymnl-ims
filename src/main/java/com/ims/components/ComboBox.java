@@ -17,8 +17,10 @@ import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
@@ -308,7 +310,6 @@ public class ComboBox<K, V> extends StackPane {
             container.setFillWidth(true);
             container.setPrefWidth(-1);
             container.setPrefHeight(-1);
-            container.getStyleClass().add("context-menu");
             
             scrollPane.setFitToHeight(false);
             scrollPane.setFitToWidth(true);

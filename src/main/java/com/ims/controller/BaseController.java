@@ -191,6 +191,8 @@ public class BaseController {
         LayoutUtils.applyVirtualScrolling(productsScrollPane, productsFlowPane);
         this.initializeProductLazyLoad();
         
+        LayoutUtils.addIconToButton(addProductButton, "/icons/plus.svg");
+        
         addProductButton.setOnMouseClicked((e) -> {
             addProductModal.show();
         });
@@ -209,8 +211,8 @@ public class BaseController {
                 category.getID()
             );
             
-            // ProductModel.currentProduct.set(addedProductObject);
-            // SceneManager.setScene("product");
+            ProductModel.currentProduct.set(addedProductObject);
+            SceneManager.setScene("product");
             
             addProductModal.hide();
             
@@ -378,6 +380,8 @@ public class BaseController {
         
         LayoutUtils.applyVirtualScrolling(categoriesScrollPane, categoriesFlowPane);
         this.initializeCategoryLazyLoad();
+        
+        LayoutUtils.addIconToButton(addCategoryButton, "/icons/plus.svg");
         addCategoryButton.setOnMouseClicked((e) -> {
             addCategoryModal.show();
         });
@@ -494,6 +498,8 @@ public class BaseController {
             ),
             "base"
         );
+        
+        tabGroup.setActivateFirstTabOnSceneChange(false);
         
         tabGroup.currentTabProperty().addListener(($1, $2, currentTab) -> {
             String tabText = currentTab.getKey().getText();

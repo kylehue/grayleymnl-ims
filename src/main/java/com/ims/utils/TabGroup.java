@@ -13,6 +13,7 @@ public class TabGroup {
     private final String activeClass;
     private final List<Pair<MFXButton, Pane>> tabs;
     private ObjectProperty<Pair<MFXButton, Pane>> currentTab = new SimpleObjectProperty<>();
+    private boolean activateFirstTabOnSceneChange = true;
     
     public TabGroup(
         String activeClass,
@@ -34,16 +35,27 @@ public class TabGroup {
             });
         }
         
+        makeTabActive(tabs.get(0));
+        
         SceneManager.onChangeScene((currentScene, oldScene) -> {
+            if (!this.activateFirstTabOnSceneChange) return;
             if (!currentScene.equals(sceneName)) return;
-            Pair<MFXButton, Pane> firstTab = tabs.get(0);
-            makeTabActive(firstTab);
+            makeTabActive(tabs.get(0));
         });
     }
     
-    private void makeTabActive(
+    public void setActivateFirstTabOnSceneChange(boolean v) {
+        this.activateFirstTabOnSceneChange = v;
+    }
+    
+    public void makeTabActive(
         Pair<MFXButton, Pane> tab
     ) {
+        if (tab == null) {
+            currentTab.set(null);
+            return;
+        }
+        
         MFXButton tabButton = tab.getKey();
         Pane tabPane = tab.getValue();
         
