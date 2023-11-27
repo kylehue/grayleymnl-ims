@@ -167,8 +167,7 @@ public class BaseController {
         refreshDashboardButton.setText("");
         refreshDashboardButton.setOnAction(e -> {
             BaseModel.updateProductStats();
-            BaseModel.historyMap.clear();
-            BaseModel.loadHistory(1);
+            BaseModel.refreshHistory();
         });
     }
     

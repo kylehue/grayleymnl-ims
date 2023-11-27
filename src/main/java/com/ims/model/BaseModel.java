@@ -92,6 +92,11 @@ public abstract class BaseModel {
         executor.shutdown();
     }
     
+    public static void refreshHistory() {
+        historyMap.clear();
+        loadHistory(Config.historyLoadLimit);
+    }
+    
     //////////////////////////////////////////////////////////////////////
     // ------------------------ PRODUCT PAGE -------------------------- //
     //////////////////////////////////////////////////////////////////////
@@ -156,7 +161,8 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
-            BaseModel.updateProductStats();
+            updateProductStats();
+            refreshHistory();
         });
         
         task.setOnFailed(e -> {
@@ -227,7 +233,8 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
-            BaseModel.updateProductStats();
+            updateProductStats();
+            refreshHistory();
         });
         
         task.setOnFailed(e -> {
@@ -273,7 +280,8 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyProduct.set(false);
-            BaseModel.updateProductStats();
+            updateProductStats();
+            refreshHistory();
         });
         
         task.setOnFailed(e -> {
@@ -432,6 +440,7 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyCategory.set(false);
+            refreshHistory();
         });
         
         task.setOnFailed(e -> {
@@ -475,6 +484,7 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyCategory.set(false);
+            refreshHistory();
         });
         
         task.setOnFailed(e -> {
@@ -526,6 +536,7 @@ public abstract class BaseModel {
         
         task.setOnSucceeded(e -> {
             isBusyCategory.set(false);
+            refreshHistory();
         });
         
         task.setOnFailed(e -> {
