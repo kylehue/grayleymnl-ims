@@ -2,6 +2,9 @@ package com.ims.database;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DBUsers {
     private static Connection connection = Database.getConnection();
@@ -177,30 +180,27 @@ public class DBUsers {
         return rows;
     }
     
-    /**
-     * Get rows that are in specified range.
-     * @param startIndex The starting row index.
-     * @param length The limit of rows to retrieve.
-     * @return An ArrayList of rows.
-     */
-    public static UserListData getInRange(
-        int startIndex,
+    public static UserListData getBulk(
+        Set<Integer> excludeID,
         int length
     ) {
         UserListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
-        
         try {
             String query = """
                 SELECT * FROM users
+                WHERE id NOT IN (%s)
                 ORDER BY joined_date ASC, id ASC
-                OFFSET ?
                 LIMIT ?;
-                """;
+                """.formatted(
+                excludeID.isEmpty() ? "-1" :
+                    excludeID.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", "))
+            );
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, startIndex);
-            preparedStatement.setInt(2, length);
+            preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
         } catch (SQLException e) {
@@ -344,5 +344,6 @@ public class DBUsers {
         }
     }
     
-    public static class UserListData extends ArrayList<UserData> {}
+    public static class UserListData extends ArrayList<UserData> {
+    }
 }

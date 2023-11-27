@@ -4,6 +4,7 @@ import com.ims.Config;
 import com.ims.components.*;
 import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
+import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.LazyLoader;
@@ -74,6 +75,15 @@ public class UserManagerController {
             }
         );
         
+        // Add the current items in the model
+        for (int id : UserManagerModel.roleMap.keySet()) {
+            RoleObject roleObject = UserManagerModel.roleMap.get(id);
+            if (roleObject == null) return;
+            Platform.runLater(() -> {
+                addRole(roleObject);
+            });
+        }
+        
         LayoutUtils.applyVirtualScrolling(
             rolesScrollPane,
             rolesFlowPane
@@ -120,12 +130,9 @@ public class UserManagerController {
                     UserManagerModel.loadRoles(1);
                     break;
                 case HIT_BOTTOM:
-                    if (!searchRoleTextField.getText().isEmpty()) return;
-                    UserManagerModel.loadRoles(Config.roleLoadLimit);
-                    break;
                 case INSUFFICIENT:
                     if (!searchRoleTextField.getText().isEmpty()) return;
-                    UserManagerModel.loadRoles(Config.roleLoadLimit / 3);
+                    UserManagerModel.loadRoles(Config.roleLoadLimit);
                     break;
             }
         });
@@ -197,6 +204,15 @@ public class UserManagerController {
             }
         );
         
+        // Add the current items in the model
+        for (int id : UserManagerModel.userMap.keySet()) {
+            UserObject userObject = UserManagerModel.userMap.get(id);
+            if (userObject == null) return;
+            Platform.runLater(() -> {
+                addUser(userObject);
+            });
+        }
+        
         LayoutUtils.applyVirtualScrolling(
             usersScrollPane,
             usersFlowPane
@@ -229,12 +245,9 @@ public class UserManagerController {
                     UserManagerModel.loadUsers(1);
                     break;
                 case HIT_BOTTOM:
-                    if (!searchUserTextField.getText().isEmpty()) return;
-                    UserManagerModel.loadUsers(Config.userLoadLimit);
-                    break;
                 case INSUFFICIENT:
                     if (!searchUserTextField.getText().isEmpty()) return;
-                    UserManagerModel.loadUsers(Config.userLoadLimit / 3);
+                    UserManagerModel.loadUsers(Config.userLoadLimit);
                     break;
             }
         });
@@ -292,6 +305,12 @@ public class UserManagerController {
                 this.initializeUserPage();
             } else if (Objects.equals(tabText, "Roles")) {
                 this.initializeRolePage();
+            }
+        });
+        
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
+            if (Objects.equals(currentScene, "user-manager")) {
+                this.initializeUserPage();
             }
         });
         

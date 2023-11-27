@@ -1,12 +1,8 @@
 package com.ims.model;
 
 import com.ims.Config;
-import com.ims.components.User;
-import com.ims.database.DBCategories;
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
-import com.ims.model.objects.CategoryObject;
-import com.ims.model.objects.ProductObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.Utils;
@@ -18,8 +14,6 @@ import javafx.concurrent.Task;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -311,8 +305,8 @@ public abstract class UserManagerModel {
             @Override
             protected Void call() throws Exception {
                 isBusyRole.set(true);
-                DBRoles.RoleListData roleRows = DBRoles.getInRange(
-                    map.size(),
+                DBRoles.RoleListData roleRows = DBRoles.getBulk(
+                    map.keySet(),
                     limit
                 );
                 
@@ -540,8 +534,8 @@ public abstract class UserManagerModel {
             @Override
             protected Void call() throws Exception {
                 isBusyUser.set(true);
-                DBUsers.UserListData userRows = DBUsers.getInRange(
-                    userMap.size(),
+                DBUsers.UserListData userRows = DBUsers.getBulk(
+                    userMap.keySet(),
                     limit
                 );
                 

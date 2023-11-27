@@ -60,7 +60,7 @@ public class LazyLoader {
     
     private void scheduleTask(Utils.Callable<Void> task) {
         if (previousTask != null) {
-            previousTask.cancel(true);
+            previousTask.cancel(false);
         }
         
         previousTask = executorService.schedule(() -> {

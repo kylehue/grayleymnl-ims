@@ -2,7 +2,8 @@ package com.ims.database;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DBRoles {
     private static Connection connection = Database.getConnection();
@@ -168,30 +169,27 @@ public class DBRoles {
         return rows;
     }
     
-    /**
-     * Get rows that are in specified range.
-     * @param startIndex The starting row index.
-     * @param length The limit of rows to retrieve.
-     * @return An ArrayList of rows.
-     */
-    public static RoleListData getInRange(
-        int startIndex,
+    public static RoleListData getBulk(
+        Set<Integer> excludeID,
         int length
     ) {
         RoleListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
-        
         try {
             String query = """
                 SELECT * FROM roles
+                WHERE id NOT IN (%s)
                 ORDER BY last_modified ASC, id ASC
-                OFFSET ?
                 LIMIT ?;
-                """;
+                """.formatted(
+                excludeID.isEmpty() ? "-1" :
+                    excludeID.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", "))
+            );
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, startIndex);
-            preparedStatement.setInt(2, length);
+            preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
         } catch (SQLException e) {
@@ -335,5 +333,6 @@ public class DBRoles {
         }
     }
     
-    public static class RoleListData extends ArrayList<RoleData> {}
+    public static class RoleListData extends ArrayList<RoleData> {
+    }
 }

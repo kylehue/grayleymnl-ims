@@ -67,8 +67,8 @@ public abstract class BaseModel {
             @Override
             protected Void call() {
                 isBusyHistory.set(true);
-                DBHistory.HistoryListData productRows = DBHistory.getInRange(
-                    historyMap.size(),
+                DBHistory.HistoryListData productRows = DBHistory.getBulk(
+                    historyMap.keySet(),
                     limit
                 );
                 
@@ -376,8 +376,8 @@ public abstract class BaseModel {
             @Override
             protected Void call() {
                 isBusyProduct.set(true);
-                DBProducts.ProductListData productRows = DBProducts.getInRange(
-                    productMap.size(),
+                DBProducts.ProductListData productRows = DBProducts.getBulk(
+                    productMap.keySet(),
                     limit
                 );
                 
@@ -671,8 +671,8 @@ public abstract class BaseModel {
             @Override
             protected Void call() throws Exception {
                 isBusyCategory.set(true);
-                DBCategories.CategoryListData categoryRows = DBCategories.getInRange(
-                    map.size(),
+                DBCategories.CategoryListData categoryRows = DBCategories.getBulk(
+                    map.keySet(),
                     limit
                 );
                 

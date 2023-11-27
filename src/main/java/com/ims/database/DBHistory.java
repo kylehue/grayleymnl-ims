@@ -2,6 +2,8 @@ package com.ims.database;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class DBHistory {
     private static Connection connection = Database.getConnection();
@@ -81,31 +83,27 @@ public abstract class DBHistory {
         return row;
     }
     
-    /**
-     * Get rows that are in specified range.
-     *
-     * @param startIndex The starting row index.
-     * @param length     The limit of rows to retrieve.
-     * @return An ArrayList of rows.
-     */
-    public static HistoryListData getInRange(
-        int startIndex,
+    public static HistoryListData getBulk(
+        Set<Integer> excludeID,
         int length
     ) {
         HistoryListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
-        
         try {
             String query = """
                 SELECT * FROM history
-                ORDER BY last_modified
-                OFFSET ?
+                WHERE id NOT IN (%s)
+                ORDER BY last_modified ASC, id ASC
                 LIMIT ?;
-                """;
+                """.formatted(
+                excludeID.isEmpty() ? "-1" :
+                    excludeID.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", "))
+            );
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, startIndex);
-            preparedStatement.setInt(2, length);
+            preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
         } catch (SQLException e) {

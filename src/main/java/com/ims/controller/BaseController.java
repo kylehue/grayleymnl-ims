@@ -635,6 +635,12 @@ public class BaseController {
             }
         });
         
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
+            if (Objects.equals(currentScene, "base")) {
+                this.initializeDashboardPage();
+            }
+        });
+        
         LayoutUtils.createResponsiveFlowPane(
             analyticsFlowPane,
             350,
