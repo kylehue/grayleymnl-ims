@@ -109,12 +109,12 @@
 }
 
 .history-item {
-    -fx-padding: 10;
-    -fx-background-radius: 5;
-    -fx-border-radius: 5;
-    -fx-background-color: rgba(125, 125, 125, 0.025);
-    -fx-border-color: rgba(125, 125, 125, 0.05);
-    -fx-border-width: 1;
+    -fx-padding: 10 0 10 0;
+    /*!*-fx-background-radius: 5;*!*/
+    /*!*-fx-border-radius: 5;*!*/
+    /*!*-fx-background-color: rgba(125, 125, 125, 0.025);*!*/
+    /*-fx-border-color: rgba(125, 125, 125, 0.1);*/
+    /*-fx-border-width: 0 0 1 0;*/
 }
 
 .history-item-user-label {
