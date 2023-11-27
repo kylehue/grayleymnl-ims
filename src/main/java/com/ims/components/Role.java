@@ -18,6 +18,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
@@ -43,6 +45,7 @@ public class Role extends GridPane {
     private final BooleanProperty allowAddProduct = new SimpleBooleanProperty();
     private final BooleanProperty allowDeleteProduct = new SimpleBooleanProperty();
     private final BooleanProperty allowEditProduct = new SimpleBooleanProperty();
+    private boolean muteSaveListener = false;
     
     public Role() {
         this.styleClass.add("card");
@@ -106,7 +109,16 @@ public class Role extends GridPane {
             nameTextField.delegateFocusedProperty()
         );
         
+        nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() != KeyCode.ENTER) return;
+            this.requestFocus();
+        });
+        
         nameTextField.delegateFocusedProperty().addListener(e -> {
+            if (muteSaveListener) {
+                muteSaveListener = false;
+                return;
+            }
             if (!nameTextFieldValidator.isValid()) return;
             if (nameTextField.delegateIsFocused()) return;
             
@@ -120,20 +132,9 @@ public class Role extends GridPane {
                 this.allowDeleteProductToggle.isSelected(),
                 this.allowEditProductToggle.isSelected()
             );
-            
-            // PopupService.messageDialog.setup(
-            //     "Update Role",
-            //     "Role has been successfully updated.",
-            //     "Got it!"
-            // ).show();
         });
         
-        nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
-            if (e.getCode() != KeyCode.ENTER) return;
-            this.requestFocus();
-        });
-        
-        InvalidationListener toggleListener = e -> {
+        EventHandler<ActionEvent> toggleListener = e -> {
             UserManagerModel.updateRole(
                 roleObject.getID(),
                 null,
@@ -146,12 +147,12 @@ public class Role extends GridPane {
             );
         };
         
-        allowAddCategoryToggle.selectedProperty().addListener(toggleListener);
-        allowDeleteCategoryToggle.selectedProperty().addListener(toggleListener);
-        allowEditCategoryToggle.selectedProperty().addListener(toggleListener);
-        allowAddProductToggle.selectedProperty().addListener(toggleListener);
-        allowDeleteProductToggle.selectedProperty().addListener(toggleListener);
-        allowEditProductToggle.selectedProperty().addListener(toggleListener);
+        allowAddCategoryToggle.setOnAction(toggleListener);
+        allowDeleteCategoryToggle.setOnAction(toggleListener);
+        allowEditCategoryToggle.setOnAction(toggleListener);
+        allowAddProductToggle.setOnAction(toggleListener);
+        allowDeleteProductToggle.setOnAction(toggleListener);
+        allowEditProductToggle.setOnAction(toggleListener);
         
         deleteButton.setOnMouseClicked((e) -> {
             PopupService.confirmDialog.setup(
