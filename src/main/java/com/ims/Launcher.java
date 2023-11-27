@@ -1,10 +1,12 @@
 package com.ims;
 
 import com.ims.database.Database;
+import com.ims.model.*;
 import com.ims.utils.Env;
 import com.ims.utils.Mail;
 import com.ims.utils.SceneManager;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.stage.Screen;
@@ -45,9 +47,20 @@ public class Launcher extends Application {
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
         stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
         stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 1.5);
+        
+        stage.setOnCloseRequest(e -> {
+            BaseModel.executor.shutdown();
+            LoginModel.executor.shutdown();
+            RegisterModel.executor.shutdown();
+            UserEditModel.executor.shutdown();
+            UserManagerModel.executor.shutdown();
+            UserSessionModel.executor.shutdown();
+            Platform.exit();
+            System.exit(0);
+        });
     }
     
-    public static void main() {
-        Application.launch();
+    public static void execute() {
+        launch();
     }
 }

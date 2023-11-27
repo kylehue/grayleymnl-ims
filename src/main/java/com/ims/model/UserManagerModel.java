@@ -18,6 +18,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class UserManagerModel {
+    public static ExecutorService executor = Executors.newFixedThreadPool(4);
+    
     //////////////////////////////////////////////////////////////////////
     // ---------------------------- ROLES ----------------------------- //
     //////////////////////////////////////////////////////////////////////
@@ -57,9 +59,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     /**
@@ -118,9 +118,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     /**
@@ -162,9 +160,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static void searchRoles(String searchText) {
@@ -194,9 +190,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static RoleObject loadAndGetRole(int id) {
@@ -231,9 +225,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         try {
             roleObject = task.get();
@@ -325,9 +317,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static void loadRoles(int limit) {
@@ -403,9 +393,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static void searchUsers(String searchText) {
@@ -435,9 +423,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static UserObject loadUserToMap(
@@ -507,9 +493,7 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         try {
             userObject = task.get();
@@ -554,8 +538,6 @@ public abstract class UserManagerModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
 }

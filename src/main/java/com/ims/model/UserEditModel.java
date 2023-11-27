@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class UserEditModel {
+    public static ExecutorService executor = Executors.newSingleThreadExecutor();
+    
     public static ObjectProperty<UserObject> currentUser = new SimpleObjectProperty<>();
     
     public static void transferOwnershipToCurrentUser() {
@@ -41,8 +43,6 @@ public abstract class UserEditModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
 }

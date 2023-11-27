@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class RegisterModel {
+    public static ExecutorService executor = Executors.newFixedThreadPool(2);
+    
     public static StringProperty emailProperty = new SimpleStringProperty("");
     public static StringProperty passwordProperty = new SimpleStringProperty("");
     public static StringProperty confirmPasswordProperty = new SimpleStringProperty("");
@@ -40,9 +42,7 @@ public abstract class RegisterModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static boolean emailExists(String email) {
@@ -57,9 +57,7 @@ public abstract class RegisterModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         boolean emailExists = false;
         try {

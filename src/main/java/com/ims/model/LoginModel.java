@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class LoginModel {
+    public static ExecutorService executor = Executors.newSingleThreadExecutor();
+    
     public static StringProperty emailProperty = new SimpleStringProperty("");
     public static StringProperty passwordProperty = new SimpleStringProperty("");
     public static BooleanProperty validProperty = new SimpleBooleanProperty(true);
@@ -85,8 +87,6 @@ public abstract class LoginModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
 }

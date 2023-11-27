@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class UserSessionModel {
+    public static ExecutorService executor = Executors.newFixedThreadPool(4);
+    
     public static ObjectProperty<UserObject> currentUser =
         new SimpleObjectProperty<>(null);
     
@@ -48,9 +50,7 @@ public abstract class UserSessionModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         String password = null;
         try {
@@ -141,9 +141,7 @@ public abstract class UserSessionModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         DBRoles.RoleData role = null;
         try {
@@ -175,9 +173,7 @@ public abstract class UserSessionModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         DBUsers.UserData user = null;
         try {
@@ -210,8 +206,6 @@ public abstract class UserSessionModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
 }

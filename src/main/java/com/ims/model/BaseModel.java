@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class BaseModel {
+    public static ExecutorService executor = Executors.newFixedThreadPool(4);
+    
     //////////////////////////////////////////////////////////////////////
     // ----------------------- DASHBOARD PAGE ------------------------- //
     //////////////////////////////////////////////////////////////////////
@@ -52,9 +54,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     /**
@@ -87,9 +87,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static void refreshHistory() {
@@ -169,9 +167,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         ProductObject productObject = null;
         try {
@@ -241,9 +237,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     /**
@@ -288,9 +282,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static void searchProducts(String searchText, String... categories) {
@@ -321,9 +313,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     private static ProductObject loadProduct(
@@ -396,9 +386,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -447,9 +435,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     /**
@@ -491,9 +477,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     /**
@@ -543,9 +527,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     public static CategoryObject loadAndGetCategory(int id) {
@@ -576,9 +558,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
         
         try {
             categoryObject = task.get();
@@ -616,9 +596,7 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
     
     private static CategoryObject loadCategory(
@@ -691,8 +669,6 @@ public abstract class BaseModel {
             System.out.println(e);
         });
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
-        executor.shutdown();
     }
 }
