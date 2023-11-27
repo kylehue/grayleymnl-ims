@@ -1,6 +1,7 @@
 package com.ims;
 
 public abstract class Config {
+    public final static boolean isProductionMode = true;
     public final static int maxCategoryNameLength = 30;
     public final static int maxRoleNameLength = 50;
     public final static int maxEmailLength = 320;

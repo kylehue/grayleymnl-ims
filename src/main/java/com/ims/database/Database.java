@@ -1,5 +1,6 @@
 package com.ims.database;
 
+import com.ims.Config;
 import com.ims.utils.Env;
 
 import java.sql.*;
@@ -19,11 +20,21 @@ public class Database {
             Class.forName("org.postgresql.Driver");
             
             Properties env = Env.get();
-            String url = env.getProperty("database.url");
-            String user = env.getProperty("database.username");
-            String password = env.getProperty("database.password");
+            String urlEnvKey = "database.url";
+            String usernameEnvKey = "database.username";
+            String passwordEnvKey = "database.password";
             
-            connection = DriverManager.getConnection(url, user, password);
+            if (Config.isProductionMode) {
+                urlEnvKey += ".hosted";
+                usernameEnvKey += ".hosted";
+                passwordEnvKey += ".hosted";
+            }
+            
+            String url = env.getProperty(urlEnvKey);
+            String username = env.getProperty(usernameEnvKey);
+            String password = env.getProperty(passwordEnvKey);
+            
+            connection = DriverManager.getConnection(url, username, password);
             
             if (connection != null) {
                 System.out.println("Successfully connected to the database.");
