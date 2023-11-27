@@ -108,8 +108,8 @@
 .tab-button, .tab-button:armed, .tab-button:focused {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-border-radius: 5 5 0 0!important;
-    -fx-background-radius: 5 5 0 0!important;
+    -fx-border-radius: 5 5 0 0 !important;
+    -fx-background-radius: 5 5 0 0 !important;
     -fx-text-fill: -text-color;
     -fx-font-family: "Roboto Medium" !important;
     -fx-underline: false;
@@ -168,7 +168,11 @@
 .icon-button,
 .icon-button:armed,
 .icon-button:focused,
-.icon-button:hover {
+.icon-button:hover,
+.icon-button-static,
+.icon-button-static:armed,
+.icon-button-static:focused,
+.icon-button-static:hover {
     -fx-background-color: transparent;
     -fx-background-radius: 50px;
     -fx-border-radius: 50px;
@@ -183,7 +187,7 @@
     -fx-border-radius: 50px;
 }
 
-.icon-button .icon {
+.icon-button .icon, .icon-button-static .icon {
     -fx-background-color: -text-color-fade;
 }
 
@@ -191,7 +195,7 @@
     -fx-background-color: -accent;
 }
 
-.icon-button-danger:hover .icon{
+.icon-button-danger:hover .icon {
     -fx-background-color: -danger;
 }
 
@@ -204,5 +208,29 @@
 }
 
 .mfx-ripple-generator {
-     -mfx-auto-clip: true;
- }
+    -mfx-auto-clip: true;
+}
+
+.icon-button-static {
+    -fx-disabled: true;
+}
+
+.icon-button-static:disabled {
+    -fx-opacity: 1!important;
+}
+
+.icon-button-static .icon {
+    -fx-background-color: -text-color-fade;
+}
+
+.icon-button-static-success .icon {
+    -fx-background-color: -success !important;
+}
+
+.icon-button-static-warning .icon {
+    -fx-background-color: -warning !important;
+}
+
+.icon-button-static-danger .icon {
+    -fx-background-color: -danger !important;
+}

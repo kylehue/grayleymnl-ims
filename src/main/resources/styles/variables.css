@@ -20,7 +20,8 @@
     -danger-hover: #ff6f6f;
     -danger-glass: rgba(255, 111, 111, 0.1);
 
-    -warning: #fa9514;
+    -success: #14c84e;
+    -warning: #ffa740;
     -info: #4894ff;
 
     /* sizes */

@@ -175,20 +175,12 @@ public abstract class LayoutUtils {
         }
     }
     
-    /**
-     * Adds an icon to a node.
-     *
-     * @param button  The node where the icon will be placed.
-     * @param iconURL The URL of the icon.
-     * @throws URISyntaxException
-     */
-    public static <T extends MFXButton> void addIconToButton(
-        MFXButton button, String iconURL
-    ) {
+    public static Pane createIcon(String iconURL) {
+        Pane icon = null;
         try {
             String resolvedPath = Utils.class.getResource(iconURL).toURI().toString();
             String path = extractSVGPath(resolvedPath);
-            Pane icon = new Pane();
+            icon = new Pane();
             icon.setStyle("-fx-shape: \"" + path + "\";");
             
             // Get bounds
@@ -203,41 +195,26 @@ public abstract class LayoutUtils {
             icon.setMaxHeight(bounds.getHeight());
             icon.setFocusTraversable(false);
             icon.getStyleClass().add("icon");
-            
-            button.setGraphicTextGap(8);
-            button.setGraphic(icon);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
+        
+        return icon;
     }
     
     /**
      * Adds an icon to a node.
      *
-     * @param textField The node where the icon will be placed.
-     * @param iconURL   The URL of the icon.
+     * @param button  The node where the icon will be placed.
+     * @param iconURL The URL of the icon.
      */
-    public static <T extends MFXButton> void addIconToTextField(
-        MFXTextField textField, String iconURL
+    public static void addIconToButton(
+        MFXButton button,
+        String iconURL
     ) {
-        try {
-            String resolvedPath = Utils.class.getResource(iconURL).toURI().toString();
-            String path = extractSVGPath(resolvedPath);
-            Pane icon = new Pane();
-            icon.setStyle("-fx-shape: \"" + path + "\";");
-            
-            double size = 16;
-            icon.setPrefWidth(size);
-            icon.setMaxWidth(size);
-            icon.setPrefHeight(size);
-            icon.setMaxHeight(size);
-            icon.setFocusTraversable(false);
-            
-            textField.setGraphicTextGap(8);
-            textField.setLeadingIcon(icon);
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        Pane icon = createIcon(iconURL);
+        button.setGraphicTextGap(8);
+        button.setGraphic(icon);
     }
     
     public static void setupGridPane(
