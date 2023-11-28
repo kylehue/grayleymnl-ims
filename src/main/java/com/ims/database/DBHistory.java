@@ -94,7 +94,7 @@ public abstract class DBHistory {
             String query = """
                 SELECT * FROM history
                 WHERE id NOT IN (%s)
-                ORDER BY last_modified ASC, id ASC
+                ORDER BY last_modified DESC, id DESC
                 LIMIT ?;
                 """.formatted(
                 excludeID.isEmpty() ? "-1" :
