@@ -201,8 +201,7 @@ public class BaseController {
             if (this.history.containsKey(historyData.getID())) return;
             historyItem.setHistoryData(historyData);
             this.history.put(historyData.getID(), historyItem);
-            historyVBox.getChildren().add(
-                getSortedHistory().indexOf(historyItem),
+            historyVBox.getChildren().addLast(
                 historyItem
             );
         });
@@ -692,6 +691,22 @@ public class BaseController {
                     addProductButton.setVisible(false);
                     addProductButton.setManaged(false);
                 }
+            });
+        });
+        
+        // update busy
+        BaseModel.isBusyProduct.addListener(e -> {
+            Platform.runLater(() -> {
+                boolean isBusyProduct = BaseModel.isBusyProduct.get();
+                addProductButton.setDisable(isBusyProduct);
+                addProductModal.addButton.setDisable(isBusyProduct);
+            });
+        });
+        BaseModel.isBusyCategory.addListener(e -> {
+            Platform.runLater(() -> {
+                boolean isBusyCategory = BaseModel.isBusyCategory.get();
+                addCategoryButton.setDisable(isBusyCategory);
+                addCategoryModal.addButton.setDisable(isBusyCategory);
             });
         });
     }

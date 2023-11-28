@@ -150,7 +150,7 @@ public class User extends GridPane {
                 }
                 roleObject.nameProperty().addListener(roleChangeListener);
                 oldRoleObject = roleObject;
-            });
+            }).execute();
         });
     }
     

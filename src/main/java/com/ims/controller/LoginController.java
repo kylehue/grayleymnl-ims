@@ -5,7 +5,9 @@ import com.ims.model.LoginModel;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
+import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
@@ -46,6 +48,12 @@ public class LoginController {
         
         loginButton.setOnMouseClicked((MouseEvent event) -> {
             LoginModel.login();
+        });
+        
+        LoginModel.isBusyLogin.addListener(e -> {
+            Platform.runLater(() -> {
+                loginButton.setDisable(LoginModel.isBusyLogin.get());
+            });
         });
         
         emailTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {

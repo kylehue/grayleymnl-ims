@@ -8,6 +8,7 @@ import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.ImageView;
@@ -110,6 +111,12 @@ public class RegisterController {
         
         registerButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             tryRegister();
+        });
+        
+        RegisterModel.isBusyRegister.addListener(e -> {
+            Platform.runLater(() -> {
+                registerButton.setDisable(RegisterModel.isBusyRegister.get());
+            });
         });
         
         emailTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {

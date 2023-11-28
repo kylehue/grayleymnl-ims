@@ -34,6 +34,7 @@ public class Role extends GridPane {
     private final MFXToggleButton allowDeleteProductToggle = new MFXToggleButton();
     private final MFXToggleButton allowEditProductToggle = new MFXToggleButton();
     private final MFXTextField nameTextField = new MFXTextField();
+    private final MFXButton deleteButton = new MFXButton();
     private RoleObject roleObject;
     public final TextFieldValidator nameTextFieldValidator;
     private final StringProperty name = new SimpleStringProperty();
@@ -79,7 +80,6 @@ public class Role extends GridPane {
         controlContainer.setPadding(new Insets(10, 0, 0, 0));
         
         // Setup delete button
-        MFXButton deleteButton = new MFXButton();
         controlContainer.getChildren().add(deleteButton);
         deleteButton.getStyleClass().addAll("icon-button", "icon-button-danger");
         deleteButton.setText("");
@@ -210,6 +210,20 @@ public class Role extends GridPane {
         SceneManager.onChangeScene((currentScene, oldScene) -> {
             if (!currentScene.equals("user-manager")) return;
             this.setRoleObject(this.roleObject);
+        });
+        
+        UserManagerModel.isBusyRole.addListener(e -> {
+            Platform.runLater(() -> {
+                boolean isBusyRole = UserManagerModel.isBusyRole.get();
+                allowAddCategoryToggle.setDisable(isBusyRole);
+                allowDeleteCategoryToggle.setDisable(isBusyRole);
+                allowEditCategoryToggle.setDisable(isBusyRole);
+                allowAddProductToggle.setDisable(isBusyRole);
+                allowDeleteProductToggle.setDisable(isBusyRole);
+                allowEditProductToggle.setDisable(isBusyRole);
+                deleteButton.setDisable(isBusyRole);
+                nameTextField.setDisable(isBusyRole);
+            });
         });
     }
     

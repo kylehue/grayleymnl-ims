@@ -53,6 +53,11 @@ public abstract class BaseModel {
      * @param limit The limit of the rows to retrieve.
      */
     public static void loadHistory(int limit) {
+        if (isBusyHistory.get()) {
+            System.out.println("Action is taken too fast.");
+            return;
+        }
+        
         new AsyncCaller<Void>(task -> {
             isBusyHistory.set(true);
             DBHistory.HistoryListData productRows = DBHistory.getBulk(
@@ -65,6 +70,8 @@ public abstract class BaseModel {
             }
             return null;
         }, Utils.executor).onSucceeded(e -> {
+            isBusyHistory.set(false);
+        }).onFailed(e -> {
             isBusyHistory.set(false);
         }).execute();
     }
@@ -96,6 +103,11 @@ public abstract class BaseModel {
         Integer categoryID
     ) {
         return new AsyncCaller<ProductObject>(task -> {
+            if (isBusyProduct.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             if (name.isEmpty()) return null;
             if (!UserSessionModel.currentUserIsAllowAddProduct()) {
                 System.out.println("The user has insufficient permissions.");
@@ -135,6 +147,8 @@ public abstract class BaseModel {
             isBusyProduct.set(false);
             updateProductStats();
             refreshHistory();
+        }).onFailed((e) -> {
+            isBusyProduct.set(false);
         });
     }
     
@@ -159,6 +173,11 @@ public abstract class BaseModel {
         }
         
         new AsyncCaller<Void>(task -> {
+            if (isBusyProduct.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyProduct.set(true);
             
             loadProduct(
@@ -185,6 +204,8 @@ public abstract class BaseModel {
             isBusyProduct.set(false);
             updateProductStats();
             refreshHistory();
+        }).onFailed((e) -> {
+            isBusyProduct.set(false);
         }).execute();
     }
     
@@ -200,6 +221,11 @@ public abstract class BaseModel {
         }
         
         new AsyncCaller<Void>(task -> {
+            if (isBusyProduct.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyProduct.set(true);
             
             DBProducts.remove(id);
@@ -220,6 +246,8 @@ public abstract class BaseModel {
             updateProductStats();
             refreshHistory();
             
+        }).onFailed((e) -> {
+            isBusyProduct.set(false);
         }).execute();
     }
     
@@ -292,7 +320,6 @@ public abstract class BaseModel {
      */
     public static void loadProducts(int limit) {
         new AsyncCaller<Void>(task -> {
-            isBusyProduct.set(true);
             DBProducts.ProductListData productRows = DBProducts.getBulk(
                 productMap.keySet(),
                 limit
@@ -302,9 +329,7 @@ public abstract class BaseModel {
                 loadProduct(row, false);
             }
             return null;
-        }, Utils.executor).onSucceeded((e) -> {
-            isBusyProduct.set(false);
-        }).execute();
+        }, Utils.executor).execute();
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -329,6 +354,11 @@ public abstract class BaseModel {
         if (name.isEmpty()) return;
         
         new AsyncCaller<Void>(task -> {
+            if (isBusyCategory.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyCategory.set(true);
             loadCategory(DBCategories.add(name), true);
             
@@ -342,6 +372,8 @@ public abstract class BaseModel {
         }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
             refreshHistory();
+        }).onFailed((e) -> {
+            isBusyCategory.set(false);
         }).execute();
     }
     
@@ -358,6 +390,11 @@ public abstract class BaseModel {
         }
         if (name.isEmpty()) return;
         new AsyncCaller<Void>(task -> {
+            if (isBusyCategory.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyCategory.set(true);
             
             loadCategory(DBCategories.update(id, name), false);
@@ -373,6 +410,8 @@ public abstract class BaseModel {
         }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
             refreshHistory();
+        }).onFailed((e) -> {
+            isBusyCategory.set(false);
         }).execute();
     }
     
@@ -388,6 +427,11 @@ public abstract class BaseModel {
         }
         
         new AsyncCaller<Void>(task -> {
+            if (isBusyCategory.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyCategory.set(true);
             
             DBCategories.remove(categoryID);
@@ -413,17 +457,17 @@ public abstract class BaseModel {
         }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
             refreshHistory();
+        }).onFailed((e) -> {
+            isBusyCategory.set(false);
         }).execute();
     }
     
     public static AsyncCaller<CategoryObject> loadAndGetCategory(int id) {
-        return new AsyncCaller<CategoryObject>(task -> {
+        return new AsyncCaller<>(task -> {
             CategoryObject categoryObject = categoryMap.get(id);
             if (categoryObject != null) {
                 return categoryObject;
             }
-            
-            isBusyCategory.set(true);
             
             DBCategories.CategoryData row = DBCategories.getOne(DBCategories.Column.ID, id);
             if (row != null) {
@@ -431,9 +475,7 @@ public abstract class BaseModel {
             }
             
             return null;
-        }, Utils.executor).onSucceeded((e) -> {
-            isBusyCategory.set(false);
-        });
+        }, Utils.executor);
     }
     
     public static void searchCategories(String searchText) {
@@ -504,7 +546,6 @@ public abstract class BaseModel {
         ObservableMap<Integer, CategoryObject> map
     ) {
         new AsyncCaller<Void>(task -> {
-            isBusyCategory.set(true);
             DBCategories.CategoryListData categoryRows = DBCategories.getBulk(
                 map.keySet(),
                 limit
@@ -514,8 +555,6 @@ public abstract class BaseModel {
                 loadCategoryToMap(row, map, false);
             }
             return null;
-        }, Utils.executor).onSucceeded((e) -> {
-            isBusyCategory.set(false);
-        }).execute();
+        }, Utils.executor).execute();
     }
 }

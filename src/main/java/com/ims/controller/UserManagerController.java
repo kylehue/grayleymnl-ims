@@ -2,9 +2,7 @@ package com.ims.controller;
 
 import com.ims.Config;
 import com.ims.components.*;
-import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
-import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.LazyLoader;
@@ -55,7 +53,7 @@ public class UserManagerController {
     
     final ObservableMap<Integer, Role> roles = FXCollections.observableHashMap();
     
-    RoleAddModal roleAddModal = new RoleAddModal();
+    RoleAddModal addRoleModal = new RoleAddModal();
     
     private boolean rolePageInitialized = false;
     public void initializeRolePage() {
@@ -91,15 +89,15 @@ public class UserManagerController {
         this.initializeRoleLazyLoad();
         
         addRoleButton.setOnMouseClicked(e -> {
-            roleAddModal.show();
+            addRoleModal.show();
         });
         
-        roleAddModal.setOnAction(() -> {
+        addRoleModal.setOnAction(() -> {
             UserManagerModel.addRole(
-                roleAddModal.nameTextField.getText()
+                addRoleModal.nameTextField.getText()
             );
             
-            roleAddModal.hide();
+            addRoleModal.hide();
             
             return null;
         });
@@ -326,6 +324,14 @@ public class UserManagerController {
             1,
             false
         );
+        
+        UserManagerModel.isBusyRole.addListener(e -> {
+            Platform.runLater(() -> {
+                boolean isBusyRole = UserManagerModel.isBusyRole.get();
+                addRoleButton.setDisable(isBusyRole);
+                addRoleModal.addButton.setDisable(isBusyRole);
+            });
+        });
     }
     
     @FXML

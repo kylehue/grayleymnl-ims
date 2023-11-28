@@ -285,6 +285,16 @@ public class ProductController {
             if (!currentScene.equals("product")) return;
             updateContents(ProductModel.currentProduct.get());
         });
+        
+        BaseModel.isBusyProduct.addListener(e -> {
+            Platform.runLater(() -> {
+                boolean isBusyProduct = BaseModel.isBusyProduct.get();
+                saveAllButton.setDisable(isBusyProduct);
+                deleteProductButton.setDisable(
+                    isBusyProduct || !UserSessionModel.currentUserIsAllowDeleteProduct()
+                );
+            });
+        });
     }
     
     private boolean isSaved() {

@@ -139,7 +139,7 @@ public class TextFieldValidator {
     
     public static AsyncCaller<Boolean> validateAll(TextFieldValidator... validators) {
         return new AsyncCaller<>(task -> {
-            boolean isValid = true;
+            Boolean isValid = true;
             for (TextFieldValidator validator : validators) {
                 for (Constraint constraint : validator.constraints) {
                     constraint.validate();
@@ -299,9 +299,8 @@ public class TextFieldValidator {
                 this.validProperty.set(validityChecker.call());
             } else {
                 try {
-                    this.validProperty.set(
-                        validityCheckerAsync.call().execute().getTask().get()
-                    );
+                    Boolean isValid = validityCheckerAsync.call().execute().getTask().get();
+                    this.validProperty.set(isValid == null ? false : isValid);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

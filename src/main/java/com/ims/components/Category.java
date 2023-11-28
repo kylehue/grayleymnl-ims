@@ -115,6 +115,18 @@ public class Category extends GridPane {
             if (!currentScene.equals("base")) return;
             this.setCategoryObject(this.categoryObject);
         });
+        
+        BaseModel.isBusyCategory.addListener(e -> {
+            Platform.runLater(() -> {
+                boolean isBusyCategory = BaseModel.isBusyCategory.get();
+                nameTextField.setDisable(
+                    isBusyCategory || !UserSessionModel.currentUserIsAllowEditCategory()
+                );
+                deleteButton.setDisable(
+                    isBusyCategory || !UserSessionModel.currentUserIsAllowDeleteCategory()
+                );
+            });
+        });
     }
     
     private void updateEditPermissions(boolean isAllowed) {

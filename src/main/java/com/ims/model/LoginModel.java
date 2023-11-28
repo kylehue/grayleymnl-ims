@@ -16,15 +16,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class LoginModel {
-    public static StringProperty emailProperty = new SimpleStringProperty("");
-    public static StringProperty passwordProperty = new SimpleStringProperty("");
-    public static BooleanProperty validProperty = new SimpleBooleanProperty(true);
+    public static final BooleanProperty isBusyLogin = new SimpleBooleanProperty(false);
+    public static final StringProperty emailProperty = new SimpleStringProperty("");
+    public static final StringProperty passwordProperty = new SimpleStringProperty("");
+    public static final BooleanProperty validProperty = new SimpleBooleanProperty(true);
     
     public static void login() {
+        if (isBusyLogin.get()) {
+            System.out.println("Action is taken too fast.");
+            return;
+        }
+        
+        isBusyLogin.set(true);
         String email = emailProperty.get();
         String password = passwordProperty.get();
         if (email.isEmpty() || password.isEmpty()) {
             validProperty.set(false);
+            isBusyLogin.set(false);
             return;
         }
         
@@ -36,6 +44,7 @@ public abstract class LoginModel {
             
             if (users.size() != 1) {
                 validProperty.set(false);
+                isBusyLogin.set(false);
                 return null;
             }
             
@@ -72,20 +81,29 @@ public abstract class LoginModel {
                                     
                                     SceneManager.setScene("base");
                                     validProperty.set(true);
+                                    isBusyLogin.set(false);
+                                }).onFailed(e -> {
+                                    isBusyLogin.set(false);
                                 }).execute();
                             } else {
                                 SceneManager.setScene("base");
                                 validProperty.set(true);
+                                isBusyLogin.set(false);
                             }
                             
+                        }).onFailed(e -> {
+                            isBusyLogin.set(false);
                         }).execute();
                     
                 } else {
                     validProperty.set(false);
+                    isBusyLogin.set(false);
                 }
             });
             
             return null;
-        }, Utils.executor).execute();
+        }, Utils.executor).onFailed(e -> {
+            isBusyLogin.set(false);
+        }).execute();
     }
 }

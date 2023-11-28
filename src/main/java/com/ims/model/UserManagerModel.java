@@ -41,11 +41,18 @@ public abstract class UserManagerModel {
         if (name.isEmpty()) return;
         
         new AsyncCaller<Void>(task -> {
+            if (isBusyRole.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyRole.set(true);
             loadRole(DBRoles.add(name), true);
             
             return null;
         }, Utils.executor).onSucceeded(e -> {
+            isBusyRole.set(false);
+        }).onFailed(e -> {
             isBusyRole.set(false);
         }).execute();
     }
@@ -74,6 +81,11 @@ public abstract class UserManagerModel {
         if (name != null && name.isEmpty()) return;
         
         new AsyncCaller<Void>(task -> {
+            if (isBusyRole.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyRole.set(true);
             
             DBRoles.RoleData newRole = DBRoles.update(
@@ -96,6 +108,8 @@ public abstract class UserManagerModel {
             return null;
         }, Utils.executor).onSucceeded(e -> {
             isBusyRole.set(false);
+        }).onFailed(e -> {
+            isBusyRole.set(false);
         }).execute();
     }
     
@@ -111,6 +125,11 @@ public abstract class UserManagerModel {
         }
         
         new AsyncCaller<>(task -> {
+            if (isBusyRole.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyRole.set(true);
             
             DBRoles.remove(roleID);
@@ -126,6 +145,8 @@ public abstract class UserManagerModel {
             
             return null;
         }, Utils.executor).onSucceeded(e -> {
+            isBusyRole.set(false);
+        }).onFailed(e -> {
             isBusyRole.set(false);
         }).execute();
     }
@@ -158,8 +179,6 @@ public abstract class UserManagerModel {
                 return roleObject;
             }
             
-            isBusyRole.set(true);
-            
             DBRoles.RoleData row = DBRoles.getOne(
                 DBRoles.Column.ID,
                 id
@@ -168,8 +187,6 @@ public abstract class UserManagerModel {
             if (row != null) {
                 return loadRole(row, false);
             }
-            
-            isBusyRole.set(false);
             
             return null;
         }, Utils.executor);
@@ -233,7 +250,6 @@ public abstract class UserManagerModel {
         ObservableMap<Integer, RoleObject> map
     ) {
         new AsyncCaller<Void>(task -> {
-            isBusyRole.set(true);
             DBRoles.RoleListData roleRows = DBRoles.getBulk(
                 map.keySet(),
                 limit
@@ -243,9 +259,7 @@ public abstract class UserManagerModel {
                 loadRoleToMap(row, map, false);
             }
             return null;
-        }, Utils.executor).onSucceeded(e -> {
-            isBusyRole.set(false);
-        }).execute();
+        }, Utils.executor).execute();
     }
     
     public static void loadRoles(int limit) {
@@ -291,6 +305,11 @@ public abstract class UserManagerModel {
         }
         
         new AsyncCaller<Void>(task -> {
+            if (isBusyRole.get()) {
+                System.out.println("Action is taken too fast.");
+                return null;
+            }
+            
             isBusyUser.set(true);
             
             DBUsers.UserData user = DBUsers.update(
@@ -309,6 +328,8 @@ public abstract class UserManagerModel {
             
             return null;
         }, Utils.executor).onSucceeded(e -> {
+            isBusyUser.set(false);
+        }).onFailed(e -> {
             isBusyUser.set(false);
         }).execute();
     }
@@ -380,14 +401,10 @@ public abstract class UserManagerModel {
                 return userObject;
             }
             
-            isBusyUser.set(true);
-            
             DBUsers.UserData userData = DBUsers.getOne(DBUsers.Column.ID, id);
             if (userData != null) {
                 return loadUser(userData, false);
             }
-            
-            isBusyUser.set(false);
             
             return null;
         }, Utils.executor);
@@ -404,7 +421,6 @@ public abstract class UserManagerModel {
      */
     public static void loadUsers(int limit) {
         new AsyncCaller<Void>(task -> {
-            isBusyUser.set(true);
             DBUsers.UserListData userRows = DBUsers.getBulk(
                 userMap.keySet(),
                 limit
@@ -414,9 +430,6 @@ public abstract class UserManagerModel {
                 loadUser(row, false);
             }
             return null;
-        }, Utils.executor).onSucceeded(e -> {
-            isBusyUser.set(false);
-            
-        }).execute();
+        }, Utils.executor).execute();
     }
 }
