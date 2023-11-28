@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class DBHistory {
-    private static Connection connection = Database.getConnection();
     
     public enum Action {
         ADD_PRODUCT(0),
@@ -68,7 +67,7 @@ public abstract class DBHistory {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, action.getCode());
             preparedStatement.setObject(2, subject);
             preparedStatement.setObject(3, userID);
@@ -102,7 +101,7 @@ public abstract class DBHistory {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);

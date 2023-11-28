@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DBRoles {
-    private static Connection connection = Database.getConnection();
-    
     public enum Column {
         ID,
         NAME,
@@ -31,7 +29,7 @@ public class DBRoles {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, name);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
@@ -71,7 +69,7 @@ public class DBRoles {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setObject(1, name);
             preparedStatement.setObject(2, allowAddCategory);
             preparedStatement.setObject(3, allowDeleteCategory);
@@ -100,7 +98,7 @@ public class DBRoles {
                 WHERE id = ?;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
         } catch (SQLException e) {
@@ -188,7 +186,7 @@ public class DBRoles {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -216,7 +214,7 @@ public class DBRoles {
                 """.formatted(
                 columnLabel
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -242,7 +240,7 @@ public class DBRoles {
                 WHERE name ~* ?
                 ORDER BY last_modified DESC, id;
                 """;
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);

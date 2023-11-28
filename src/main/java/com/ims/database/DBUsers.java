@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DBUsers {
-    private static Connection connection = Database.getConnection();
-    
     public enum Column {
         ID,
         EMAIL,
@@ -34,7 +32,7 @@ public class DBUsers {
                 DBUsers.Column.PASSWORD
             );
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, email);
             preparedStatement.setString(2, password);
             resultSet = preparedStatement.executeQuery();
@@ -69,7 +67,7 @@ public class DBUsers {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setObject(1, password);
             preparedStatement.setObject(2, roleID);
             preparedStatement.setObject(3, isDisabled);
@@ -96,7 +94,7 @@ public class DBUsers {
                 SET is_owner = CASE WHEN id = ? THEN true ELSE false END;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, userID);
             preparedStatement.executeQuery();
         } catch (SQLException e) {
@@ -116,7 +114,7 @@ public class DBUsers {
                 AND is_owner=false;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
         } catch (SQLException e) {
@@ -199,7 +197,7 @@ public class DBUsers {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -227,7 +225,7 @@ public class DBUsers {
                 """.formatted(
                 columnLabel
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -260,7 +258,7 @@ public class DBUsers {
                 ) ~* ?
                 ORDER BY u.joined_date DESC, u.id;
                 """;
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);

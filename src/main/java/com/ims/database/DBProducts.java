@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DBProducts {
-    private static Connection connection = Database.getConnection();
-    
     public enum Column {
         ID,
         NAME,
@@ -44,7 +42,7 @@ public class DBProducts {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, name);
             preparedStatement.setInt(2, categoryID);
             preparedStatement.setString(3, imageURL);
@@ -86,7 +84,7 @@ public class DBProducts {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setObject(1, name);
             preparedStatement.setObject(2, price);
             preparedStatement.setObject(3, categoryID);
@@ -115,7 +113,7 @@ public class DBProducts {
                 WHERE id = ?;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
@@ -201,7 +199,7 @@ public class DBProducts {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -237,7 +235,7 @@ public class DBProducts {
                 """.formatted(
                 columnLabel
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -278,7 +276,7 @@ public class DBProducts {
                             "'" + String.join("', '", categories) + "'"
                         )
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -299,7 +297,7 @@ public class DBProducts {
             String query = """
                 SELECT COUNT(*) AS count FROM products;
                 """;
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             count = resultSet.getInt("count");
@@ -322,7 +320,7 @@ public class DBProducts {
                 SELECT COUNT(*) AS count FROM products
                 WHERE current_stocks = 0;
                 """;
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             count = resultSet.getInt("count");
@@ -350,7 +348,7 @@ public class DBProducts {
                     CAST(expected_stocks AS float)
                 ) < %s;
                 """.formatted(Config.lowStockRate);
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             count = resultSet.getInt("count");

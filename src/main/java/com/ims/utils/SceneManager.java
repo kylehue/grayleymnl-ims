@@ -104,6 +104,10 @@ public abstract class SceneManager {
         return SceneManager.registeredScenes.get(currentSceneID);
     }
     
+    public static String getCurrentSceneID() {
+        return currentSceneID;
+    }
+    
     /**
      * Use this to set the default size of scenes.
      *

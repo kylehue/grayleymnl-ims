@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DBCategories {
-    private static Connection connection = Database.getConnection();
-    
     public enum Column {
         ID,
         NAME,
@@ -25,7 +23,7 @@ public class DBCategories {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, name);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
@@ -50,7 +48,7 @@ public class DBCategories {
                 RETURNING *;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, name);
             preparedStatement.setInt(2, id);
             resultSet = preparedStatement.executeQuery();
@@ -73,7 +71,7 @@ public class DBCategories {
                 WHERE id = ?;
                 """;
             
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
         } catch (SQLException e) {
@@ -132,7 +130,7 @@ public class DBCategories {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -166,7 +164,7 @@ public class DBCategories {
                 """.formatted(
                 columnLabel
             );
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -192,7 +190,7 @@ public class DBCategories {
                 WHERE name ~* ?
                 ORDER BY last_modified DESC, id;
                 """;
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = Database.getConnection().prepareStatement(query);
             preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
