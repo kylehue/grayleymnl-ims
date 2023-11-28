@@ -1,10 +1,7 @@
 package com.ims;
 
 import com.ims.database.Database;
-import com.ims.utils.Env;
-import com.ims.utils.Mail;
-import com.ims.utils.SceneManager;
-import com.ims.utils.Utils;
+import com.ims.utils.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
@@ -52,6 +49,7 @@ public class Launcher extends Application {
         
         stage.setOnCloseRequest(e -> {
             Utils.executor.shutdown();
+            LazyLoader.executor.shutdown();
             Database.shutdown();
             Platform.exit();
             System.exit(0);

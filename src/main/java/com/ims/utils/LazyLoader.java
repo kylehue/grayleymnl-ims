@@ -1,11 +1,9 @@
 package com.ims.utils;
 
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
-import javafx.animation.KeyFrame;
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
-import javafx.event.ActionEvent;
 import javafx.scene.layout.Pane;
 
 import java.util.concurrent.Executors;
@@ -14,6 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class LazyLoader {
+    public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final MFXScrollPane scrollPane;
     private final Pane contentPane;
     private final ObservableMap<?, ?> model;
@@ -56,14 +55,12 @@ public class LazyLoader {
     
     private ScheduledFuture<?> previousTask = null;
     
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    
     private void scheduleTask(Utils.Callable<Void> task) {
         if (previousTask != null) {
             previousTask.cancel(false);
         }
         
-        previousTask = executorService.schedule(() -> {
+        previousTask = executor.schedule(() -> {
             task.call();
         }, 300, TimeUnit.MILLISECONDS);
     }
