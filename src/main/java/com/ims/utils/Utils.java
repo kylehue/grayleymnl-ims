@@ -27,7 +27,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Utils {
-    public static final ExecutorService executor = Executors.newFixedThreadPool(8);
+    public static final ExecutorService executor = Executors.newFixedThreadPool(
+        Config.maxThreads,
+        (runnable) -> {
+            Thread thread = new Thread(runnable);
+            thread.setDaemon(true);
+            return thread;
+        }
+    );
     
     public static String formatDate(LocalDateTime date) {
         LocalDate today = LocalDateTime.now().toLocalDate();
