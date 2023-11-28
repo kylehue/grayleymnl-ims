@@ -6,6 +6,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -144,7 +145,7 @@ public class TextFieldValidator {
                 for (Constraint constraint : validator.constraints) {
                     constraint.validate();
                 }
-                
+
                 isValid = validator.validProperty.get()
                     && validator.getInvalidConstraint() == null;
                 
@@ -299,8 +300,9 @@ public class TextFieldValidator {
                 this.validProperty.set(validityChecker.call());
             } else {
                 try {
-                    Boolean isValid = validityCheckerAsync.call().execute().getTask().get();
-                    this.validProperty.set(isValid == null ? false : isValid);
+                    validityCheckerAsync.call().onSucceeded(isValid -> {
+                        this.validProperty.set(isValid == null ? false : isValid);
+                    }).execute();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
