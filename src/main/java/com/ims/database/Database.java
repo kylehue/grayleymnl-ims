@@ -15,6 +15,14 @@ public class Database {
         return connection;
     }
     
+    public static void closeConnection() {
+        try {
+            getConnection().close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     public static void connect() {
         try {
             Class.forName("org.postgresql.Driver");

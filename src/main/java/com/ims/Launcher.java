@@ -51,6 +51,7 @@ public class Launcher extends Application {
         
         stage.setOnCloseRequest(e -> {
             Utils.executor.shutdown();
+            Database.closeConnection();
             Platform.exit();
             System.exit(0);
         });
