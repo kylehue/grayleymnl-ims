@@ -3,7 +3,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 out/
-src/main/resources/META-INF/
 .idea/artifacts/
 src/main/resources/env.properties
 

@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Main-Class: com.ims.Main
+Class-Path: javafx.swing.jar virtualizedfx-11.9.1.jar mfxlocalization-11
+ .1.0.jar javafx.base.jar javafx-swt.jar javafx.controls.jar javafx-medi
+ a-21-ea+24-win.jar javafx-base-21-ea+24.jar mfxresources-11.3.2.jar jav
+ afx-web-21-ea+24-win.jar javafx-web-21-ea+24.jar jbcrypt-0.4.jar postgr
+ esql-42.6.0.jar checker-qual-3.31.0.jar javafx-web-18.jar javafx-web-18
+ -win.jar javafx-controls-18.jar javafx-controls-18-win.jar javafx-graph
+ ics-18.jar javafx-graphics-18-win.jar javafx-base-18.jar javafx-base-18
+ -win.jar javafx-media-18.jar javafx-media-18-win.jar mfxcore-11.3.0.jar
+  javafx-graphics-21-ea+24.jar javafx.media.jar javafx-base-21-ea+24-win
+ .jar javafx-fxml-21-ea+24-win.jar mfxeffects-11.0.5.jar javafx-controls
+ -21-ea+24-win.jar javafx-fxml-21-ea+24.jar javax.mail-1.6.2.jar activat
+ ion-1.1.jar javafx.fxml.jar javafx-swing-18.jar javafx-swing-18-win.jar
+  javafx-graphics-18.jar javafx-graphics-18-win.jar javafx-base-18.jar j
+ avafx-base-18-win.jar javafx-graphics-21-ea+24-win.jar javafx.web.jar j
+ avafx-controls-20.jar javafx-controls-20-win.jar javafx-graphics-20.jar
+  javafx-graphics-20-win.jar javafx-base-20.jar javafx-base-20-win.jar m
+ aterialfx-11.16.1.jar javafx-fxml-19.0.2.jar javafx-fxml-19.0.2-win.jar
+  javafx-controls-19.0.2.jar javafx-controls-19.0.2-win.jar javafx-graph
+ ics-19.0.2.jar javafx-graphics-19.0.2-win.jar javafx-base-19.0.2.jar ja
+ vafx-base-19.0.2-win.jar materialfx-11.13.5.jar virtualizedfx-11.2.6.ja
+ r javafx.graphics.jar javafx-controls-21-ea+24.jar javafx-media-21-ea+2
+ 4.jar
+
