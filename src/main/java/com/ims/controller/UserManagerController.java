@@ -123,16 +123,8 @@ public class UserManagerController {
         );
         
         lazyLoader.setLoader((requestType) -> {
-            switch (requestType) {
-                case INITIAL:
-                    UserManagerModel.loadRoles(1);
-                    break;
-                case HIT_BOTTOM:
-                case INSUFFICIENT:
-                    if (!searchRoleTextField.getText().isEmpty()) return;
-                    UserManagerModel.loadRoles(Config.roleLoadLimit);
-                    break;
-            }
+            if (!searchRoleTextField.getText().isEmpty()) return;
+            UserManagerModel.loadRoles(Config.roleLoadLimit);
         });
     }
     
@@ -238,16 +230,8 @@ public class UserManagerController {
         );
         
         lazyLoader.setLoader((requestType) -> {
-            switch (requestType) {
-                case INITIAL:
-                    UserManagerModel.loadUsers(1);
-                    break;
-                case HIT_BOTTOM:
-                case INSUFFICIENT:
-                    if (!searchUserTextField.getText().isEmpty()) return;
-                    UserManagerModel.loadUsers(Config.userLoadLimit);
-                    break;
-            }
+            if (!searchUserTextField.getText().isEmpty()) return;
+            UserManagerModel.loadUsers(Config.userLoadLimit);
         });
     }
     

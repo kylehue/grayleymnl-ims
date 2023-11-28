@@ -102,16 +102,8 @@ public class RoleComboBox extends ComboBox<Integer, RoleObject> {
         );
         
         lazyLoader.setLoader((requestType) -> {
-            switch (requestType) {
-                case INITIAL:
-                    loadRoles(8);
-                    break;
-                case HIT_BOTTOM:
-                case INSUFFICIENT:
-                    if (!this.getSearchText().isEmpty()) return;
-                    loadRoles(Config.roleLoadLimit);
-                    break;
-            }
+            if (!this.getSearchText().isEmpty()) return;
+            loadRoles(Config.roleLoadLimit);
         });
     }
 }

@@ -100,16 +100,8 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
         );
         
         lazyLoader.setLoader((requestType) -> {
-            switch (requestType) {
-                case INITIAL:
-                    loadCategories(8);
-                    break;
-                case HIT_BOTTOM:
-                case INSUFFICIENT:
-                    if (!this.getSearchText().isEmpty()) return;
-                    loadCategories(Config.categoryLoadLimit);
-                    break;
-            }
+            if (!this.getSearchText().isEmpty()) return;
+            loadCategories(Config.categoryLoadLimit);
         });
     }
 }

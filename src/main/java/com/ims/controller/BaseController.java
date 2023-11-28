@@ -182,15 +182,7 @@ public class BaseController {
         );
         
         lazyLoader.setLoader((requestType) -> {
-            switch (requestType) {
-                case INITIAL:
-                    BaseModel.loadHistory(1);
-                    break;
-                case HIT_BOTTOM:
-                case INSUFFICIENT:
-                    BaseModel.loadHistory(Config.historyLoadLimit);
-                    break;
-            }
+            BaseModel.loadHistory(Config.historyLoadLimit);
         });
     }
     
@@ -347,17 +339,9 @@ public class BaseController {
         );
         
         lazyLoader.setLoader((requestType) -> {
-            switch (requestType) {
-                case INITIAL:
-                    BaseModel.loadProducts(1);
-                    break;
-                case HIT_BOTTOM:
-                case INSUFFICIENT:
-                    if (!searchProductTextField.getText().isEmpty()) return;
-                    if (!getAllActiveCategoryTags().isEmpty()) return;
-                    BaseModel.loadProducts(Config.productLoadLimit);
-                    break;
-            }
+            if (!searchProductTextField.getText().isEmpty()) return;
+            if (!getAllActiveCategoryTags().isEmpty()) return;
+            BaseModel.loadProducts(Config.productLoadLimit);
         });
     }
     
@@ -522,16 +506,8 @@ public class BaseController {
         );
         
         lazyLoader.setLoader((requestType) -> {
-            switch (requestType) {
-                case INITIAL:
-                    BaseModel.loadCategories(1);
-                    break;
-                case HIT_BOTTOM:
-                case INSUFFICIENT:
-                    if (!searchCategoryTextField.getText().isEmpty()) return;
-                    BaseModel.loadCategories(Config.categoryLoadLimit);
-                    break;
-            }
+            if (!searchCategoryTextField.getText().isEmpty()) return;
+            BaseModel.loadCategories(Config.categoryLoadLimit);
         });
     }
     
