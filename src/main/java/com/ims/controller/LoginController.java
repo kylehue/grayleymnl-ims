@@ -45,6 +45,8 @@ public class LoginController {
     public void initialize() {
         this.initializeNetworkAnimation();
         LayoutUtils.fitImageViewToParent(vectorImage);
+        emailTextField.setContextMenuDisabled(true);
+        passwordTextField.setContextMenuDisabled(true);
         
         loginButton.setOnMouseClicked((MouseEvent event) -> {
             LoginModel.login();

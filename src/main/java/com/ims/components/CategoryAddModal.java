@@ -24,6 +24,7 @@ public class CategoryAddModal extends Modal {
         nameTextField.setMinWidth(100);
         nameTextField.setPrefWidth(300);
         nameTextField.setMaxWidth(Double.MAX_VALUE);
+        nameTextField.setContextMenuDisabled(true);
         
         nameTextFieldValidator = new TextFieldValidator(
             nameTextField

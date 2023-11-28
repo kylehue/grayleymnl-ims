@@ -28,6 +28,7 @@ public class ProductAddModal extends Modal {
         this.contentContainer.setMaxWidth(400);
         this.contentContainer.setVgap(10);
         
+        nameTextField.setContextMenuDisabled(true);
         nameTextField.setFloatingText("Product Name");
         nameTextField.setMinWidth(100);
         nameTextField.setPrefWidth(300);

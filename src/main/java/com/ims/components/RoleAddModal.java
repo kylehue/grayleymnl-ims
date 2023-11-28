@@ -55,6 +55,7 @@ public class RoleAddModal extends Modal {
             nameTextFieldValidator.reset();
         });
         
+        nameTextField.setContextMenuDisabled(true);
         nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             if (this.listener == null) return;

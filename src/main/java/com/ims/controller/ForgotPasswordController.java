@@ -48,6 +48,7 @@ public class ForgotPasswordController {
     public void initialize() {
         // this.initializeNetworkAnimation();
         LayoutUtils.fitImageViewToParent(vectorImage);
+        emailTextField.setContextMenuDisabled(true);
         
         loginButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
             SceneManager.setScene("login");

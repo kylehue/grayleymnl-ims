@@ -112,6 +112,7 @@ public class Role extends GridPane {
             this.requestFocus();
         });
         
+        nameTextField.setContextMenuDisabled(true);
         nameTextField.delegateFocusedProperty().addListener(e -> {
             if (muteSaveListener) {
                 muteSaveListener = false;

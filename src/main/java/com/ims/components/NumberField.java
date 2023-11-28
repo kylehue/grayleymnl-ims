@@ -59,6 +59,7 @@ public class NumberField extends StackPane {
             });
         }
         
+        textField.setContextMenuDisabled(true);
         textField.setFloatingText("Number");
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!isValid(newValue)) {

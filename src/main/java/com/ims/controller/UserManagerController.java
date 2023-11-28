@@ -113,6 +113,8 @@ public class UserManagerController {
         refreshRolesButton.setOnAction(e -> {
             UserManagerModel.searchRoles("");
         });
+        
+        searchRoleTextField.setContextMenuDisabled(true);
     }
     
     public void initializeRoleLazyLoad() {
@@ -209,6 +211,7 @@ public class UserManagerController {
         );
         this.initializeUserLazyLoad();
         
+        searchUserTextField.setContextMenuDisabled(true);
         searchUserTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             UserManagerModel.searchUsers(searchUserTextField.getText());

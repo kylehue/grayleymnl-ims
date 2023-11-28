@@ -111,6 +111,7 @@ public class ProductController {
             currentStocksNumberField.valueProperty()
         );
         
+        productImageURLTextField.setContextMenuDisabled(true);
         productImageURLTextField.setStyle("-fx-padding: 5 40 5 0 !important");
         
         uploadImageButton.setText("");
@@ -150,6 +151,7 @@ public class ProductController {
             }
         );
         
+        productNameTextField.setContextMenuDisabled(true);
         productNameTextFieldValidator = new TextFieldValidator(productNameTextField);
         productNameTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,

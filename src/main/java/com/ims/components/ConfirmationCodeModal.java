@@ -36,6 +36,7 @@ public class ConfirmationCodeModal extends Modal {
         codeTextField.setMinWidth(100);
         codeTextField.setPrefWidth(300);
         codeTextField.setMaxWidth(Double.MAX_VALUE);
+        codeTextField.setContextMenuDisabled(true);
         
         codeTextFieldValidator = new TextFieldValidator(
             codeTextField

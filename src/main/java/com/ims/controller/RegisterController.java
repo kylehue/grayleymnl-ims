@@ -48,6 +48,9 @@ public class RegisterController {
     public void initialize() {
         // this.initializeNetworkAnimation();
         LayoutUtils.fitImageViewToParent(vectorImage);
+        emailTextField.setContextMenuDisabled(true);
+        passwordTextField.setContextMenuDisabled(true);
+        confirmPasswordTextField.setContextMenuDisabled(true);
         
         emailTextFieldValidator =
             new TextFieldValidator(emailTextField);

@@ -47,6 +47,7 @@ public class ComboBox<K, V> extends StackPane {
         textField.setMinWidth(100);
         textField.setMaxWidth(Double.MAX_VALUE);
         textField.setPadding(new Insets(0, 50, 0, 0));
+        textField.setContextMenuDisabled(true);
         this.getChildren().add(textField);
         
         // Set up dropdown button

@@ -315,6 +315,7 @@ public class BaseController {
             return null;
         });
         
+        searchProductTextField.setContextMenuDisabled(true);
         searchProductTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             BaseModel.searchProducts(searchProductTextField.getText());
@@ -482,6 +483,7 @@ public class BaseController {
             return null;
         });
         
+        searchCategoryTextField.setContextMenuDisabled(true);
         searchCategoryTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             BaseModel.searchCategories(searchCategoryTextField.getText());
