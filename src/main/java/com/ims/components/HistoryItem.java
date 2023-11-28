@@ -67,8 +67,10 @@ public class HistoryItem extends GridPane {
         userIDProperty().addListener(e -> {
             Platform.runLater(() -> {
                 Integer userID = userIDProperty().get();
-                if (userID != null) {
-                    UserObject user = UserManagerModel.loadAndGetUser(userID);
+                UserObject user = userID == null ? null :
+                    UserManagerModel.loadAndGetUser(userID);
+                
+                if (user != null) {
                     userLabel.setText(user.getEmail().split("@")[0]);
                 } else {
                     userLabel.setText("Unknown user");
@@ -97,7 +99,7 @@ public class HistoryItem extends GridPane {
                 if (
                     action == DBHistory.Action.ADD_PRODUCT ||
                         action == DBHistory.Action.ADD_CATEGORY
-                )  {
+                ) {
                     iconURL = "/icons/plus-circle.svg";
                     iconContainer.getStyleClass().add(
                         "icon-button-static-success"

@@ -3,6 +3,7 @@ package com.ims.controller;
 import com.ims.components.PopupService;
 import com.ims.database.DBRoles;
 import com.ims.model.UserSessionModel;
+import com.ims.model.objects.RoleObject;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
@@ -76,7 +77,7 @@ public class AccountSettingsController {
         UserSessionModel.currentUser.addListener(e -> {
             if (UserSessionModel.currentUser.get() == null) return;
             emailTextField.setText(UserSessionModel.getCurrentUserEmail());
-            DBRoles.RoleData roleData = UserSessionModel.getCurrentUserRole();
+            RoleObject roleData = UserSessionModel.getCurrentUserRole();
             if (roleData != null) {
                 roleTextField.setText(roleData.getName());
             }

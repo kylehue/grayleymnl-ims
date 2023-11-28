@@ -193,15 +193,17 @@ public class Product extends GridPane {
             this.setPrice(this.priceProperty().get());
         });
         
-        updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
+        // updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
         UserSessionModel.currentUser.addListener(e -> {
             updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
         });
     }
     
     private void updateEditPermissions(boolean isAllowed) {
-        editButton.setVisible(isAllowed);
-        editButton.setManaged(isAllowed);
+        Platform.runLater(() -> {
+            editButton.setVisible(isAllowed);
+            editButton.setManaged(isAllowed);
+        });
     }
     
     public ObjectProperty<String> nameProperty() {

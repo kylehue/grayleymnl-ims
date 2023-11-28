@@ -1,6 +1,7 @@
 package com.ims.utils;
 
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -113,43 +114,45 @@ public class TextFieldValidator {
     }
     
     private void initializeStyleValidation() {
-        ObservableList<String> textFieldStyleClass = textField.getStyleClass();
-        ObservableList<String> messageLabelStyleClass = messageLabel.getStyleClass();
-        if (this.validProperty.get()) {
-            textFieldStyleClass.removeAll(
-                INFO_STYLE_CLASS,
-                WARNING_STYLE_CLASS,
-                ERROR_STYLE_CLASS
-            );
-            messageLabelStyleClass.removeAll(
-                "text-info",
-                "text-warning",
-                "text-error"
-            );
-            messageLabel.setText("");
-            messageLabel.setVisible(false);
-            messageLabel.setManaged(false);
-        } else {
-            if (this.severity == Severity.ERROR) {
-                if (!textFieldStyleClass.contains(ERROR_STYLE_CLASS)) {
-                    textFieldStyleClass.add(ERROR_STYLE_CLASS);
-                    messageLabelStyleClass.add("text-danger");
-                }
-            } else if (this.severity == Severity.WARNING) {
-                if (!textFieldStyleClass.contains(WARNING_STYLE_CLASS)) {
-                    textFieldStyleClass.add(WARNING_STYLE_CLASS);
-                    messageLabelStyleClass.add("text-warning");
-                }
+        Platform.runLater(() -> {
+            ObservableList<String> textFieldStyleClass = textField.getStyleClass();
+            ObservableList<String> messageLabelStyleClass = messageLabel.getStyleClass();
+            if (this.validProperty.get()) {
+                textFieldStyleClass.removeAll(
+                    INFO_STYLE_CLASS,
+                    WARNING_STYLE_CLASS,
+                    ERROR_STYLE_CLASS
+                );
+                messageLabelStyleClass.removeAll(
+                    "text-info",
+                    "text-warning",
+                    "text-error"
+                );
+                messageLabel.setText("");
+                messageLabel.setVisible(false);
+                messageLabel.setManaged(false);
             } else {
-                if (!textFieldStyleClass.contains(INFO_STYLE_CLASS)) {
-                    textFieldStyleClass.add(INFO_STYLE_CLASS);
-                    messageLabelStyleClass.add("text-info");
+                if (this.severity == Severity.ERROR) {
+                    if (!textFieldStyleClass.contains(ERROR_STYLE_CLASS)) {
+                        textFieldStyleClass.add(ERROR_STYLE_CLASS);
+                        messageLabelStyleClass.add("text-danger");
+                    }
+                } else if (this.severity == Severity.WARNING) {
+                    if (!textFieldStyleClass.contains(WARNING_STYLE_CLASS)) {
+                        textFieldStyleClass.add(WARNING_STYLE_CLASS);
+                        messageLabelStyleClass.add("text-warning");
+                    }
+                } else {
+                    if (!textFieldStyleClass.contains(INFO_STYLE_CLASS)) {
+                        textFieldStyleClass.add(INFO_STYLE_CLASS);
+                        messageLabelStyleClass.add("text-info");
+                    }
                 }
+                messageLabel.setText(this.invalidMessage);
+                messageLabel.setVisible(true);
+                messageLabel.setManaged(true);
             }
-            messageLabel.setText(this.invalidMessage);
-            messageLabel.setVisible(true);
-            messageLabel.setManaged(true);
-        }
+        });
     }
     
     private Label initializeMessageLabel(MFXTextField textField) {

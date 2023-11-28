@@ -36,19 +36,14 @@ public abstract class LoginModel {
         Task<DBUsers.UserListData> task = new Task<>() {
             @Override
             protected DBUsers.UserListData call() {
-                return DBUsers.get(
+                DBUsers.UserListData users = DBUsers.get(
                     DBUsers.Column.EMAIL,
                     email
                 );
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
-            try {
-                DBUsers.UserListData users = task.get();
+                
                 if (users.size() != 1) {
                     validProperty.set(false);
-                    return;
+                    return null;
                 }
                 
                 DBUsers.UserData userData = users.getFirst();
@@ -57,31 +52,40 @@ public abstract class LoginModel {
                     userData.getPassword()
                 );
                 
-                if (isCorrectPassword) {
-                    if (userData.isDisabled() && !userData.isOwner()) {
-                        PopupService.messageDialog.setup(
-                            "Disabled Account",
-                            "Your account has been disabled by the owner.",
-                            "Close"
-                        ).show();
-                        return;
+                Platform.runLater(() -> {
+                    if (isCorrectPassword) {
+                        if (userData.isDisabled() && !userData.isOwner()) {
+                            PopupService.messageDialog.setup(
+                                "Disabled Account",
+                                "Your account has been disabled by the owner.",
+                                "Close"
+                            ).show();
+                            return;
+                        }
+                        
+                        int id = userData.getID();
+                        
+                        UserSessionModel.currentUser.set(
+                            UserManagerModel.loadAndGetUser(id)
+                        );
+                        
+                        Integer roleID = userData.getRoleID();
+                        if (roleID != null) {
+                            UserSessionModel.currentUserRole.set(
+                                UserManagerModel.loadAndGetRole(roleID)
+                            );
+                        }
+                        
+                        SceneManager.setScene("base");
+                        validProperty.set(true);
+                    } else {
+                        validProperty.set(false);
                     }
-                    
-                    SceneManager.setScene("base");
-                    validProperty.set(true);
-                    
-                    int id = userData.getID();
-                    
-                    UserSessionModel.currentUser.set(
-                        UserManagerModel.loadAndGetUser(id)
-                    );
-                } else {
-                    validProperty.set(false);
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                });
+                
+                return null;
             }
-        });
+        };
         
         task.setOnFailed(e -> {
             System.out.println(e);
