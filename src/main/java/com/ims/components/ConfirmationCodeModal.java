@@ -17,7 +17,7 @@ public class ConfirmationCodeModal extends Modal {
     public final MFXButton resendCodeButton = new MFXButton("Resend Code");
     public final MFXTextField codeTextField = new MFXTextField();
     public final TextFieldValidator codeTextFieldValidator;
-    private String correctCode;
+    private String correctCode = null;
     private Utils.Callable<Void> listener = null;
     
     public ConfirmationCodeModal() {
@@ -54,6 +54,8 @@ public class ConfirmationCodeModal extends Modal {
         });
         
         this.setOnHidden((e) -> {
+            correctCode = null;
+            codeTextField.setText("");
             codeTextFieldValidator.reset();
         });
         
