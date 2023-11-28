@@ -311,27 +311,17 @@ public class BaseController {
             String name = addProductModal.nameTextField.getText();
             CategoryObject category = addProductModal.categoryComboBox.getValue();
             
-            ProductObject addedProductObject = BaseModel.addProduct(
+            BaseModel.addProduct(
                 name,
                 category.getID()
-            );
-            
-            ProductModel.currentProduct.set(addedProductObject);
-            SceneManager.setScene("product");
-            
-            addProductModal.hide();
+            ).onSucceeded(addedProductObject -> {
+                ProductModel.currentProduct.set(addedProductObject);
+                SceneManager.setScene("product");
+                
+                addProductModal.hide();
+            }).execute();
             
             return null;
-        });
-        
-        UserSessionModel.currentUser.addListener(e -> {
-            if (UserSessionModel.currentUserIsAllowAddProduct()) {
-                addProductButton.setVisible(true);
-                addProductButton.setManaged(true);
-            } else {
-                addProductButton.setVisible(false);
-                addProductButton.setManaged(false);
-            }
         });
         
         searchProductTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
@@ -509,16 +499,6 @@ public class BaseController {
             return null;
         });
         
-        UserSessionModel.currentUser.addListener(e -> {
-            if (UserSessionModel.currentUserIsAllowAddCategory()) {
-                addCategoryButton.setVisible(true);
-                addCategoryButton.setManaged(true);
-            } else {
-                addCategoryButton.setVisible(false);
-                addCategoryButton.setManaged(false);
-            }
-        });
-        
         searchCategoryTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             BaseModel.searchCategories(searchCategoryTextField.getText());
@@ -686,14 +666,33 @@ public class BaseController {
             SceneManager.setScene("user-manager");
         });
         
-        UserSessionModel.currentUser.addListener(e -> {
-            if (UserSessionModel.currentUserIsOwner()) {
-                managerUsersButton.setVisible(true);
-                managerUsersButton.setManaged(true);
-            } else {
-                managerUsersButton.setVisible(false);
-                managerUsersButton.setManaged(false);
-            }
+        // update permission stuff
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
+            Platform.runLater(() -> {
+                if (UserSessionModel.currentUserIsOwner()) {
+                    managerUsersButton.setVisible(true);
+                    managerUsersButton.setManaged(true);
+                } else {
+                    managerUsersButton.setVisible(false);
+                    managerUsersButton.setManaged(false);
+                }
+                
+                if (UserSessionModel.currentUserIsAllowAddCategory()) {
+                    addCategoryButton.setVisible(true);
+                    addCategoryButton.setManaged(true);
+                } else {
+                    addCategoryButton.setVisible(false);
+                    addCategoryButton.setManaged(false);
+                }
+                
+                if (UserSessionModel.currentUserIsAllowAddProduct()) {
+                    addProductButton.setVisible(true);
+                    addProductButton.setManaged(true);
+                } else {
+                    addProductButton.setVisible(false);
+                    addProductButton.setManaged(false);
+                }
+            });
         });
     }
 }

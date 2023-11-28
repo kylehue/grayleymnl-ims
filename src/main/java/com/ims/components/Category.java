@@ -91,17 +91,11 @@ public class Category extends GridPane {
         
         nameTextField.delegateFocusedProperty().addListener((e) -> {
             if (nameTextField.delegateIsFocused()) return;
-            if (!this.nameTextFieldValidator.isValid()) {
+            if (!this.nameTextFieldValidator.isValidSync()) {
                 return;
             }
             
             BaseModel.updateCategory(categoryObject.getID(), this.getName());
-            
-            // PopupService.messageDialog.setup(
-            //     "Update Category",
-            //     "Category has been successfully updated.",
-            //     "Got it!"
-            // ).show();
         });
     }
     
@@ -113,26 +107,27 @@ public class Category extends GridPane {
             this.setName(this.nameProperty().get());
         });
         
-        SceneManager.onChangeScene((currentScene, oldScene) -> {
-            if (!currentScene.equals("base")) return;
-            this.setCategoryObject(this.categoryObject);
-        });
-        
         updateEditPermissions(UserSessionModel.currentUserIsAllowEditCategory());
         updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteCategory());
-        UserSessionModel.currentUser.addListener(e -> {
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
             updateEditPermissions(UserSessionModel.currentUserIsAllowEditCategory());
             updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteCategory());
+            if (!currentScene.equals("base")) return;
+            this.setCategoryObject(this.categoryObject);
         });
     }
     
     private void updateEditPermissions(boolean isAllowed) {
-        nameTextField.setDisable(!isAllowed);
+        Platform.runLater(() -> {
+            nameTextField.setDisable(!isAllowed);
+        });
     }
     
     private void updateDeletePermissions(boolean isAllowed) {
-        deleteButton.setVisible(isAllowed);
-        deleteButton.setManaged(isAllowed);
+        Platform.runLater(() -> {
+            deleteButton.setVisible(isAllowed);
+            deleteButton.setManaged(isAllowed);
+        });
     }
     
     public StringProperty nameProperty() {

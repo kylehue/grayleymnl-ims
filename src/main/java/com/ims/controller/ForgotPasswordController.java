@@ -88,25 +88,24 @@ public class ForgotPasswordController {
     }
     
     private void tryProceed() {
-        if (!emailTextFieldValidator.isValid()) return;
-        String email = emailTextField.getText();
-        
-        String confirmationCode = Utils.generateRandomCode(6);
-        
-        sendCode(email, confirmationCode);
-        confirmationCodeModal.show();
-        confirmationCodeModal.setCorrectCode(confirmationCode);
-        
-        confirmationCodeModal.resendCodeButton.setOnMouseClicked(ev -> {
-            sendCode(email, confirmationCode);
-        });
-        
-        confirmationCodeModal.setOnAction(() -> {
-            confirmationCodeModal.hide();
+        TextFieldValidator.validateAll(emailTextFieldValidator).onSucceeded(isValid -> {
+            if (!isValid) return;
+            String email = emailTextField.getText();
             
-            Task<Void> task = new Task<>() {
-                @Override
-                protected Void call() {
+            String confirmationCode = Utils.generateRandomCode(6);
+            
+            sendCode(email, confirmationCode);
+            confirmationCodeModal.show();
+            confirmationCodeModal.setCorrectCode(confirmationCode);
+            
+            confirmationCodeModal.resendCodeButton.setOnMouseClicked(ev -> {
+                sendCode(email, confirmationCode);
+            });
+            
+            confirmationCodeModal.setOnAction(() -> {
+                confirmationCodeModal.hide();
+                
+                new AsyncCaller<Void>(task -> {
                     DBUsers.UserData userData = DBUsers.getOne(
                         DBUsers.Column.EMAIL,
                         email
@@ -126,27 +125,17 @@ public class ForgotPasswordController {
                     
                     sendNewPassword(email, newPassword);
                     return null;
-                }
-            };
-            
-            task.setOnSucceeded(event -> {
-                PopupService.messageDialog.setup(
-                    "Account Recovery",
-                    "Your account has been successfully recovered. Your temporary password has been sent to your email. Please use it to log in and update your password.",
-                    "Got it!"
-                ).show();
+                }, Utils.executor).onSucceeded((e) -> {
+                    PopupService.messageDialog.setup(
+                        "Account Recovery",
+                        "Your account has been successfully recovered. Your temporary password has been sent to your email. Please use it to log in and update your password.",
+                        "Got it!"
+                    ).show();
+                }).execute();
+                
+                return null;
             });
-            
-            task.setOnFailed(err -> {
-                System.out.println(err);
-            });
-            
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            executor.submit(task);
-            executor.shutdown();
-            
-            return null;
-        });
+        }).execute();
     }
     
     private void sendCode(String email, String code) {

@@ -2,6 +2,7 @@ package com.ims.model;
 
 import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
+import com.ims.utils.AsyncCaller;
 import com.ims.utils.SceneManager;
 import com.ims.utils.Utils;
 import javafx.beans.property.SimpleStringProperty;
@@ -12,8 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class RegisterModel {
-    public static ExecutorService executor = Executors.newFixedThreadPool(2);
-    
     public static StringProperty emailProperty = new SimpleStringProperty("");
     public static StringProperty passwordProperty = new SimpleStringProperty("");
     public static StringProperty confirmPasswordProperty = new SimpleStringProperty("");
@@ -24,48 +23,25 @@ public abstract class RegisterModel {
         
         if (email.isEmpty() || password.isEmpty()) return;
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                DBUsers.add(email, Utils.hashPassword(password));
-                return null;
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
+        new AsyncCaller<Void>(task -> {
+            DBUsers.add(email, Utils.hashPassword(password));
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             LoginModel.emailProperty.set(email);
             LoginModel.passwordProperty.set(password);
             SceneManager.setScene("login");
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
-    public static boolean emailExists(String email) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() throws Exception {
-                return !DBUsers.get(DBUsers.Column.EMAIL, email).isEmpty();
-            }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
-        
-        boolean emailExists = false;
-        try {
-            emailExists = task.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return emailExists;
+    public static AsyncCaller<Boolean> emailExists(String email) {
+        return new AsyncCaller<>(task -> {
+            return !DBUsers.get(DBUsers.Column.EMAIL, email).isEmpty();
+        }, Utils.executor);
+    }
+    
+    public static AsyncCaller<Boolean> emailNotExists(String email) {
+        return new AsyncCaller<>(task -> {
+            return DBUsers.get(DBUsers.Column.EMAIL, email).isEmpty();
+        }, Utils.executor);
     }
 }

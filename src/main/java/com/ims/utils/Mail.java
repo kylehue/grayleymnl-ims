@@ -40,32 +40,19 @@ public abstract class Mail {
     }
     
     public static void send(String to, String subject, String msg) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(
-                    Env.get().getProperty("mail.email")
-                ));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-                message.setSubject(subject);
-                message.setText(msg);
-                
-                Transport.send(message);
-                return null;
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
+        new AsyncCaller<Void>(task -> {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(
+                Env.get().getProperty("mail.email")
+            ));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject(subject);
+            message.setText(msg);
+            
+            Transport.send(message);
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             System.out.println("Email sent successfully!");
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(task);
-        executor.shutdown();
+        }).execute();
     }
 }

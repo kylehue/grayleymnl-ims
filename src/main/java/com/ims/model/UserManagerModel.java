@@ -5,12 +5,12 @@ import com.ims.database.DBRoles;
 import com.ims.database.DBUsers;
 import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
+import com.ims.utils.AsyncCaller;
 import com.ims.utils.Utils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
-import javafx.concurrent.Task;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -18,8 +18,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class UserManagerModel {
-    public static ExecutorService executor = Executors.newFixedThreadPool(4);
-    
     //////////////////////////////////////////////////////////////////////
     // ---------------------------- ROLES ----------------------------- //
     //////////////////////////////////////////////////////////////////////
@@ -39,27 +37,17 @@ public abstract class UserManagerModel {
             System.out.println("The user has insufficient permissions.");
             return;
         }
+        
         if (name.isEmpty()) return;
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyRole.set(true);
-                loadRole(DBRoles.add(name), true);
-                
-                return null;
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
+        new AsyncCaller<Void>(task -> {
+            isBusyRole.set(true);
+            loadRole(DBRoles.add(name), true);
+            
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             isBusyRole.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     /**
@@ -82,43 +70,33 @@ public abstract class UserManagerModel {
             System.out.println("The user has insufficient permissions.");
             return;
         }
+        
         if (name != null && name.isEmpty()) return;
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyRole.set(true);
-                
-                DBRoles.RoleData newRole = DBRoles.update(
-                    id,
-                    name,
-                    allowAddCategory,
-                    allowDeleteCategory,
-                    allowEditCategory,
-                    allowAddProduct,
-                    allowDeleteProduct,
-                    allowEditProduct
-                );
-                
-                // Update in list if it exists
-                RoleObject roleObject = roleMap.get(id);
-                if (roleObject != null) {
-                    loadRole(newRole, false);
-                }
-                
-                return null;
+        new AsyncCaller<Void>(task -> {
+            isBusyRole.set(true);
+            
+            DBRoles.RoleData newRole = DBRoles.update(
+                id,
+                name,
+                allowAddCategory,
+                allowDeleteCategory,
+                allowEditCategory,
+                allowAddProduct,
+                allowDeleteProduct,
+                allowEditProduct
+            );
+            
+            // Update in list if it exists
+            RoleObject roleObject = roleMap.get(id);
+            if (roleObject != null) {
+                loadRole(newRole, false);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             isBusyRole.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     /**
@@ -132,108 +110,69 @@ public abstract class UserManagerModel {
             return;
         }
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyRole.set(true);
-                
-                DBRoles.remove(roleID);
-                roleMap.remove(roleID);
-                
-                // Nullify role of users that has the removed role
-                for (int userID : userMap.keySet()) {
-                    UserObject userObject = userMap.get(userID);
-                    if (userObject.getRoleID() == null) continue;
-                    if (userObject.getRoleID() != roleID) continue;
-                    userObject.setRoleID(null);
-                }
-                
-                return null;
+        new AsyncCaller<>(task -> {
+            isBusyRole.set(true);
+            
+            DBRoles.remove(roleID);
+            roleMap.remove(roleID);
+            
+            // Nullify role of users that has the removed role
+            for (int userID : userMap.keySet()) {
+                UserObject userObject = userMap.get(userID);
+                if (userObject.getRoleID() == null) continue;
+                if (userObject.getRoleID() != roleID) continue;
+                userObject.setRoleID(null);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             isBusyRole.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     public static void searchRoles(String searchText) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                roleMap.clear();
-                if (searchText.isEmpty()) {
-                    loadRoles(Config.roleLoadLimit);
-                    return null;
-                }
-                
-                String searchPattern = Utils.textToSearchPattern(searchText);
-                DBRoles.RoleListData result = DBRoles.search(
-                    searchPattern
-                );
-                
-                for (DBRoles.RoleData row : result) {
-                    loadRole(row, false);
-                }
-                
+        new AsyncCaller<>(task -> {
+            roleMap.clear();
+            if (searchText.isEmpty()) {
+                loadRoles(Config.roleLoadLimit);
                 return null;
             }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+            
+            String searchPattern = Utils.textToSearchPattern(searchText);
+            DBRoles.RoleListData result = DBRoles.search(
+                searchPattern
+            );
+            
+            for (DBRoles.RoleData row : result) {
+                loadRole(row, false);
+            }
+            
+            return null;
+        }, Utils.executor).execute();
     }
     
-    public static RoleObject loadAndGetRole(int id) {
-        RoleObject roleObject = roleMap.get(id);
-        if (roleObject != null) {
-            return roleObject;
-        }
-        
-        Task<RoleObject> task = new Task<>() {
-            @Override
-            protected RoleObject call() throws Exception {
-                isBusyRole.set(true);
-                
-                DBRoles.RoleData row = DBRoles.getOne(
-                    DBRoles.Column.ID,
-                    id
-                );
-                
-                if (row != null) {
-                    return loadRole(row, false);
-                }
-                
-                return null;
+    public static AsyncCaller<RoleObject> loadAndGetRole(int id) {
+        return new AsyncCaller<>(task -> {
+            RoleObject roleObject = roleMap.get(id);
+            if (roleObject != null) {
+                return roleObject;
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            
+            isBusyRole.set(true);
+            
+            DBRoles.RoleData row = DBRoles.getOne(
+                DBRoles.Column.ID,
+                id
+            );
+            
+            if (row != null) {
+                return loadRole(row, false);
+            }
+            
             isBusyRole.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
-        
-        try {
-            roleObject = task.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return roleObject;
+            
+            return null;
+        }, Utils.executor);
     }
     
     public static RoleObject loadRoleToMap(
@@ -293,31 +232,20 @@ public abstract class UserManagerModel {
         int limit,
         ObservableMap<Integer, RoleObject> map
     ) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyRole.set(true);
-                DBRoles.RoleListData roleRows = DBRoles.getBulk(
-                    map.keySet(),
-                    limit
-                );
-                
-                for (DBRoles.RoleData row : roleRows) {
-                    loadRoleToMap(row, map, false);
-                }
-                return null;
+        new AsyncCaller<Void>(task -> {
+            isBusyRole.set(true);
+            DBRoles.RoleListData roleRows = DBRoles.getBulk(
+                map.keySet(),
+                limit
+            );
+            
+            for (DBRoles.RoleData row : roleRows) {
+                loadRoleToMap(row, map, false);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             isBusyRole.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     public static void loadRoles(int limit) {
@@ -362,68 +290,48 @@ public abstract class UserManagerModel {
             return;
         }
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyUser.set(true);
-                
-                DBUsers.UserData user = DBUsers.update(
-                    id,
-                    password,
-                    roleID,
-                    isDisabled,
-                    isOwner
-                );
-                
-                // Update in list if it exists
-                UserObject userObject = userMap.get(id);
-                if (userObject != null) {
-                    loadUser(user, false);
-                }
-                
-                return null;
+        new AsyncCaller<Void>(task -> {
+            isBusyUser.set(true);
+            
+            DBUsers.UserData user = DBUsers.update(
+                id,
+                password,
+                roleID,
+                isDisabled,
+                isOwner
+            );
+            
+            // Update in list if it exists
+            UserObject userObject = userMap.get(id);
+            if (userObject != null) {
+                loadUser(user, false);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             isBusyUser.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     public static void searchUsers(String searchText) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                userMap.clear();
-                if (searchText.isEmpty()) {
-                    loadUsers(Config.categoryLoadLimit);
-                    return null;
-                }
-                
-                String searchPattern = Utils.textToSearchPattern(searchText);
-                DBUsers.UserListData result = DBUsers.search(
-                    searchPattern
-                );
-                
-                for (DBUsers.UserData row : result) {
-                    loadUser(row, false);
-                }
-                
+        new AsyncCaller<Void>(task -> {
+            userMap.clear();
+            if (searchText.isEmpty()) {
+                loadUsers(Config.categoryLoadLimit);
                 return null;
             }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+            
+            String searchPattern = Utils.textToSearchPattern(searchText);
+            DBUsers.UserListData result = DBUsers.search(
+                searchPattern
+            );
+            
+            for (DBUsers.UserData row : result) {
+                loadUser(row, false);
+            }
+            
+            return null;
+        }, Utils.executor).execute();
     }
     
     public static UserObject loadUserToMap(
@@ -465,43 +373,24 @@ public abstract class UserManagerModel {
         return userObject;
     }
     
-    public static UserObject loadAndGetUser(int id) {
-        UserObject userObject = userMap.get(id);
-        if (userObject != null) {
-            return userObject;
-        }
-        
-        Task<UserObject> task = new Task<>() {
-            @Override
-            protected UserObject call() {
-                isBusyUser.set(true);
-                
-                DBUsers.UserData userData = DBUsers.getOne(DBUsers.Column.ID, id);
-                if (userData != null) {
-                    return loadUser(userData, false);
-                }
-                
-                return null;
+    public static AsyncCaller<UserObject> loadAndGetUser(int id) {
+        return new AsyncCaller<>(task -> {
+            UserObject userObject = userMap.get(id);
+            if (userObject != null) {
+                return userObject;
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            
+            isBusyUser.set(true);
+            
+            DBUsers.UserData userData = DBUsers.getOne(DBUsers.Column.ID, id);
+            if (userData != null) {
+                return loadUser(userData, false);
+            }
+            
             isBusyUser.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
-        
-        try {
-            userObject = task.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return userObject;
+            
+            return null;
+        }, Utils.executor);
     }
     
     private static UserObject loadUser(DBUsers.UserData user, boolean isNew) {
@@ -514,30 +403,20 @@ public abstract class UserManagerModel {
      * @param limit The limit of the rows to retrieve.
      */
     public static void loadUsers(int limit) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyUser.set(true);
-                DBUsers.UserListData userRows = DBUsers.getBulk(
-                    userMap.keySet(),
-                    limit
-                );
-                
-                for (DBUsers.UserData row : userRows) {
-                    loadUser(row, false);
-                }
-                return null;
+        new AsyncCaller<Void>(task -> {
+            isBusyUser.set(true);
+            DBUsers.UserListData userRows = DBUsers.getBulk(
+                userMap.keySet(),
+                limit
+            );
+            
+            for (DBUsers.UserData row : userRows) {
+                loadUser(row, false);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             isBusyUser.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+            
+        }).execute();
     }
 }

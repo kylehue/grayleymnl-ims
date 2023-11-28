@@ -5,16 +5,14 @@ import com.ims.model.objects.RoleObject;
 import com.ims.model.objects.UserObject;
 import com.ims.utils.AsyncCaller;
 import com.ims.utils.SceneManager;
+import com.ims.utils.Utils;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Task;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class UserSessionModel {
-    public static ExecutorService executor = Executors.newFixedThreadPool(4);
-    
     public static ObjectProperty<UserObject> currentUser =
         new SimpleObjectProperty<>(null);
     public static ObjectProperty<RoleObject> currentUserRole =
@@ -93,31 +91,35 @@ public abstract class UserSessionModel {
     }
     
     public static void updatePassword(
-        String password
+        String unhashedPassword
     ) {
         new AsyncCaller<Void>((task) -> {
+            String hashedPassword = Utils.hashPassword(unhashedPassword);
             DBUsers.update(
                 currentUser.get().getID(),
-                password,
+                hashedPassword,
                 null,
                 null,
                 null
             );
             
+            currentUser.get().setPassword(hashedPassword);
+            
             return null;
-        }).onFailed(System.out::println).execute(executor);
+        }, Utils.executor).execute();
     }
     
     public static void deleteAccount() {
         if (UserSessionModel.currentUserIsOwner()) {
+            System.out.println("Must transfer ownership first before deleting account.");
             return;
         }
         
         new AsyncCaller<Void>((task) -> {
             DBUsers.remove(currentUser.get().getID());
             return null;
-        }).onSucceeded(e -> {
+        }, Utils.executor).onSucceeded(e -> {
             logout();
-        }).onFailed(System.out::println).execute(executor);
+        }).execute();
     }
 }

@@ -4,6 +4,7 @@ import com.ims.Config;
 import com.ims.database.DBCategories;
 import com.ims.model.BaseModel;
 import com.ims.model.objects.CategoryObject;
+import com.ims.utils.AsyncCaller;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.LazyLoader;
 import com.ims.utils.Utils;
@@ -62,36 +63,25 @@ public class CategoryComboBox extends ComboBox<Integer, CategoryObject> {
     
     @Override
     public void search(String searchText) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                model.clear();
-                clear();
-                if (searchText.isEmpty()) {
-                    loadCategories(Config.categoryLoadLimit);
-                    return null;
-                }
-                
-                String searchPattern = Utils.textToSearchPattern(searchText);
-                DBCategories.CategoryListData result = DBCategories.search(
-                    searchPattern
-                );
-                
-                for (DBCategories.CategoryData row : result) {
-                    loadCategory(row);
-                }
-                
+        new AsyncCaller<Void>(task -> {
+            model.clear();
+            clear();
+            if (searchText.isEmpty()) {
+                loadCategories(Config.categoryLoadLimit);
                 return null;
             }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(task);
-        executor.shutdown();
+            
+            String searchPattern = Utils.textToSearchPattern(searchText);
+            DBCategories.CategoryListData result = DBCategories.search(
+                searchPattern
+            );
+            
+            for (DBCategories.CategoryData row : result) {
+                loadCategory(row);
+            }
+            
+            return null;
+        }, Utils.executor).execute();
     }
     
     private void loadCategories(int limit) {

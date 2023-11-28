@@ -16,7 +16,6 @@ import com.ims.utils.TextFieldValidator;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -214,7 +213,7 @@ public class ProductController {
         
         saveAllButton.setOnMouseClicked(e -> {
             if (
-                !productNameTextFieldValidator.isValid() || !productCategoryComboBoxValidator.isValid()
+                !productNameTextFieldValidator.isValidSync() || !productCategoryComboBoxValidator.isValidSync()
             ) {
                 tabGeneralButton.fire();
                 return;
@@ -281,11 +280,8 @@ public class ProductController {
         });
         
         updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
-        UserSessionModel.currentUser.addListener(e -> {
-            updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
-        });
-        
         SceneManager.onChangeScene((currentScene, oldScene) -> {
+            updateDeletePermissions(UserSessionModel.currentUserIsAllowDeleteProduct());
             if (!currentScene.equals("product")) return;
             updateContents(ProductModel.currentProduct.get());
         });
@@ -333,9 +329,11 @@ public class ProductController {
             if (categoryID == null) {
                 productCategoryComboBox.setValue(null);
             } else {
-                productCategoryComboBox.setValue(BaseModel.loadAndGetCategory(
+                BaseModel.loadAndGetCategory(
                     categoryID
-                ));
+                ).onSucceeded(categoryObject -> {
+                    productCategoryComboBox.setValue(categoryObject);
+                }).execute();
             }
             
             String imageURL = currentProduct.getImageURL();

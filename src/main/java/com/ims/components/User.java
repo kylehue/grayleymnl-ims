@@ -142,14 +142,15 @@ public class User extends GridPane {
                 roleLabel.setText("No Role Assigned");
                 return;
             }
-            RoleObject roleObject = UserManagerModel.loadAndGetRole(roleID);
-            if (roleObject == null) return;
-            roleLabel.setText(roleObject.getName());
-            if (oldRoleObject != null) {
-                oldRoleObject.nameProperty().removeListener(roleChangeListener);
-            }
-            roleObject.nameProperty().addListener(roleChangeListener);
-            oldRoleObject = roleObject;
+            UserManagerModel.loadAndGetRole(roleID).onSucceeded(roleObject -> {
+                if (roleObject == null) return;
+                roleLabel.setText(roleObject.getName());
+                if (oldRoleObject != null) {
+                    oldRoleObject.nameProperty().removeListener(roleChangeListener);
+                }
+                roleObject.nameProperty().addListener(roleChangeListener);
+                oldRoleObject = roleObject;
+            });
         });
     }
     

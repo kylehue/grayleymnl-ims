@@ -193,8 +193,8 @@ public class Product extends GridPane {
             this.setPrice(this.priceProperty().get());
         });
         
-        // updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
-        UserSessionModel.currentUser.addListener(e -> {
+        updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
             updateEditPermissions(UserSessionModel.currentUserIsAllowEditProduct());
         });
     }
@@ -279,14 +279,15 @@ public class Product extends GridPane {
                 return;
             }
             
-            CategoryObject categoryObject = BaseModel.loadAndGetCategory(categoryID);
-            if (categoryObject == null) return;
-            categoryLabel.setText(categoryObject.getName());
-            if (oldCategoryObject != null) {
-                oldCategoryObject.nameProperty().removeListener(categoryChangeListener);
-            }
-            categoryObject.nameProperty().addListener(categoryChangeListener);
-            oldCategoryObject = categoryObject;
+            BaseModel.loadAndGetCategory(categoryID).onSucceeded(categoryObject -> {
+                if (categoryObject == null) return;
+                categoryLabel.setText(categoryObject.getName());
+                if (oldCategoryObject != null) {
+                    oldCategoryObject.nameProperty().removeListener(categoryChangeListener);
+                }
+                categoryObject.nameProperty().addListener(categoryChangeListener);
+                oldCategoryObject = categoryObject;
+            }).execute();
         });
     }
     

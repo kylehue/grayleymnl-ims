@@ -13,7 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TextFieldValidator {
     private final String ERROR_STYLE_CLASS = "mfx-text-field-danger";
@@ -53,24 +53,39 @@ public class TextFieldValidator {
         boolean call();
     }
     
-    public Constraint addConstraint(
+    public interface ValidityCheckerAsync {
+        AsyncCaller<Boolean> call();
+    }
+    
+    private Constraint _addConstraint(
         Severity severity,
         String invalidMessage,
         ValidityChecker validityChecker,
+        ValidityCheckerAsync validityCheckerAsync,
         Observable... dependencies
     ) {
-        Constraint constraint = new Constraint(
-            severity,
-            invalidMessage,
-            validityChecker,
-            dependencies
-        );
+        AtomicReference<Constraint> constraint = new AtomicReference<>(null);
+        if (validityChecker != null) {
+            constraint.set(new Constraint(
+                severity,
+                invalidMessage,
+                validityChecker,
+                dependencies
+            ));
+        } else {
+            constraint.set(new Constraint(
+                severity,
+                invalidMessage,
+                validityCheckerAsync,
+                dependencies
+            ));
+        }
         
-        constraints.add(constraint);
-        constraint.validProperty.addListener(($1, $2, isValid) -> {
+        constraints.add(constraint.get());
+        constraint.get().validProperty.addListener(($1, $2, isValid) -> {
             if (!isValid) {
-                this.invalidMessage = constraint.getInvalidMessage();
-                this.severity = constraint.getSeverity();
+                this.invalidMessage = constraint.get().getInvalidMessage();
+                this.severity = constraint.get().getSeverity();
                 this.validProperty.set(false);
             } else {
                 if (this.getInvalidConstraint() == null) {
@@ -79,13 +94,67 @@ public class TextFieldValidator {
             }
         });
         
-        return constraint;
+        return constraint.get();
     }
     
-    public void validate() {
-        for (Constraint constraint : constraints) {
-            constraint.validate();
-        }
+    public Constraint addConstraint(
+        Severity severity,
+        String invalidMessage,
+        ValidityChecker validityChecker,
+        Observable... dependencies
+    ) {
+        return this._addConstraint(
+            severity,
+            invalidMessage,
+            validityChecker,
+            null,
+            dependencies
+        );
+    }
+    
+    public Constraint addConstraint(
+        Severity severity,
+        String invalidMessage,
+        ValidityCheckerAsync validityCheckerAsync,
+        Observable... dependencies
+    ) {
+        return this._addConstraint(
+            severity,
+            invalidMessage,
+            null,
+            validityCheckerAsync,
+            dependencies
+        );
+    }
+    
+    public AsyncCaller<Boolean> validate() {
+        return new AsyncCaller<>(task -> {
+            for (Constraint constraint : constraints) {
+                constraint.validate();
+            }
+            
+            return this.validProperty.get() && this.getInvalidConstraint() == null;
+        }, Utils.executor);
+    }
+    
+    public static AsyncCaller<Boolean> validateAll(TextFieldValidator... validators) {
+        return new AsyncCaller<>(task -> {
+            boolean isValid = true;
+            for (TextFieldValidator validator : validators) {
+                for (Constraint constraint : validator.constraints) {
+                    constraint.validate();
+                }
+                
+                isValid = validator.validProperty.get()
+                    && validator.getInvalidConstraint() == null;
+                
+                if (!isValid) {
+                    break;
+                }
+            }
+            
+            return isValid;
+        }, Utils.executor);
     }
     
     private void resetConstraints() {
@@ -99,7 +168,7 @@ public class TextFieldValidator {
         this.validProperty.set(true);
     }
     
-    public boolean isValid() {
+    public boolean isValidSync() {
         this.validate();
         return this.validProperty.get() && this.getInvalidConstraint() == null;
     }
@@ -190,7 +259,8 @@ public class TextFieldValidator {
         public final BooleanProperty validProperty = new SimpleBooleanProperty(true);
         private final TextFieldValidator.Severity severity;
         private final String invalidMessage;
-        private final ValidityChecker validityChecker;
+        private ValidityChecker validityChecker = null;
+        private ValidityCheckerAsync validityCheckerAsync = null;
         
         public Constraint(
             TextFieldValidator.Severity severity,
@@ -208,9 +278,34 @@ public class TextFieldValidator {
             }
         }
         
-        public boolean validate() {
-            this.validProperty.set(validityChecker.call());
-            return this.validProperty.get();
+        public Constraint(
+            TextFieldValidator.Severity severity,
+            String invalidMessage,
+            ValidityCheckerAsync validityCheckerAsync,
+            Observable... dependencies
+        ) {
+            this.severity = severity;
+            this.invalidMessage = invalidMessage;
+            this.validityCheckerAsync = validityCheckerAsync;
+            for (Observable dep : dependencies) {
+                dep.addListener((e) -> {
+                    this.validate();
+                });
+            }
+        }
+        
+        public void validate() {
+            if (validityChecker != null) {
+                this.validProperty.set(validityChecker.call());
+            } else {
+                try {
+                    this.validProperty.set(
+                        validityCheckerAsync.call().execute().getTask().get()
+                    );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
         
         public String getInvalidMessage() {

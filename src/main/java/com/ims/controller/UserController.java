@@ -1,7 +1,6 @@
 package com.ims.controller;
 
 import com.ims.components.*;
-import com.ims.model.BaseModel;
 import com.ims.model.UserEditModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.UserSessionModel;
@@ -84,11 +83,13 @@ public class UserController {
             ($1, $2, currentUser) -> {
                 emailTextField.setText(currentUser.getEmail());
                 if (currentUser.getRoleID() != null) {
-                    roleComboBox.setValue(
-                        UserManagerModel.loadAndGetRole(
-                            currentUser.getRoleID()
-                        )
-                    );
+                    UserManagerModel.loadAndGetRole(
+                        currentUser.getRoleID()
+                    ).onSucceeded(roleObject -> {
+                        roleComboBox.setValue(
+                            roleObject
+                        );
+                    }).execute();
                 }
                 
                 updateDisableAccountButton(
@@ -160,23 +161,21 @@ public class UserController {
                 "Transfer Ownership",
                 "Transfer",
                 () -> {
-                    UserEditModel.transferOwnershipToCurrentUser();
-                    
-                    Platform.runLater(() -> {
-                        SceneManager.setScene("base");
-                        
-                        // Reset to trigger listeners that restrict regular users
-                        UserObject currentUser = UserSessionModel.currentUser.get();
-                        currentUser.setOwner(false);
-                        UserSessionModel.currentUser.set(null);
-                        UserSessionModel.currentUser.set(currentUser);
-                        
-                        PopupService.messageDialog.setup(
-                            "Transfer Ownership",
-                            "The ownership has been successfully transferred.",
-                            "Got it!"
-                        ).show();
-                    });
+                    UserEditModel.transferOwnershipToCurrentUser()
+                        .onSucceeded($1 -> {
+                            Platform.runLater(() -> {
+                                // Reset to trigger listeners that restrict regular users
+                                UserObject currentUser = UserSessionModel.currentUser.get();
+                                currentUser.setOwner(false);
+                                
+                                SceneManager.setScene("base");
+                                PopupService.messageDialog.setup(
+                                    "Transfer Ownership",
+                                    "The ownership has been successfully transferred.",
+                                    "Got it!"
+                                ).show();
+                            });
+                        }).execute();
                 }
             ).show();
         });

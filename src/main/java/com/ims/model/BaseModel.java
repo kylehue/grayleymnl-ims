@@ -6,6 +6,7 @@ import com.ims.database.DBHistory;
 import com.ims.database.DBProducts;
 import com.ims.model.objects.CategoryObject;
 import com.ims.model.objects.ProductObject;
+import com.ims.utils.AsyncCaller;
 import com.ims.utils.Utils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -20,8 +21,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class BaseModel {
-    public static ExecutorService executor = Executors.newFixedThreadPool(4);
-    
     //////////////////////////////////////////////////////////////////////
     // ----------------------- DASHBOARD PAGE ------------------------- //
     //////////////////////////////////////////////////////////////////////
@@ -35,26 +34,17 @@ public abstract class BaseModel {
         isBusyHistory = new SimpleBooleanProperty(false);
     
     public static void updateProductStats() {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                int totalProducts = DBProducts.getTotalProductsCount();
-                int lowStockProducts = DBProducts.getLowStockProductsCount();
-                int outOfStockProducts = DBProducts.getOutOfStockProductsCount();
-                
-                totalProductsCount.set(totalProducts);
-                lowStockProductsCount.set(lowStockProducts);
-                outOfStockProductsCount.set(outOfStockProducts);
-                
-                return null;
-            }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        new AsyncCaller<Void>(task -> {
+            int totalProducts = DBProducts.getTotalProductsCount();
+            int lowStockProducts = DBProducts.getLowStockProductsCount();
+            int outOfStockProducts = DBProducts.getOutOfStockProductsCount();
+            
+            totalProductsCount.set(totalProducts);
+            lowStockProductsCount.set(lowStockProducts);
+            outOfStockProductsCount.set(outOfStockProducts);
+            
+            return null;
+        }, Utils.executor).execute();
     }
     
     /**
@@ -63,31 +53,20 @@ public abstract class BaseModel {
      * @param limit The limit of the rows to retrieve.
      */
     public static void loadHistory(int limit) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                isBusyHistory.set(true);
-                DBHistory.HistoryListData productRows = DBHistory.getBulk(
-                    historyMap.keySet(),
-                    limit
-                );
-                
-                for (DBHistory.HistoryData historyData : productRows) {
-                    historyMap.put(historyData.getID(), historyData);
-                }
-                return null;
+        new AsyncCaller<Void>(task -> {
+            isBusyHistory.set(true);
+            DBHistory.HistoryListData productRows = DBHistory.getBulk(
+                historyMap.keySet(),
+                limit
+            );
+            
+            for (DBHistory.HistoryData historyData : productRows) {
+                historyMap.put(historyData.getID(), historyData);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            return null;
+        }, Utils.executor).onSucceeded(e -> {
             isBusyHistory.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     public static void refreshHistory() {
@@ -112,71 +91,51 @@ public abstract class BaseModel {
      *
      * @param name The name of the product to add.
      */
-    public static ProductObject addProduct(
+    public static AsyncCaller<ProductObject> addProduct(
         String name,
         Integer categoryID
     ) {
-        if (name.isEmpty()) return null;
-        if (!UserSessionModel.currentUserIsAllowAddProduct()) {
-            System.out.println("The user has insufficient permissions.");
-            return null;
-        }
-        
-        Task<ProductObject> task = new Task<>() {
-            @Override
-            protected ProductObject call() throws Exception {
-                isBusyProduct.set(true);
-                // First, we have to make sure the category exists in the database
-                DBCategories.CategoryData retrievedCategory =
-                    DBCategories.getOne(DBCategories.Column.ID, categoryID);
-                if (retrievedCategory == null) {
-                    System.out.println(
-                        "Category with the id of %s doesn't exist.".formatted(
-                            categoryID
-                        )
-                    );
-                    return null;
-                }
-                
-                DBHistory.add(
-                    DBHistory.Action.ADD_PRODUCT,
-                    name,
-                    UserSessionModel.getCurrentUserID()
-                );
-                
-                return loadProduct(
-                    DBProducts.add(
-                        name,
-                        categoryID,
-                        null,
-                        0,
-                        0
-                    ),
-                    true
-                );
+        return new AsyncCaller<ProductObject>(task -> {
+            if (name.isEmpty()) return null;
+            if (!UserSessionModel.currentUserIsAllowAddProduct()) {
+                System.out.println("The user has insufficient permissions.");
+                return null;
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            
+            isBusyProduct.set(true);
+            // First, we have to make sure the category exists in the database
+            DBCategories.CategoryData retrievedCategory =
+                DBCategories.getOne(DBCategories.Column.ID, categoryID);
+            if (retrievedCategory == null) {
+                System.out.println(
+                    "Category with the id of %s doesn't exist.".formatted(
+                        categoryID
+                    )
+                );
+                return null;
+            }
+            
+            DBHistory.add(
+                DBHistory.Action.ADD_PRODUCT,
+                name,
+                UserSessionModel.getCurrentUserID()
+            );
+            
+            return loadProduct(
+                DBProducts.add(
+                    name,
+                    categoryID,
+                    null,
+                    0,
+                    0
+                ),
+                true
+            );
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyProduct.set(false);
             updateProductStats();
             refreshHistory();
         });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
-        
-        ProductObject productObject = null;
-        try {
-            productObject = task.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return productObject;
     }
     
     /**
@@ -199,45 +158,34 @@ public abstract class BaseModel {
             return;
         }
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyProduct.set(true);
-                
-                loadProduct(
-                    DBProducts.update(
-                        id,
-                        name,
-                        price,
-                        categoryID,
-                        imageURL,
-                        currentStocks,
-                        expectedStocks
-                    ),
-                    false
-                );
-                
-                DBHistory.add(
-                    DBHistory.Action.EDIT_PRODUCT,
+        new AsyncCaller<Void>(task -> {
+            isBusyProduct.set(true);
+            
+            loadProduct(
+                DBProducts.update(
+                    id,
                     name,
-                    UserSessionModel.getCurrentUserID()
-                );
-                
-                return null;
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
+                    price,
+                    categoryID,
+                    imageURL,
+                    currentStocks,
+                    expectedStocks
+                ),
+                false
+            );
+            
+            DBHistory.add(
+                DBHistory.Action.EDIT_PRODUCT,
+                name,
+                UserSessionModel.getCurrentUserID()
+            );
+            
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyProduct.set(false);
             updateProductStats();
             refreshHistory();
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     /**
@@ -251,69 +199,50 @@ public abstract class BaseModel {
             return;
         }
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyProduct.set(true);
-                
-                DBProducts.remove(id);
-                
-                ProductObject productObject = productMap.get(id);
-                
-                DBHistory.add(
-                    DBHistory.Action.REMOVE_PRODUCT,
-                    productObject == null ? "" : productObject.getName(),
-                    UserSessionModel.getCurrentUserID()
-                );
-                
-                productMap.remove(id);
-                
-                return null;
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
+        new AsyncCaller<Void>(task -> {
+            isBusyProduct.set(true);
+            
+            DBProducts.remove(id);
+            
+            ProductObject productObject = productMap.get(id);
+            
+            DBHistory.add(
+                DBHistory.Action.REMOVE_PRODUCT,
+                productObject == null ? "" : productObject.getName(),
+                UserSessionModel.getCurrentUserID()
+            );
+            
+            productMap.remove(id);
+            
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyProduct.set(false);
             updateProductStats();
             refreshHistory();
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+            
+        }).execute();
     }
     
     public static void searchProducts(String searchText, String... categories) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                productMap.clear();
-                if (searchText.isEmpty() && categories.length == 0) {
-                    loadProducts(Config.productLoadLimit);
-                    return null;
-                }
-                
-                String searchPattern = Utils.textToSearchPattern(searchText);
-                DBProducts.ProductListData result = DBProducts.search(
-                    searchPattern,
-                    categories
-                );
-                
-                for (DBProducts.ProductData row : result) {
-                    loadProduct(row, false);
-                }
-                
+        new AsyncCaller<Void>(task -> {
+            productMap.clear();
+            if (searchText.isEmpty() && categories.length == 0) {
+                loadProducts(Config.productLoadLimit);
                 return null;
             }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+            
+            String searchPattern = Utils.textToSearchPattern(searchText);
+            DBProducts.ProductListData result = DBProducts.search(
+                searchPattern,
+                categories
+            );
+            
+            for (DBProducts.ProductData row : result) {
+                loadProduct(row, false);
+            }
+            
+            return null;
+        }, Utils.executor).execute();
     }
     
     private static ProductObject loadProduct(
@@ -362,31 +291,20 @@ public abstract class BaseModel {
      * @param limit The limit of the rows to retrieve.
      */
     public static void loadProducts(int limit) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                isBusyProduct.set(true);
-                DBProducts.ProductListData productRows = DBProducts.getBulk(
-                    productMap.keySet(),
-                    limit
-                );
-                
-                for (DBProducts.ProductData row : productRows) {
-                    loadProduct(row, false);
-                }
-                return null;
+        new AsyncCaller<Void>(task -> {
+            isBusyProduct.set(true);
+            DBProducts.ProductListData productRows = DBProducts.getBulk(
+                productMap.keySet(),
+                limit
+            );
+            
+            for (DBProducts.ProductData row : productRows) {
+                loadProduct(row, false);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyProduct.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -410,32 +328,21 @@ public abstract class BaseModel {
         }
         if (name.isEmpty()) return;
         
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyCategory.set(true);
-                loadCategory(DBCategories.add(name), true);
-                
-                DBHistory.add(
-                    DBHistory.Action.ADD_CATEGORY,
-                    name,
-                    UserSessionModel.getCurrentUserID()
-                );
-                
-                return null;
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
+        new AsyncCaller<Void>(task -> {
+            isBusyCategory.set(true);
+            loadCategory(DBCategories.add(name), true);
+            
+            DBHistory.add(
+                DBHistory.Action.ADD_CATEGORY,
+                name,
+                UserSessionModel.getCurrentUserID()
+            );
+            
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
             refreshHistory();
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     /**
@@ -450,34 +357,23 @@ public abstract class BaseModel {
             return;
         }
         if (name.isEmpty()) return;
-        
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyCategory.set(true);
-                
-                loadCategory(DBCategories.update(id, name), false);
-                
-                DBHistory.add(
-                    DBHistory.Action.EDIT_CATEGORY,
-                    name,
-                    UserSessionModel.getCurrentUserID()
-                );
-                
-                return null;
-            }
-        };
-        
-        task.setOnSucceeded(e -> {
+        new AsyncCaller<Void>(task -> {
+            isBusyCategory.set(true);
+            
+            loadCategory(DBCategories.update(id, name), false);
+            
+            DBHistory.add(
+                DBHistory.Action.EDIT_CATEGORY,
+                name,
+                UserSessionModel.getCurrentUserID()
+            );
+            
+            return null;
+            
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
             refreshHistory();
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
     /**
@@ -490,113 +386,75 @@ public abstract class BaseModel {
             System.out.println("The user has insufficient permissions.");
             return;
         }
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyCategory.set(true);
-                
-                DBCategories.remove(categoryID);
-                categoryMap.remove(categoryID);
-                
-                CategoryObject categoryObject = categoryMap.get(categoryID);
-                
-                DBHistory.add(
-                    DBHistory.Action.REMOVE_CATEGORY,
-                    categoryObject == null ? "" : categoryObject.getName(),
-                    UserSessionModel.getCurrentUserID()
-                );
-                
-                // Nullify category of products that has the removed category
-                for (int productID : productMap.keySet()) {
-                    ProductObject productObject = productMap.get(productID);
-                    if (productObject.getCategoryID() == null) continue;
-                    if (productObject.getCategoryID() != categoryID) continue;
-                    productObject.setCategoryID(null);
-                }
-                
-                return null;
-            }
-        };
         
-        task.setOnSucceeded(e -> {
+        new AsyncCaller<Void>(task -> {
+            isBusyCategory.set(true);
+            
+            DBCategories.remove(categoryID);
+            categoryMap.remove(categoryID);
+            
+            CategoryObject categoryObject = categoryMap.get(categoryID);
+            
+            DBHistory.add(
+                DBHistory.Action.REMOVE_CATEGORY,
+                categoryObject == null ? "" : categoryObject.getName(),
+                UserSessionModel.getCurrentUserID()
+            );
+            
+            // Nullify category of products that has the removed category
+            for (int productID : productMap.keySet()) {
+                ProductObject productObject = productMap.get(productID);
+                if (productObject.getCategoryID() == null) continue;
+                if (productObject.getCategoryID() != categoryID) continue;
+                productObject.setCategoryID(null);
+            }
+            
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
             refreshHistory();
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
     
-    public static CategoryObject loadAndGetCategory(int id) {
-        CategoryObject categoryObject = categoryMap.get(id);
-        if (categoryObject != null) {
-            return categoryObject;
-        }
-        
-        Task<CategoryObject> task = new Task<>() {
-            @Override
-            protected CategoryObject call() {
-                isBusyCategory.set(true);
-                
-                DBCategories.CategoryData row = DBCategories.getOne(DBCategories.Column.ID, id);
-                if (row != null) {
-                    return loadCategory(row, false);
-                }
-                
-                return null;
+    public static AsyncCaller<CategoryObject> loadAndGetCategory(int id) {
+        return new AsyncCaller<CategoryObject>(task -> {
+            CategoryObject categoryObject = categoryMap.get(id);
+            if (categoryObject != null) {
+                return categoryObject;
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            
+            isBusyCategory.set(true);
+            
+            DBCategories.CategoryData row = DBCategories.getOne(DBCategories.Column.ID, id);
+            if (row != null) {
+                return loadCategory(row, false);
+            }
+            
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
         });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
-        
-        try {
-            categoryObject = task.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return categoryObject;
     }
     
     public static void searchCategories(String searchText) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                categoryMap.clear();
-                if (searchText.isEmpty()) {
-                    loadCategories(Config.categoryLoadLimit);
-                    return null;
-                }
-                
-                String searchPattern = Utils.textToSearchPattern(searchText);
-                DBCategories.CategoryListData result = DBCategories.search(
-                    searchPattern
-                );
-                
-                for (DBCategories.CategoryData row : result) {
-                    loadCategory(row, false);
-                }
-                
+        new AsyncCaller<Void>(task -> {
+            categoryMap.clear();
+            if (searchText.isEmpty()) {
+                loadCategories(Config.categoryLoadLimit);
                 return null;
             }
-        };
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+            
+            String searchPattern = Utils.textToSearchPattern(searchText);
+            DBCategories.CategoryListData result = DBCategories.search(
+                searchPattern
+            );
+            
+            for (DBCategories.CategoryData row : result) {
+                loadCategory(row, false);
+            }
+            
+            return null;
+        }, Utils.executor).execute();
     }
     
     private static CategoryObject loadCategory(
@@ -645,30 +503,19 @@ public abstract class BaseModel {
         int limit,
         ObservableMap<Integer, CategoryObject> map
     ) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                isBusyCategory.set(true);
-                DBCategories.CategoryListData categoryRows = DBCategories.getBulk(
-                    map.keySet(),
-                    limit
-                );
-                
-                for (DBCategories.CategoryData row : categoryRows) {
-                    loadCategoryToMap(row, map, false);
-                }
-                return null;
+        new AsyncCaller<Void>(task -> {
+            isBusyCategory.set(true);
+            DBCategories.CategoryListData categoryRows = DBCategories.getBulk(
+                map.keySet(),
+                limit
+            );
+            
+            for (DBCategories.CategoryData row : categoryRows) {
+                loadCategoryToMap(row, map, false);
             }
-        };
-        
-        task.setOnSucceeded(e -> {
+            return null;
+        }, Utils.executor).onSucceeded((e) -> {
             isBusyCategory.set(false);
-        });
-        
-        task.setOnFailed(e -> {
-            System.out.println(e);
-        });
-        
-        executor.submit(task);
+        }).execute();
     }
 }

@@ -96,8 +96,8 @@ public class ProductAddModal extends Modal {
     }
     
     private boolean isValid() {
-        boolean nameIsValid = nameTextFieldValidator.isValid();
-        boolean categoryIsValid = categoryComboBoxValidator.isValid();
+        boolean nameIsValid = nameTextFieldValidator.isValidSync();
+        boolean categoryIsValid = categoryComboBoxValidator.isValidSync();
         return nameIsValid && categoryIsValid;
     }
     

@@ -223,8 +223,8 @@ public abstract class PopupService {
         }
         
         private boolean isValid() {
-            boolean emailIsValid = emailTextFieldValidator.isValid();
-            boolean passwordIsValid = passwordFieldValidator.isValid();
+            boolean emailIsValid = emailTextFieldValidator.isValidSync();
+            boolean passwordIsValid = passwordFieldValidator.isValidSync();
             return emailIsValid && passwordIsValid;
         }
         

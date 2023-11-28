@@ -8,6 +8,7 @@ import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
@@ -120,46 +121,49 @@ public class AccountSettingsController {
         );
         
         updatePasswordButton.setOnMouseClicked(e -> {
-            if (!oldPasswordFieldValidator.isValid() ||
-                !newPasswordFieldValidator.isValid() ||
-                !confirmNewPasswordTextFieldValidator.isValid()) {
-                return;
-            }
-            
-            PopupService.confirmDialog.setup(
-                "Update Password",
-                "Are you sure you want to update your password?",
-                "Update",
-                false,
-                () -> {
-                    if (!oldPasswordFieldValidator.isValid() ||
-                        !newPasswordFieldValidator.isValid() ||
-                        !confirmNewPasswordTextFieldValidator.isValid()) {
-                        return;
+            TextFieldValidator.validateAll(
+                oldPasswordFieldValidator,
+                newPasswordFieldValidator,
+                confirmNewPasswordTextFieldValidator
+            ).onSucceeded(isValid -> {
+                if (!isValid) return;
+                oldPasswordField.setDisable(true);
+                newPasswordField.setDisable(true);
+                confirmNewPasswordField.setDisable(true);
+                PopupService.confirmDialog.setup(
+                    "Update Password",
+                    "Are you sure you want to update your password?",
+                    "Update",
+                    false,
+                    () -> {
+                        String password = confirmNewPasswordField.getText();
+                        UserSessionModel.updatePassword(password);
+                        
+                        oldPasswordField.setText("");
+                        newPasswordField.setText("");
+                        confirmNewPasswordField.setText("");
+                        
+                        oldPasswordFieldValidator.reset();
+                        newPasswordFieldValidator.reset();
+                        confirmNewPasswordTextFieldValidator.reset();
+                        
+                        PopupService.confirmDialog.hide();
+                        
+                        PopupService.messageDialog.setup(
+                            "Update Password",
+                            "Your password has been updated.",
+                            "Got it!"
+                        ).show();
                     }
-                    
-                    String password = confirmNewPasswordField.getText();
-                    UserSessionModel.updatePassword(
-                        Utils.hashPassword(password)
-                    );
-                    
-                    oldPasswordField.setText("");
-                    newPasswordField.setText("");
-                    confirmNewPasswordField.setText("");
-                    
-                    oldPasswordFieldValidator.reset();
-                    newPasswordFieldValidator.reset();
-                    confirmNewPasswordTextFieldValidator.reset();
-                    
-                    PopupService.confirmDialog.hide();
-                    
-                    PopupService.messageDialog.setup(
-                        "Update Password",
-                        "Your password has been updated.",
-                        "Got it!"
-                    ).show();
-                }
-            ).show();
+                ).show();
+            }).execute();
+        });
+        
+        PopupService.confirmDialog.showingProperty().addListener(e -> {
+            if (PopupService.confirmDialog.isShowing()) return;
+            oldPasswordField.setDisable(false);
+            newPasswordField.setDisable(false);
+            confirmNewPasswordField.setDisable(false);
         });
         
         deleteAccountButton.setOnMouseClicked(e -> {
@@ -180,12 +184,18 @@ public class AccountSettingsController {
             ).show();
         });
         
-        UserSessionModel.currentUser.addListener(e -> {
-            if (UserSessionModel.currentUserIsOwner()) {
-                deleteAccountButton.setDisable(true);
-            } else {
-                deleteAccountButton.setDisable(false);
-            }
+        SceneManager.onChangeScene((currentScene, oldScene) -> {
+            Platform.runLater(() -> {
+                deleteAccountButton.setDisable(UserSessionModel.currentUserIsOwner());
+                
+                oldPasswordField.setText("");
+                newPasswordField.setText("");
+                confirmNewPasswordField.setText("");
+                
+                oldPasswordFieldValidator.reset();
+                newPasswordFieldValidator.reset();
+                confirmNewPasswordTextFieldValidator.reset();
+            });
         });
     }
     

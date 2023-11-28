@@ -2,7 +2,6 @@ package com.ims.components;
 
 import com.ims.database.DBHistory;
 import com.ims.model.UserManagerModel;
-import com.ims.model.objects.UserObject;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.Transition;
 import com.ims.utils.Utils;
@@ -14,9 +13,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
 
 import java.sql.Timestamp;
@@ -67,13 +64,14 @@ public class HistoryItem extends GridPane {
         userIDProperty().addListener(e -> {
             Platform.runLater(() -> {
                 Integer userID = userIDProperty().get();
-                UserObject user = userID == null ? null :
-                    UserManagerModel.loadAndGetUser(userID);
-                
-                if (user != null) {
-                    userLabel.setText(user.getEmail().split("@")[0]);
-                } else {
-                    userLabel.setText("Unknown user");
+                if (userID != null) {
+                    UserManagerModel.loadAndGetUser(userID).onSucceeded(userObject -> {
+                        if (userObject != null) {
+                            userLabel.setText(userObject.getEmail().split("@")[0]);
+                        } else {
+                            userLabel.setText("Unknown user");
+                        }
+                    }).execute();
                 }
             });
         });

@@ -1,6 +1,5 @@
 package com.ims.components;
 
-import com.ims.Config;
 import com.ims.utils.CountdownTimer;
 import com.ims.utils.LayoutUtils;
 import com.ims.utils.TextFieldValidator;
@@ -66,13 +65,13 @@ public class ConfirmationCodeModal extends Modal {
         codeTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             if (this.listener == null) return;
-            if (!codeTextFieldValidator.isValid()) return;
+            if (!codeTextFieldValidator.isValidSync()) return;
             this.listener.call();
         });
         
         continueButton.setOnAction(e -> {
             if (this.listener == null) return;
-            if (!codeTextFieldValidator.isValid()) return;
+            if (!codeTextFieldValidator.isValidSync()) return;
             this.listener.call();
         });
     }

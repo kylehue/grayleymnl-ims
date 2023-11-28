@@ -55,7 +55,7 @@ public class RegisterController {
             "This email address already exists.",
             () -> {
                 String email = emailTextField.getText();
-                return !RegisterModel.emailExists(email);
+                return RegisterModel.emailNotExists(email);
             },
             registerButton.armedProperty()
         );
@@ -129,13 +129,15 @@ public class RegisterController {
     }
     
     private void tryRegister() {
-        if (
-            emailTextFieldValidator.isValid() &&
-                passwordTextFieldValidator.isValid() &&
-                confirmPasswordTextFieldValidator.isValid()
-        ) {
-            RegisterModel.register();
-        }
+        TextFieldValidator.validateAll(
+            emailTextFieldValidator,
+            passwordTextFieldValidator,
+            confirmPasswordTextFieldValidator
+        ).onSucceeded(isValid -> {
+            if (isValid) {
+                RegisterModel.register();
+            }
+        }).execute();
     }
     
     private void initializeNetworkAnimation() {

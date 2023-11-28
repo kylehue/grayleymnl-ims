@@ -62,8 +62,8 @@ public class UserObject {
         return password.get();
     }
     
-    public void setPassword(String password) {
-        this.password.set(password);
+    public void setPassword(String hashedPassword) {
+        this.password.set(hashedPassword);
     }
     
     public ObjectProperty<Date> joinedDateProperty() {

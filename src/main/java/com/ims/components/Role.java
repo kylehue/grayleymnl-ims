@@ -1,7 +1,6 @@
 package com.ims.components;
 
 import com.ims.Config;
-import com.ims.model.BaseModel;
 import com.ims.model.UserManagerModel;
 import com.ims.model.objects.RoleObject;
 import com.ims.utils.LayoutUtils;
@@ -12,7 +11,6 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -119,7 +117,7 @@ public class Role extends GridPane {
                 muteSaveListener = false;
                 return;
             }
-            if (!nameTextFieldValidator.isValid()) return;
+            if (!nameTextFieldValidator.isValidSync()) return;
             if (nameTextField.delegateIsFocused()) return;
             
             UserManagerModel.updateRole(

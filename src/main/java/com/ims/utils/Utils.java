@@ -20,11 +20,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Utils {
+    public static final ExecutorService executor = Executors.newFixedThreadPool(8);
+    
     public static String formatDate(LocalDateTime date) {
         LocalDate today = LocalDateTime.now().toLocalDate();
         LocalDate yesterday = today.minusDays(1);
