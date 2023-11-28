@@ -14,7 +14,7 @@ public abstract class Config {
     /**
      * The threshold rate indicating when a product's stock is considered low.
      */
-    public final static float lowStockRate = 0.33f; // 33%
+    public final static float lowStockRate = 0.4f; // 40%
     public final static int productLoadLimit = 9;
     public final static int categoryLoadLimit = 12;
     public final static int roleLoadLimit = 9;
