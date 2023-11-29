@@ -1,12 +1,10 @@
 * {
     /* colors */
     -accent: #3e7bed;
-    -accent-glass: rgba(62, 123, 237, 0.1);
     -text-color: #4d4d51;
     -text-color-fade: #6e6e71;
     -text-color-fader: #818184;
     -button-text-color: #f3f4f6;
-    -button-hovered-color: #4b86f4;
     -tag-button-background-color: #ebedf1;
     -tag-button-hover-background-color: #e1e3e8;
     -text-field-background-color: #fafafc;
@@ -16,13 +14,10 @@
     -card-background-color: white;
     -card-border-color: white;
 
-    -danger: #ff6060;
-    -danger-hover: #ff6f6f;
-    -danger-glass: rgba(255, 111, 111, 0.1);
-
+    -info: #4894ff;
     -success: #14c84e;
     -warning: #ffa740;
-    -info: #4894ff;
+    -danger: #ff6060;
 
     /* sizes */
     -field-height: 50px;
