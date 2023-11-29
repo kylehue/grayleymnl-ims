@@ -386,7 +386,7 @@ public class DBProducts {
                 AND (
                     CAST(current_stocks AS float) /
                     CAST(expected_stocks AS float)
-                ) < %s;
+                ) <= %s;
                 """.formatted(Config.lowStockRate);
             Connection connection = Database.getConnection();
             if (connection == null || connection.isClosed()) {
