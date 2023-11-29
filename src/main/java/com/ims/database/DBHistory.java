@@ -67,7 +67,12 @@ public abstract class DBHistory {
                 RETURNING *;
                 """;
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, action.getCode());
             preparedStatement.setObject(2, subject);
             preparedStatement.setObject(3, userID);
@@ -101,7 +106,12 @@ public abstract class DBHistory {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);

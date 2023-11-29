@@ -16,8 +16,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Database {
-    private static Connection connection;
-    private static final BooleanProperty isConnected = new SimpleBooleanProperty(false);
+    private static Connection connection = null;
+    private static final BooleanProperty isConnected = new SimpleBooleanProperty(true);
     
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     
@@ -26,6 +26,17 @@ public class Database {
     }
     
     public static Connection getConnection() {
+        try {
+            if (connection != null) {
+                isConnected.set(!connection.isClosed());
+            } else {
+                isConnected.set(false);
+            }
+        } catch (SQLException e) {
+            isConnected.set(false);
+            e.printStackTrace();
+        }
+        
         return connection;
     }
     
@@ -39,6 +50,7 @@ public class Database {
     }
     
     public static void connect() {
+        initializeReconnector();
         try {
             Class.forName("org.postgresql.Driver");
             
@@ -62,7 +74,6 @@ public class Database {
             if (connection != null) {
                 System.out.println("Successfully connected to the database.");
                 isConnected.set(true);
-                initializeReconnector();
             } else {
                 System.out.println("Database connection has failed.");
                 isConnected.set(false);
@@ -102,6 +113,10 @@ public class Database {
         isInitializedReconnector = true;
         
         scheduler.scheduleAtFixedRate(() -> {
+            if (connection == null)  {
+                isConnected.set(false);
+                return;
+            }
             try {
                 Statement statement = connection.createStatement();
                 statement.execute("SELECT 1");
@@ -109,6 +124,7 @@ public class Database {
             } catch (SQLException e) {
                 isConnected.set(false);
                 Database.connect();
+                System.out.println(e);
             }
         }, 0, 10, TimeUnit.SECONDS);
     }

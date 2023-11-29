@@ -32,7 +32,12 @@ public class DBUsers {
                 DBUsers.Column.PASSWORD
             );
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, email);
             preparedStatement.setString(2, password);
             resultSet = preparedStatement.executeQuery();
@@ -67,7 +72,12 @@ public class DBUsers {
                 RETURNING *;
                 """;
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, password);
             preparedStatement.setObject(2, roleID);
             preparedStatement.setObject(3, isDisabled);
@@ -94,7 +104,12 @@ public class DBUsers {
                 SET is_owner = CASE WHEN id = ? THEN true ELSE false END;
                 """;
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, userID);
             preparedStatement.executeQuery();
         } catch (SQLException e) {
@@ -114,7 +129,12 @@ public class DBUsers {
                 AND is_owner=false;
                 """;
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
         } catch (SQLException e) {
@@ -197,7 +217,12 @@ public class DBUsers {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -225,7 +250,12 @@ public class DBUsers {
                 """.formatted(
                 columnLabel
             );
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -258,7 +288,12 @@ public class DBUsers {
                 ) ~* ?
                 ORDER BY u.joined_date DESC, u.id;
                 """;
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);

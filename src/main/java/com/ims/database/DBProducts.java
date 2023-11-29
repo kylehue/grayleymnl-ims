@@ -42,7 +42,12 @@ public class DBProducts {
                 RETURNING *;
                 """;
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, name);
             preparedStatement.setInt(2, categoryID);
             preparedStatement.setString(3, imageURL);
@@ -84,7 +89,12 @@ public class DBProducts {
                 RETURNING *;
                 """;
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, name);
             preparedStatement.setObject(2, price);
             preparedStatement.setObject(3, categoryID);
@@ -113,7 +123,12 @@ public class DBProducts {
                 WHERE id = ?;
                 """;
             
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
             row = extractRowsFromResultSet(resultSet).get(0);
@@ -199,7 +214,12 @@ public class DBProducts {
                         .map(Object::toString)
                         .collect(Collectors.joining(", "))
             );
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, length);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -235,7 +255,12 @@ public class DBProducts {
                 """.formatted(
                 columnLabel
             );
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setObject(1, compareValue);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -276,7 +301,12 @@ public class DBProducts {
                             "'" + String.join("', '", categories) + "'"
                         )
             );
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, regexPattern);
             resultSet = preparedStatement.executeQuery();
             rows = extractRowsFromResultSet(resultSet);
@@ -297,7 +327,12 @@ public class DBProducts {
             String query = """
                 SELECT COUNT(*) AS count FROM products;
                 """;
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             count = resultSet.getInt("count");
@@ -320,7 +355,12 @@ public class DBProducts {
                 SELECT COUNT(*) AS count FROM products
                 WHERE current_stocks = 0;
                 """;
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             count = resultSet.getInt("count");
@@ -348,7 +388,12 @@ public class DBProducts {
                     CAST(expected_stocks AS float)
                 ) < %s;
                 """.formatted(Config.lowStockRate);
-            preparedStatement = Database.getConnection().prepareStatement(query);
+            Connection connection = Database.getConnection();
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("You are not connected to the database.");
+            }
+            
+            preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             count = resultSet.getInt("count");
