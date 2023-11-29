@@ -202,7 +202,7 @@ public class DBUsers {
         Set<Integer> excludeID,
         int length
     ) {
-        UserListData rows = null;
+        UserListData rows = new UserListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -239,7 +239,7 @@ public class DBUsers {
         DBUsers.Column columnLabel,
         Object compareValue
     ) {
-        UserListData rows = null;
+        UserListData rows = new UserListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -271,7 +271,7 @@ public class DBUsers {
     public static UserListData search(
         String regexPattern
     ) {
-        UserListData rows = null;
+        UserListData rows = new UserListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         

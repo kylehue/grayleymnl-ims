@@ -2,6 +2,8 @@ package com.ims.database;
 
 import com.ims.Config;
 import com.ims.utils.Env;
+import com.ims.utils.SceneManager;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -14,6 +16,7 @@ import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Database {
     private static Connection connection = null;
@@ -112,19 +115,38 @@ public class Database {
         }
         isInitializedReconnector = true;
         
+        AtomicReference<String> oldScene = new AtomicReference<>();
+        Database.isConnectedProperty().addListener(e -> {
+            Platform.runLater(() -> {
+                if (!Database.isConnectedProperty().get()) {
+                    oldScene.set(SceneManager.getCurrentSceneID());
+                    SceneManager.setScene("disconnected");
+                } else {
+                    if (oldScene.get() != null) {
+                        SceneManager.setScene(oldScene.get());
+                    }
+                }
+            });
+        });
+        
         scheduler.scheduleAtFixedRate(() -> {
-            if (connection == null)  {
-                isConnected.set(false);
-                return;
-            }
+            boolean _isConnected = true;
             try {
-                Statement statement = connection.createStatement();
-                statement.execute("SELECT 1");
-                isConnected.set(!connection.isClosed());
+                if (connection == null)  {
+                    _isConnected = false;
+                } else {
+                    Statement statement = connection.createStatement();
+                    statement.execute("SELECT 1");
+                    _isConnected = !connection.isClosed();
+                }
             } catch (SQLException e) {
-                isConnected.set(false);
-                Database.connect();
+                _isConnected = false;
                 System.out.println(e);
+            }
+            
+            isConnected.set(_isConnected);
+            if (!_isConnected) {
+                Database.connect();
             }
         }, 0, 10, TimeUnit.SECONDS);
     }

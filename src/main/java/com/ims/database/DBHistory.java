@@ -91,7 +91,7 @@ public abstract class DBHistory {
         Set<Integer> excludeID,
         int length
     ) {
-        HistoryListData rows = null;
+        HistoryListData rows = new HistoryListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {

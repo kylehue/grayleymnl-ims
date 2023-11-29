@@ -54,20 +54,6 @@ public class Launcher extends Application {
             Platform.exit();
             System.exit(0);
         });
-        
-        AtomicReference<String> oldScene = new AtomicReference<>();
-        Database.isConnectedProperty().addListener(e -> {
-            Platform.runLater(() -> {
-                if (!Database.isConnectedProperty().get()) {
-                    oldScene.set(SceneManager.getCurrentSceneID());
-                    SceneManager.setScene("disconnected");
-                } else {
-                    if (oldScene.get() != null) {
-                        SceneManager.setScene(oldScene.get());
-                    }
-                }
-            });
-        });
     }
     
     public static void execute() {

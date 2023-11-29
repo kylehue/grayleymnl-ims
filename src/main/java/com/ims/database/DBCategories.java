@@ -130,7 +130,7 @@ public class DBCategories {
         Set<Integer> excludeID,
         int length
     ) {
-        CategoryListData rows = null;
+        CategoryListData rows = new CategoryListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -173,7 +173,7 @@ public class DBCategories {
         Column columnLabel,
         Object compareValue
     ) {
-        CategoryListData rows = null;
+        CategoryListData rows = new CategoryListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -205,7 +205,7 @@ public class DBCategories {
     public static CategoryListData search(
         String regexPattern
     ) {
-        CategoryListData rows = null;
+        CategoryListData rows = new CategoryListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         

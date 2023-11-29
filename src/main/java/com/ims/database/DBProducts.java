@@ -199,7 +199,7 @@ public class DBProducts {
         Set<Integer> excludeID,
         int length
     ) {
-        ProductListData rows = null;
+        ProductListData rows = new ProductListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -243,7 +243,7 @@ public class DBProducts {
         Column columnLabel,
         Object compareValue
     ) {
-        ProductListData rows = null;
+        ProductListData rows = new ProductListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -277,7 +277,7 @@ public class DBProducts {
         String regexPattern,
         String... categories
     ) {
-        ProductListData rows = null;
+        ProductListData rows = new ProductListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -347,7 +347,6 @@ public class DBProducts {
     
     public static int getOutOfStockProductsCount() {
         int count = 0;
-        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -375,7 +374,6 @@ public class DBProducts {
     
     public static int getLowStockProductsCount() {
         int count = 0;
-        ProductListData rows = null;
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {

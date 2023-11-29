@@ -186,7 +186,7 @@ public class DBRoles {
         Set<Integer> excludeID,
         int length
     ) {
-        RoleListData rows = null;
+        RoleListData rows = new RoleListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -223,7 +223,7 @@ public class DBRoles {
         DBRoles.Column columnLabel,
         Object compareValue
     ) {
-        RoleListData rows = null;
+        RoleListData rows = new RoleListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
@@ -255,7 +255,7 @@ public class DBRoles {
     public static RoleListData search(
         String regexPattern
     ) {
-        RoleListData rows = null;
+        RoleListData rows = new RoleListData();
         ResultSet resultSet = null;
         PreparedStatement preparedStatement = null;
         
