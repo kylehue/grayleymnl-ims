@@ -28,12 +28,16 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class Product extends GridPane {
     private ProductObject productObject;
     private final ObservableList<String> styleClass = this.getStyleClass();
     
     private final GridPane textGridPane = LayoutUtils.createGridPane(3, 1);
     private final ImageView imgView = new ImageView();
+    private Image img = null;
     private final StackPane imgContainer = new StackPane(imgView);
     private final MFXProgressSpinner imgProgressSpinner = new MFXProgressSpinner();
     
@@ -49,6 +53,7 @@ public class Product extends GridPane {
     private final ObjectProperty<Integer> currentStocks = new SimpleObjectProperty<>(0);
     private final ObjectProperty<Integer> expectedStocks = new SimpleObjectProperty<>(0);
     private final ObjectProperty<Double> price = new SimpleObjectProperty<>();
+    private static final HashMap<String, Image> cachedImages = new HashMap<>();
     
     public Product() {
         this.styleClass.add("card");
@@ -236,20 +241,25 @@ public class Product extends GridPane {
         if (imageUrl.isEmpty()) return;
         imgProgressSpinner.setVisible(true);
         
-        Image img = new Image(imageUrl, true);
-        img.progressProperty().addListener(($1, $2, progress) -> {
-            if (progress.doubleValue() >= 1) {
+        img = cachedImages.get(imageUrl);
+        if (img == null) {
+            img = new Image(imageUrl, true);
+            cachedImages.put(imageUrl, img);
+            
+            img.progressProperty().addListener(($1, $2, progress) -> {
+                if (progress.doubleValue() >= 1) {
+                    imgProgressSpinner.setVisible(false);
+                } else {
+                    imgProgressSpinner.setVisible(true);
+                }
+            });
+            
+            img.errorProperty().addListener(e -> {
+                if (!img.isError()) return;
                 imgProgressSpinner.setVisible(false);
-            } else {
-                imgProgressSpinner.setVisible(true);
-            }
-        });
-        
-        img.errorProperty().addListener(e -> {
-            if (!img.isError()) return;
-            imgProgressSpinner.setVisible(false);
-            setToDefaultImage();
-        });
+                setToDefaultImage();
+            });
+        }
         
         Platform.runLater(() -> {
             this.imgView.setImage(img);
