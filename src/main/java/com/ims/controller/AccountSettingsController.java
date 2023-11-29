@@ -121,42 +121,43 @@ public class AccountSettingsController {
         );
         
         updatePasswordButton.setOnMouseClicked(e -> {
-            TextFieldValidator.validateAll(
-                oldPasswordFieldValidator,
-                newPasswordFieldValidator,
-                confirmNewPasswordTextFieldValidator
-            ).onSucceeded(isValid -> {
-                if (!isValid) return;
-                oldPasswordField.setDisable(true);
-                newPasswordField.setDisable(true);
-                confirmNewPasswordField.setDisable(true);
-                PopupService.confirmDialog.setup(
-                    "Update Password",
-                    "Are you sure you want to update your password?",
-                    "Update",
-                    false,
-                    () -> {
-                        String password = confirmNewPasswordField.getText();
-                        UserSessionModel.updatePassword(password);
-                        
-                        oldPasswordField.setText("");
-                        newPasswordField.setText("");
-                        confirmNewPasswordField.setText("");
-                        
-                        oldPasswordFieldValidator.reset();
-                        newPasswordFieldValidator.reset();
-                        confirmNewPasswordTextFieldValidator.reset();
-                        
-                        PopupService.confirmDialog.hide();
-                        
-                        PopupService.messageDialog.setup(
-                            "Update Password",
-                            "Your password has been updated.",
-                            "Got it!"
-                        ).show();
-                    }
-                ).show();
-            }).execute();
+            if (
+                !oldPasswordFieldValidator.isValid() ||
+                    !newPasswordFieldValidator.isValid() ||
+                    !confirmNewPasswordTextFieldValidator.isValid()
+            ) {
+                return;
+            }
+            
+            oldPasswordField.setDisable(true);
+            newPasswordField.setDisable(true);
+            confirmNewPasswordField.setDisable(true);
+            PopupService.confirmDialog.setup(
+                "Update Password",
+                "Are you sure you want to update your password?",
+                "Update",
+                false,
+                () -> {
+                    String password = confirmNewPasswordField.getText();
+                    UserSessionModel.updatePassword(password);
+                    
+                    oldPasswordField.setText("");
+                    newPasswordField.setText("");
+                    confirmNewPasswordField.setText("");
+                    
+                    oldPasswordFieldValidator.reset();
+                    newPasswordFieldValidator.reset();
+                    confirmNewPasswordTextFieldValidator.reset();
+                    
+                    PopupService.confirmDialog.hide();
+                    
+                    PopupService.messageDialog.setup(
+                        "Update Password",
+                        "Your password has been updated.",
+                        "Got it!"
+                    ).show();
+                }
+            ).show();
         });
         
         PopupService.confirmDialog.showingProperty().addListener(e -> {

@@ -215,7 +215,7 @@ public class ProductController {
         
         saveAllButton.setOnMouseClicked(e -> {
             if (
-                !productNameTextFieldValidator.isValidSync() || !productCategoryComboBoxValidator.isValidSync()
+                !productNameTextFieldValidator.isValid() || !productCategoryComboBoxValidator.isValid()
             ) {
                 tabGeneralButton.fire();
                 return;

@@ -59,13 +59,13 @@ public class RoleAddModal extends Modal {
         nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             if (this.listener == null) return;
-            if (!nameTextFieldValidator.isValidSync()) return;
+            if (!nameTextFieldValidator.isValid()) return;
             this.listener.call();
         });
         
         addButton.setOnAction(e -> {
             if (this.listener == null) return;
-            if (!nameTextFieldValidator.isValidSync()) return;
+            if (!nameTextFieldValidator.isValid()) return;
             this.listener.call();
         });
     }

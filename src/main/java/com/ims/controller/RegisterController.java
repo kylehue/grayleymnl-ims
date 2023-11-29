@@ -9,6 +9,8 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.ImageView;
@@ -43,6 +45,7 @@ public class RegisterController {
     private TextFieldValidator emailTextFieldValidator;
     private TextFieldValidator passwordTextFieldValidator;
     private TextFieldValidator confirmPasswordTextFieldValidator;
+    private final BooleanProperty emailExistsProperty = new SimpleBooleanProperty(false);
     
     @FXML
     public void initialize() {
@@ -57,11 +60,9 @@ public class RegisterController {
         emailTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
             "This email address already exists.",
-            () -> {
-                String email = emailTextField.getText();
-                return RegisterModel.emailNotExists(email);
-            },
-            registerButton.armedProperty()
+            () -> !emailExistsProperty.get(),
+            registerButton.armedProperty(),
+            emailExistsProperty
         );
         emailTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
@@ -139,14 +140,18 @@ public class RegisterController {
     }
     
     private void tryRegister() {
-        TextFieldValidator.validateAll(
-            emailTextFieldValidator,
-            passwordTextFieldValidator,
-            confirmPasswordTextFieldValidator
-        ).onSucceeded(isValid -> {
-            if (isValid) {
-                RegisterModel.register();
+        RegisterModel.emailExists(emailTextField.getText()).onSucceeded(emailExists -> {
+            emailExistsProperty.set(emailExists);
+            
+            if (
+                !emailTextFieldValidator.isValid() ||
+                    !passwordTextFieldValidator.isValid() ||
+                    !confirmPasswordTextFieldValidator.isValid()
+            ) {
+                return;
             }
+            
+            RegisterModel.register();
         }).execute();
     }
     

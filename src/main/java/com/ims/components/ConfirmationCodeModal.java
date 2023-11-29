@@ -68,13 +68,13 @@ public class ConfirmationCodeModal extends Modal {
         codeTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() != KeyCode.ENTER) return;
             if (this.listener == null) return;
-            if (!codeTextFieldValidator.isValidSync()) return;
+            if (!codeTextFieldValidator.isValid()) return;
             this.listener.call();
         });
         
         continueButton.setOnAction(e -> {
             if (this.listener == null) return;
-            if (!codeTextFieldValidator.isValidSync()) return;
+            if (!codeTextFieldValidator.isValid()) return;
             this.listener.call();
         });
     }

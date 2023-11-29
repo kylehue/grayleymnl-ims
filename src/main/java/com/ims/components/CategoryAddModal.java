@@ -59,13 +59,13 @@ public class CategoryAddModal extends Modal {
         nameTextField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (this.listener == null) return;
             if (e.getCode() != KeyCode.ENTER) return;
-            if (!nameTextFieldValidator.isValidSync()) return;
+            if (!nameTextFieldValidator.isValid()) return;
             this.listener.call();
         });
         
         addButton.setOnAction(e -> {
             if (this.listener == null) return;
-            if (!nameTextFieldValidator.isValidSync()) return;
+            if (!nameTextFieldValidator.isValid()) return;
             this.listener.call();
         });
     }

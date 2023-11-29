@@ -118,7 +118,7 @@ public class Role extends GridPane {
                 muteSaveListener = false;
                 return;
             }
-            if (!nameTextFieldValidator.isValidSync()) return;
+            if (!nameTextFieldValidator.isValid()) return;
             if (nameTextField.delegateIsFocused()) return;
             
             UserManagerModel.updateRole(

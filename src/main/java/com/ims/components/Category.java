@@ -92,7 +92,7 @@ public class Category extends GridPane {
         nameTextField.setContextMenuDisabled(true);
         nameTextField.delegateFocusedProperty().addListener((e) -> {
             if (nameTextField.delegateIsFocused()) return;
-            if (!this.nameTextFieldValidator.isValidSync()) {
+            if (!this.nameTextFieldValidator.isValid()) {
                 return;
             }
             

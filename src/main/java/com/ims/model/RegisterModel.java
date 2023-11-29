@@ -63,20 +63,4 @@ public abstract class RegisterModel {
             isBusyRegister.set(false);
         });
     }
-    
-    public static AsyncCaller<Boolean> emailNotExists(String email) {
-        return new AsyncCaller<Boolean>(task -> {
-            if (isBusyRegister.get()) {
-                System.out.println("Action is taken too fast.");
-                return null;
-            }
-            isBusyRegister.set(true);
-            
-            return DBUsers.get(DBUsers.Column.EMAIL, email).isEmpty();
-        }, Utils.executor).onSucceeded(e -> {
-            isBusyRegister.set(false);
-        }).onFailed(e -> {
-            isBusyRegister.set(false);
-        });
-    }
 }

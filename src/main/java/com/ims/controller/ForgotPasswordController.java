@@ -6,11 +6,14 @@ import com.ims.components.PopupService;
 import com.ims.database.DBUsers;
 import com.ims.model.LoginModel;
 import com.ims.model.RegisterModel;
+import com.ims.model.UserManagerModel;
 import com.ims.utils.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -43,6 +46,7 @@ public class ForgotPasswordController {
     private TextFieldValidator emailTextFieldValidator;
     
     ConfirmationCodeModal confirmationCodeModal = new ConfirmationCodeModal();
+    private final BooleanProperty emailExistsProperty = new SimpleBooleanProperty(false);
     
     @FXML
     public void initialize() {
@@ -58,11 +62,9 @@ public class ForgotPasswordController {
         emailTextFieldValidator.addConstraint(
             TextFieldValidator.Severity.ERROR,
             "This email address doesn't exist.",
-            () -> {
-                String email = emailTextField.getText();
-                return RegisterModel.emailExists(email);
-            },
-            continueButton.armedProperty()
+            () -> emailExistsProperty.get(),
+            continueButton.armedProperty(),
+            emailExistsProperty
         );
         
         emailTextFieldValidator.addConstraint(
@@ -89,9 +91,12 @@ public class ForgotPasswordController {
     }
     
     private void tryProceed() {
-        TextFieldValidator.validateAll(emailTextFieldValidator).onSucceeded(isValid -> {
-            if (!isValid) return;
-            String email = emailTextField.getText();
+        String email = emailTextField.getText();
+        
+        RegisterModel.emailExists(email).onSucceeded(emailExists -> {
+            emailExistsProperty.set(emailExists);
+            
+            if (!emailTextFieldValidator.isValid()) return;
             
             String confirmationCode = Utils.generateRandomCode(6);
             
@@ -116,9 +121,15 @@ public class ForgotPasswordController {
                     
                     // Change user's password
                     String newPassword = Utils.generateRandomCode(12);
+                    String hashedPassword = Utils.hashPassword(newPassword);
+                    
+                    UserManagerModel.loadAndGetUser(userData.getID()).onSucceeded(userObject -> {
+                        userObject.setPassword(hashedPassword);
+                    }).execute();
+                    
                     DBUsers.update(
                         userData.getID(),
-                        Utils.hashPassword(newPassword),
+                        hashedPassword,
                         null,
                         null,
                         null
